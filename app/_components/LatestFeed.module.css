@@ -1,0 +1,133 @@
+.wrapper {
+  background-color: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pulse {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  flex-shrink: 0;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+.heading {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.updateNote {
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  color: var(--color-ink-muted);
+  margin-left: auto;
+}
+
+.feed {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.item:nth-child(even) {
+  border-right: none;
+}
+
+.item:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+
+.item:hover {
+  background-color: var(--color-bg);
+}
+
+.itemLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  min-width: 64px;
+}
+
+.time {
+  font-family: var(--font-serif);
+  font-size: 0.68rem;
+  color: var(--color-ink-muted);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-ink);
+  transition: color 0.15s ease;
+}
+
+.item:hover .title {
+  color: var(--color-accent);
+}
+
+.readTime {
+  font-family: var(--font-serif);
+  font-size: 0.68rem;
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse { animation: none; }
+}
+
+@media (max-width: 768px) {
+  .feed {
+    grid-template-columns: 1fr;
+  }
+
+  .item:nth-child(even) {
+    border-right: none;
+  }
+
+  .item:nth-last-child(-n+2) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .item:last-child {
+    border-bottom: none;
+  }
+}
