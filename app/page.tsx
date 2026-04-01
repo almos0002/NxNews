@@ -1,70 +1,96 @@
+import BreakingTicker from "./_components/BreakingTicker";
+import Header from "./_components/Header";
+import ArticleCard from "./_components/ArticleCard";
+import SectionHeading from "./_components/SectionHeading";
+import TrendingSidebar from "./_components/TrendingSidebar";
+import Footer from "./_components/Footer";
+import {
+  breakingHeadline,
+  featuredArticle,
+  sidebarArticles,
+  gridArticles,
+  opinionArticles,
+} from "./_data/articles";
+import styles from "./page.module.css";
+
 export default function Home() {
   return (
-    <main
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        padding: "2rem",
-        gap: "1.5rem",
-        fontFamily: "Arial, Helvetica, sans-serif",
-      }}
-    >
-      <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>
-        Welcome to Next.js 16
-      </h1>
-      <p style={{ fontSize: "1.125rem", color: "#6b7280", textAlign: "center" }}>
-        Get started by editing{" "}
-        <code
-          style={{
-            fontFamily: "monospace",
-            backgroundColor: "#f3f4f6",
-            padding: "0.2rem 0.4rem",
-            borderRadius: "0.25rem",
-          }}
-        >
-          app/page.tsx
-        </code>
-      </p>
-      <div
-        style={{
-          display: "flex",
-          gap: "1rem",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          marginTop: "1rem",
-        }}
-      >
-        <a
-          href="https://nextjs.org/docs"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            padding: "0.75rem 1.5rem",
-            backgroundColor: "#000",
-            color: "#fff",
-            borderRadius: "0.5rem",
-            fontWeight: "600",
-          }}
-        >
-          Docs
-        </a>
-        <a
-          href="https://nextjs.org/learn"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            padding: "0.75rem 1.5rem",
-            border: "1px solid #d1d5db",
-            borderRadius: "0.5rem",
-            fontWeight: "600",
-          }}
-        >
-          Learn
-        </a>
-      </div>
-    </main>
+    <>
+      <BreakingTicker headline={breakingHeadline} />
+      <Header />
+
+      <main className={styles.main}>
+        <section className={styles.heroSection}>
+          <div className={styles.heroLeft}>
+            <ArticleCard article={featuredArticle} variant="hero" />
+          </div>
+          <div className={styles.heroRight}>
+            <div className={styles.heroRightHeading}>
+              <SectionHeading title="Latest" />
+            </div>
+            {sidebarArticles.map((article) => (
+              <ArticleCard
+                key={article.id}
+                article={article}
+                variant="sidebar"
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.gridSection}>
+          <div className={styles.gridMain}>
+            <SectionHeading title="Top Stories" />
+            <div className={styles.articleGrid}>
+              {gridArticles.map((article) => (
+                <ArticleCard key={article.id} article={article} variant="grid" />
+              ))}
+            </div>
+          </div>
+          <div className={styles.gridSide}>
+            <TrendingSidebar />
+          </div>
+        </section>
+
+        <section className={styles.opinionSection}>
+          <SectionHeading title="Opinion" />
+          <div className={styles.opinionGrid}>
+            {opinionArticles.map((article) => (
+              <ArticleCard
+                key={article.id}
+                article={article}
+                variant="compact"
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.newsletter}>
+          <div className={styles.newsletterInner}>
+            <div className={styles.newsletterContent}>
+              <h2 className={styles.newsletterTitle}>The Morning Briefing</h2>
+              <p className={styles.newsletterText}>
+                Start every day informed. Our editors curate the most important
+                stories delivered straight to your inbox before 7 AM.
+              </p>
+            </div>
+            <form className={styles.newsletterForm} action="#" onSubmit={undefined}>
+              <input
+                type="email"
+                placeholder="Your email address"
+                className={styles.newsletterInput}
+                aria-label="Email address"
+                required
+              />
+              <button type="submit" className={styles.newsletterButton}>
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </>
   );
 }

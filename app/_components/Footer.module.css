@@ -1,0 +1,138 @@
+.footer {
+  background-color: var(--color-ink);
+  color: #ffffff;
+  margin-top: 80px;
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.topRule {
+  height: 4px;
+  background-color: var(--color-accent);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr;
+  gap: 48px;
+  padding: 48px 0;
+}
+
+.brand {
+  padding-right: 32px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.description {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: #aaaaaa;
+}
+
+.columnTitle {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.linkList li {
+  margin-bottom: 10px;
+}
+
+.linkList a {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: #aaaaaa;
+  transition: color 0.15s ease;
+}
+
+.linkList a:hover {
+  color: #ffffff;
+}
+
+.subscribeText {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #aaaaaa;
+  margin-bottom: 20px;
+}
+
+.subscribeBtn {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  transition: background-color 0.15s ease;
+}
+
+.subscribeBtn:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-top: 1px solid #333333;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: #666666;
+}
+
+.bottomLinks {
+  display: flex;
+  gap: 24px;
+}
+
+.bottomLinks a {
+  color: #666666;
+  transition: color 0.15s ease;
+}
+
+.bottomLinks a:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .bottom {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}

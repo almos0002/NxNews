@@ -1,0 +1,26 @@
+.badge {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  line-height: 1;
+}
+
+.dark {
+  background-color: var(--color-ink);
+  color: var(--color-category-text);
+}
+
+.outline {
+  background-color: transparent;
+  color: var(--color-ink);
+  border: 1px solid var(--color-ink);
+}
+
+.accent {
+  background-color: var(--color-accent);
+  color: #ffffff;
+}

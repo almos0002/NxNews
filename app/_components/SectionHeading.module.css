@@ -1,0 +1,18 @@
+.wrapper {
+  margin-bottom: 28px;
+}
+
+.rule {
+  height: 3px;
+  background-color: var(--color-ink);
+  margin-bottom: 12px;
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}

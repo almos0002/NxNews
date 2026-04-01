@@ -1,0 +1,202 @@
+.main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.heroSection {
+  display: grid;
+  grid-template-columns: 7fr 4fr;
+  gap: 32px;
+  padding: 32px 0 48px;
+  border-bottom: 1px solid var(--color-rule-light);
+}
+
+.heroLeft {
+  border-right: 1px solid var(--color-rule-light);
+  padding-right: 32px;
+}
+
+.heroRight {
+  display: flex;
+  flex-direction: column;
+}
+
+.heroRightHeading {
+  margin-bottom: 4px;
+}
+
+.gridSection {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+  padding: 48px 0;
+  border-bottom: 1px solid var(--color-rule-light);
+}
+
+.gridMain {
+  min-width: 0;
+}
+
+.articleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.gridSide {
+  padding-top: 0;
+}
+
+.opinionSection {
+  padding: 48px 0;
+  border-bottom: 1px solid var(--color-rule-light);
+}
+
+.opinionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0 40px;
+}
+
+.opinionGrid > :nth-child(1),
+.opinionGrid > :nth-child(2) {
+  border-right: 1px solid var(--color-rule-light);
+  padding-right: 40px;
+}
+
+.newsletter {
+  padding: 56px 0;
+}
+
+.newsletterInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  border: 2px solid var(--color-ink);
+  padding: 40px 48px;
+}
+
+.newsletterContent {
+  flex: 1;
+}
+
+.newsletterTitle {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.newsletterText {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: var(--color-ink-light);
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+.newsletterForm {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.newsletterInput {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  padding: 14px 20px;
+  border: 1px solid var(--color-rule-light);
+  border-right: none;
+  outline: none;
+  width: 260px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.newsletterInput:focus {
+  border-color: var(--color-ink);
+}
+
+.newsletterInput::placeholder {
+  color: var(--color-ink-muted);
+}
+
+.newsletterButton {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  border: 1px solid var(--color-accent);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.newsletterButton:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+@media (max-width: 1024px) {
+  .heroSection {
+    grid-template-columns: 1fr;
+  }
+
+  .heroLeft {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid var(--color-rule-light);
+    padding-bottom: 32px;
+  }
+
+  .gridSection {
+    grid-template-columns: 1fr;
+  }
+
+  .opinionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .opinionGrid > :nth-child(1),
+  .opinionGrid > :nth-child(2) {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .newsletterInner {
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+    padding: 32px;
+  }
+
+  .newsletterForm {
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .newsletterInput {
+    flex: 1;
+    width: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .articleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletterForm {
+    flex-direction: column;
+  }
+
+  .newsletterInput {
+    border-right: 1px solid var(--color-rule-light);
+    border-bottom: none;
+  }
+}
