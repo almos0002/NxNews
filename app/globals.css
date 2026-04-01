@@ -9,7 +9,7 @@
   --color-border: #e0e0dc;
   --color-tag-bg: #f0efeb;
   --font-serif: var(--font-noticia), "Georgia", serif;
-  --font-sans: var(--font-dm-sans), "Helvetica Neue", sans-serif;
+  --font-sans: var(--font-noticia), "Georgia", serif;
   --max-width: 1200px;
   --radius: 6px;
 }
