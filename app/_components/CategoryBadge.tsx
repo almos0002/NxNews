@@ -8,6 +8,9 @@ export default function CategoryBadge({
   variant?: "default" | "accent";
 }) {
   return (
-    <span className={`${styles.badge} ${styles[variant]}`}>{category}</span>
+    <span className={`${styles.badge} ${styles[variant]}`}>
+      {variant === "accent" && <span className={styles.dot} aria-hidden="true" />}
+      {category}
+    </span>
   );
 }
