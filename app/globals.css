@@ -1,18 +1,17 @@
 :root {
-  --color-bg: #faf9f6;
-  --color-paper: #ffffff;
-  --color-ink: #1a1a1a;
-  --color-ink-light: #555555;
-  --color-ink-muted: #888888;
-  --color-accent: #c41e3a;
-  --color-accent-hover: #a01830;
-  --color-rule: #1a1a1a;
-  --color-rule-light: #d4d4d4;
-  --color-category-bg: #1a1a1a;
-  --color-category-text: #ffffff;
+  --color-bg: #f5f5f0;
+  --color-surface: #ffffff;
+  --color-ink: #141414;
+  --color-ink-secondary: #4a4a4a;
+  --color-ink-muted: #8c8c8c;
+  --color-accent: #e63946;
+  --color-accent-hover: #d62839;
+  --color-border: #e0e0dc;
+  --color-tag-bg: #f0efeb;
   --font-serif: var(--font-noticia), "Georgia", serif;
   --font-sans: var(--font-dm-sans), "Helvetica Neue", sans-serif;
-  --max-width: 1280px;
+  --max-width: 1200px;
+  --radius: 6px;
 }
 
 *,
@@ -27,10 +26,11 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   color: var(--color-ink);
   background-color: var(--color-bg);
   line-height: 1.6;

@@ -30,10 +30,10 @@ export default function ArticleCard({
           <h2 className={styles.heroTitle}>{article.title}</h2>
           <p className={styles.heroExcerpt}>{article.excerpt}</p>
           <div className={styles.meta}>
-            <span className={styles.author}>By {article.author}</span>
-            <span className={styles.dot} aria-hidden="true">
-              &middot;
-            </span>
+            <span className={styles.author}>{article.author}</span>
+            <span className={styles.separator}>/</span>
+            <time className={styles.date}>{article.date}</time>
+            <span className={styles.separator}>/</span>
             <span className={styles.readTime}>{article.readTime}</span>
           </div>
         </div>
@@ -44,28 +44,26 @@ export default function ArticleCard({
   if (variant === "sidebar") {
     return (
       <article className={styles.sidebar}>
-        <div className={styles.sidebarContent}>
-          <CategoryBadge category={article.category} variant="outline" />
-          <h3 className={styles.sidebarTitle}>{article.title}</h3>
-          <div className={styles.meta}>
-            <span className={styles.author}>{article.author}</span>
-            <span className={styles.dot} aria-hidden="true">
-              &middot;
-            </span>
-            <span className={styles.readTime}>{article.readTime}</span>
-          </div>
-        </div>
         {article.imageUrl && (
           <div className={styles.sidebarImage}>
             <Image
               src={article.imageUrl}
               alt={article.title}
               fill
-              sizes="120px"
+              sizes="96px"
               style={{ objectFit: "cover" }}
             />
           </div>
         )}
+        <div className={styles.sidebarContent}>
+          <CategoryBadge category={article.category} />
+          <h3 className={styles.sidebarTitle}>{article.title}</h3>
+          <div className={styles.meta}>
+            <span className={styles.author}>{article.author}</span>
+            <span className={styles.separator}>/</span>
+            <span className={styles.readTime}>{article.readTime}</span>
+          </div>
+        </div>
       </article>
     );
   }
@@ -73,15 +71,14 @@ export default function ArticleCard({
   if (variant === "compact") {
     return (
       <article className={styles.compact}>
-        <CategoryBadge category={article.category} variant="outline" />
-        <h3 className={styles.compactTitle}>{article.title}</h3>
-        <p className={styles.compactExcerpt}>{article.excerpt}</p>
-        <div className={styles.meta}>
-          <span className={styles.author}>{article.author}</span>
-          <span className={styles.dot} aria-hidden="true">
-            &middot;
-          </span>
-          <span className={styles.readTime}>{article.readTime}</span>
+        <div className={styles.compactNumber} aria-hidden="true" />
+        <div className={styles.compactContent}>
+          <CategoryBadge category={article.category} />
+          <h3 className={styles.compactTitle}>{article.title}</h3>
+          <p className={styles.compactExcerpt}>{article.excerpt}</p>
+          <div className={styles.meta}>
+            <span className={styles.author}>{article.author}</span>
+          </div>
         </div>
       </article>
     );
@@ -95,7 +92,7 @@ export default function ArticleCard({
             src={article.imageUrl}
             alt={article.title}
             fill
-            sizes="(max-width: 768px) 100vw, 25vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
             style={{ objectFit: "cover" }}
           />
         </div>
@@ -103,12 +100,9 @@ export default function ArticleCard({
       <div className={styles.gridContent}>
         <CategoryBadge category={article.category} />
         <h3 className={styles.gridTitle}>{article.title}</h3>
-        <p className={styles.gridExcerpt}>{article.excerpt}</p>
         <div className={styles.meta}>
           <span className={styles.author}>{article.author}</span>
-          <span className={styles.dot} aria-hidden="true">
-            &middot;
-          </span>
+          <span className={styles.separator}>/</span>
           <span className={styles.readTime}>{article.readTime}</span>
         </div>
       </div>

@@ -21,13 +21,12 @@ export default function Home() {
 
       <main className={styles.main}>
         <section className={styles.heroSection}>
-          <div className={styles.heroLeft}>
-            <ArticleCard article={featuredArticle} variant="hero" />
-          </div>
-          <div className={styles.heroRight}>
-            <div className={styles.heroRightHeading}>
-              <SectionHeading title="Latest" />
-            </div>
+          <ArticleCard article={featuredArticle} variant="hero" />
+        </section>
+
+        <section className={styles.latestSection}>
+          <SectionHeading title="Latest" />
+          <div className={styles.latestGrid}>
             {sidebarArticles.map((article) => (
               <ArticleCard
                 key={article.id}
@@ -38,8 +37,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className={styles.gridSection}>
-          <div className={styles.gridMain}>
+        <section className={styles.storiesSection}>
+          <div className={styles.storiesMain}>
             <SectionHeading title="Top Stories" />
             <div className={styles.articleGrid}>
               {gridArticles.map((article) => (
@@ -47,7 +46,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className={styles.gridSide}>
+          <div className={styles.storiesSide}>
             <TrendingSidebar />
           </div>
         </section>
@@ -67,17 +66,16 @@ export default function Home() {
 
         <section className={styles.newsletter}>
           <div className={styles.newsletterInner}>
-            <div className={styles.newsletterContent}>
-              <h2 className={styles.newsletterTitle}>The Morning Briefing</h2>
-              <p className={styles.newsletterText}>
-                Start every day informed. Our editors curate the most important
-                stories delivered straight to your inbox before 7 AM.
-              </p>
-            </div>
-            <form className={styles.newsletterForm} action="#" onSubmit={undefined}>
+            <span className={styles.newsletterLabel}>Newsletter</span>
+            <h2 className={styles.newsletterTitle}>The Morning Briefing</h2>
+            <p className={styles.newsletterText}>
+              Start every day informed. Our editors curate the most important
+              stories delivered to your inbox before 7 AM.
+            </p>
+            <form className={styles.newsletterForm} action="#">
               <input
                 type="email"
-                placeholder="Your email address"
+                placeholder="Enter your email"
                 className={styles.newsletterInput}
                 aria-label="Email address"
                 required

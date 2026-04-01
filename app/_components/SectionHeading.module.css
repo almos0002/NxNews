@@ -1,18 +1,22 @@
 .wrapper {
-  margin-bottom: 28px;
-}
-
-.rule {
-  height: 3px;
-  background-color: var(--color-ink);
-  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .title {
   font-family: var(--font-sans);
   font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border);
 }

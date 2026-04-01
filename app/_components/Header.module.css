@@ -1,69 +1,57 @@
 .header {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.inner {
   max-width: var(--max-width);
   margin: 0 auto;
-}
-
-.topBar {
+  padding: 0 24px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 24px;
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  color: var(--color-ink-muted);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  justify-content: space-between;
+  height: 60px;
+  gap: 32px;
 }
 
-.date {
-  font-weight: 500;
+.brand {
+  flex-shrink: 0;
 }
 
-.edition {
-  font-weight: 600;
-  color: var(--color-accent);
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.masthead {
-  text-align: center;
-  padding: 20px 24px 16px;
-}
-
-.mastheadRule {
-  height: 3px;
-  background-color: var(--color-ink);
-  margin: 0 auto;
-}
-
-.mastheadRule:first-child {
-  margin-bottom: 16px;
-}
-
-.mastheadRule:last-child {
-  margin-top: 12px;
-}
-
-.title {
+.logoMark {
   font-family: var(--font-serif);
-  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-size: 0.9rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  text-transform: uppercase;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
 }
 
-.tagline {
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  color: var(--color-ink-muted);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-top: 6px;
+.logoText {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
 }
 
 .nav {
-  border-top: 1px solid var(--color-rule-light);
-  border-bottom: 1px solid var(--color-rule-light);
+  flex: 1;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -74,52 +62,64 @@
 
 .navList {
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 0;
-  padding: 0 24px;
+  gap: 4px;
 }
 
 .navLink {
   display: block;
   font-family: var(--font-sans);
   font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 12px 18px;
-  color: var(--color-ink);
-  transition: color 0.15s ease;
+  font-weight: 500;
+  color: var(--color-ink-secondary);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  transition: background-color 0.15s ease, color 0.15s ease;
   white-space: nowrap;
-  position: relative;
-}
-
-.navLink::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: calc(100% - 36px);
-  height: 2px;
-  background-color: var(--color-accent);
-  transition: transform 0.2s ease;
 }
 
 .navLink:hover {
-  color: var(--color-accent);
+  background-color: var(--color-tag-bg);
+  color: var(--color-ink);
 }
 
-.navLink:hover::after {
-  transform: translateX(-50%) scaleX(1);
+.actions {
+  flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
+.subscribeLink {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-accent);
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  transition: background-color 0.15s ease;
+}
+
+.subscribeLink:hover {
+  background-color: var(--color-accent-hover);
+}
+
+@media (max-width: 900px) {
+  .logoText {
+    display: none;
+  }
+
   .navList {
     justify-content: flex-start;
   }
+}
 
-  .navLink {
-    padding: 10px 14px;
-    font-size: 0.75rem;
+@media (max-width: 600px) {
+  .inner {
+    height: 52px;
+    gap: 12px;
+  }
+
+  .nav {
+    display: none;
   }
 }

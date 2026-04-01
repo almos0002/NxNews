@@ -1,29 +1,19 @@
 .aside {
-  border-left: 3px solid var(--color-ink);
-  padding-left: 24px;
+  background-color: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 24px;
 }
 
 .heading {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.headingAccent {
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-accent);
-  flex-shrink: 0;
-}
-
-.headingText {
   font-family: var(--font-sans);
   font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-ink);
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-accent);
+  margin-bottom: 8px;
 }
 
 .list {
@@ -32,24 +22,25 @@
 
 .item {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   align-items: flex-start;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--color-rule-light);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .item:last-child {
   border-bottom: none;
+  padding-bottom: 0;
 }
 
 .rank {
   font-family: var(--font-sans);
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--color-rule-light);
+  color: var(--color-border);
   line-height: 1;
   flex-shrink: 0;
-  min-width: 36px;
+  min-width: 30px;
 }
 
 .itemContent {
@@ -61,29 +52,21 @@
 .category {
   font-family: var(--font-sans);
   font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-accent);
 }
 
 .title {
   font-family: var(--font-serif);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.35;
   color: var(--color-ink);
+  transition: color 0.15s ease;
 }
 
 .title:hover {
   color: var(--color-accent);
-}
-
-@media (max-width: 1024px) {
-  .aside {
-    border-left: none;
-    border-top: 3px solid var(--color-ink);
-    padding-left: 0;
-    padding-top: 24px;
-  }
 }

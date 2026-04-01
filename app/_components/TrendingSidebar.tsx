@@ -4,10 +4,7 @@ import styles from "./TrendingSidebar.module.css";
 export default function TrendingSidebar() {
   return (
     <aside className={styles.aside}>
-      <div className={styles.heading}>
-        <span className={styles.headingAccent} aria-hidden="true" />
-        <h2 className={styles.headingText}>Most Read</h2>
-      </div>
+      <h2 className={styles.heading}>Trending Now</h2>
       <ol className={styles.list}>
         {trendingArticles.map((article, index) => (
           <li key={article.id} className={styles.item}>

@@ -2,10 +2,10 @@ import styles from "./CategoryBadge.module.css";
 
 export default function CategoryBadge({
   category,
-  variant = "dark",
+  variant = "default",
 }: {
   category: string;
-  variant?: "dark" | "outline" | "accent";
+  variant?: "default" | "accent";
 }) {
   return (
     <span className={`${styles.badge} ${styles[variant]}`}>{category}</span>

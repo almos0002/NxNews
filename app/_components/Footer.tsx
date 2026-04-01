@@ -4,52 +4,49 @@ export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
-        <div className={styles.topRule} />
-        <div className={styles.grid}>
+        <div className={styles.top}>
           <div className={styles.brand}>
-            <h2 className={styles.title}>The Daily Report</h2>
+            <div className={styles.logoRow}>
+              <span className={styles.logoMark}>DR</span>
+              <span className={styles.logoText}>The Daily Report</span>
+            </div>
             <p className={styles.description}>
-              Delivering independent, in-depth journalism to readers worldwide.
-              Our commitment is to truth, clarity, and the stories that matter.
+              Independent, in-depth journalism for a complex world. Delivering
+              clarity through rigorous reporting since 2024.
             </p>
           </div>
-          <div className={styles.column}>
-            <h3 className={styles.columnTitle}>Sections</h3>
-            <ul className={styles.linkList}>
-              <li><a href="#">World</a></li>
-              <li><a href="#">Politics</a></li>
-              <li><a href="#">Business</a></li>
-              <li><a href="#">Technology</a></li>
-              <li><a href="#">Science</a></li>
-              <li><a href="#">Culture</a></li>
-            </ul>
-          </div>
-          <div className={styles.column}>
-            <h3 className={styles.columnTitle}>Company</h3>
-            <ul className={styles.linkList}>
-              <li><a href="#">About</a></li>
-              <li><a href="#">Careers</a></li>
-              <li><a href="#">Contact</a></li>
-              <li><a href="#">Advertise</a></li>
-              <li><a href="#">Ethics Policy</a></li>
-            </ul>
-          </div>
-          <div className={styles.column}>
-            <h3 className={styles.columnTitle}>Subscribe</h3>
-            <p className={styles.subscribeText}>
-              Get unlimited access to award-winning journalism.
-            </p>
-            <a href="#" className={styles.subscribeBtn}>
-              Subscribe Now
-            </a>
+
+          <div className={styles.links}>
+            <div className={styles.column}>
+              <h3 className={styles.columnTitle}>Sections</h3>
+              <ul className={styles.linkList}>
+                <li><a href="/world">World</a></li>
+                <li><a href="/politics">Politics</a></li>
+                <li><a href="/business">Business</a></li>
+                <li><a href="/technology">Technology</a></li>
+                <li><a href="/science">Science</a></li>
+                <li><a href="/culture">Culture</a></li>
+              </ul>
+            </div>
+            <div className={styles.column}>
+              <h3 className={styles.columnTitle}>Company</h3>
+              <ul className={styles.linkList}>
+                <li><a href="/about">About</a></li>
+                <li><a href="/careers">Careers</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/advertise">Advertise</a></li>
+                <li><a href="/ethics">Ethics Policy</a></li>
+              </ul>
+            </div>
           </div>
         </div>
+
         <div className={styles.bottom}>
-          <span>&copy; 2026 The Daily Report. All rights reserved.</span>
+          <span>&copy; 2026 The Daily Report</span>
           <div className={styles.bottomLinks}>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Cookie Settings</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/cookies">Cookies</a>
           </div>
         </div>
       </div>
