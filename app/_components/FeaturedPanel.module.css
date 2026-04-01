@@ -1,105 +1,113 @@
 .panel {
   display: grid;
-  grid-template-columns: 55fr 45fr;
+  grid-template-columns: 60fr 40fr;
   gap: 16px;
   align-items: stretch;
 }
 
+/* ── Primary card ───────────────────────────────── */
 .primary {
   display: block;
   border-radius: var(--radius);
   overflow: hidden;
   text-decoration: none;
+  position: relative;
 }
 
 .primaryImage {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 420px;
+  min-height: 480px;
+  overflow: hidden;
   background-color: var(--color-tag-bg);
 }
 
 .primaryOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.35) 50%,
+    transparent 100%
+  );
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 28px;
-  gap: 10px;
+  padding: 32px;
+  gap: 12px;
 }
 
 .primaryTitle {
   font-family: var(--font-serif);
-  font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
   color: #ffffff;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .primary:hover .primaryTitle {
   text-decoration: underline;
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
 }
 
 .primaryExcerpt {
   font-family: var(--font-serif);
-  font-size: 0.88rem;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+/* ── Secondary stack ─────────────────────────────── */
 .secondaryStack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .secondary {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 14px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
   background-color: var(--color-surface);
   border-radius: var(--radius);
   overflow: hidden;
   text-decoration: none;
-  transition: background-color 0.15s ease;
   flex: 1;
+  transition: opacity 0.15s ease;
 }
 
 .secondary:hover {
-  background-color: var(--color-tag-bg);
+  opacity: 0.88;
 }
 
 .secondaryImage {
   position: relative;
-  width: 120px;
-  height: 100%;
-  min-height: 100px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
   background-color: var(--color-tag-bg);
   flex-shrink: 0;
 }
 
 .secondaryContent {
-  padding: 16px 16px 16px 0;
+  padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  flex: 1;
 }
 
 .secondaryTitle {
   font-family: var(--font-serif);
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
   color: var(--color-ink);
 }
 
@@ -107,13 +115,27 @@
   color: var(--color-accent);
 }
 
+.secondaryExcerpt {
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--color-ink-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Shared meta ─────────────────────────────────── */
 .meta {
   display: flex;
   align-items: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 5px;
   font-family: var(--font-serif);
   font-size: 0.72rem;
   color: var(--color-ink-muted);
+  margin-top: 4px;
 }
 
 .author {
@@ -122,35 +144,43 @@
 }
 
 .dot {
-  font-size: 0.4rem;
-  opacity: 0.5;
+  font-size: 0.35rem;
+  opacity: 0.45;
 }
 
-@media (max-width: 900px) {
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 960px) {
   .panel {
     grid-template-columns: 1fr;
   }
 
   .primaryImage {
-    min-height: 280px;
+    min-height: 320px;
   }
 
   .secondaryStack {
     flex-direction: row;
-    flex-wrap: wrap;
   }
 
   .secondary {
-    flex: 1 1 calc(50% - 8px);
+    flex: 1 1 0;
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 560px) {
   .secondaryStack {
     flex-direction: column;
   }
 
   .secondary {
-    flex: 1 1 100%;
+    flex: none;
+  }
+
+  .primaryImage {
+    min-height: 260px;
+  }
+
+  .primaryOverlay {
+    padding: 20px;
   }
 }

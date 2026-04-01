@@ -29,14 +29,14 @@ export default function Home() {
 
       <main className={styles.main}>
 
+        {/* Featured first */}
+        <section className={styles.section}>
+          <FeaturedPanel primary={featuredArticle} secondary={secondaryFeatured} />
+        </section>
+
         {/* Latest news live feed */}
         <section className={styles.section}>
           <LatestFeed articles={latestNews} />
-        </section>
-
-        {/* 3-panel compact featured section */}
-        <section className={styles.section}>
-          <FeaturedPanel primary={featuredArticle} secondary={secondaryFeatured} />
         </section>
 
         {/* Editor's Pick dark strip */}
@@ -44,7 +44,7 @@ export default function Home() {
           <EditorsPick articles={editorsPicks} />
         </section>
 
-        {/* Top Stories grid + Trending sidebar */}
+        {/* Top Stories — 3-col grid + trending sidebar */}
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
             <SectionHeading title="Top Stories" />
@@ -59,17 +59,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Business & Markets topic section */}
+        {/* Business & Markets — 3-column equal cards */}
         <div className={styles.topicDivider}>
-          <TopicSection title="Business & Markets" articles={businessArticles} />
+          <TopicSection title="Business & Markets" articles={businessArticles} columns={3} />
         </div>
 
-        {/* Science & Technology topic section */}
+        {/* Science & Technology — 2-column lead layout */}
         <div className={styles.topicDivider}>
-          <TopicSection title="Science & Technology" articles={techArticles} />
+          <TopicSection title="Science & Technology" articles={techArticles} columns={2} />
         </div>
 
-        {/* Opinion */}
+        {/* Opinion — 3-column */}
         <section className={styles.opinionSection}>
           <SectionHeading title="Opinion" />
           <div className={styles.opinionGrid}>

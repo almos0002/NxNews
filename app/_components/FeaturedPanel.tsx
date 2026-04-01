@@ -12,13 +12,14 @@ export default function FeaturedPanel({
 }) {
   return (
     <div className={styles.panel}>
+      {/* Primary hero — large left card with overlay */}
       <a href={`/article/${primary.id}`} className={styles.primary}>
         <div className={styles.primaryImage}>
           <Image
             src={primary.imageUrl}
             alt={primary.title}
             fill
-            sizes="(max-width: 768px) 100vw, 55vw"
+            sizes="(max-width: 768px) 100vw, 60vw"
             priority
             style={{ objectFit: "cover" }}
           />
@@ -37,6 +38,7 @@ export default function FeaturedPanel({
         </div>
       </a>
 
+      {/* Secondary cards — stacked vertically on the right, image on top */}
       <div className={styles.secondaryStack}>
         {secondary.map((article) => (
           <a href={`/article/${article.id}`} key={article.id} className={styles.secondary}>
@@ -45,17 +47,20 @@ export default function FeaturedPanel({
                 src={article.imageUrl}
                 alt={article.title}
                 fill
-                sizes="(max-width: 768px) 100vw, 25vw"
+                sizes="(max-width: 768px) 100vw, 40vw"
                 style={{ objectFit: "cover" }}
               />
             </div>
             <div className={styles.secondaryContent}>
               <CategoryBadge category={article.category} />
               <h3 className={styles.secondaryTitle}>{article.title}</h3>
+              <p className={styles.secondaryExcerpt}>{article.excerpt}</p>
               <div className={styles.meta}>
                 <span className={styles.author}>{article.author}</span>
                 <span className={styles.dot}>·</span>
                 <span>{article.time}</span>
+                <span className={styles.dot}>·</span>
+                <span>{article.readTime}</span>
               </div>
             </div>
           </a>
