@@ -12,8 +12,8 @@ export default function ThreeColSection({
 }) {
   const col1Lead    = articles[0];
   const col1Texts   = articles.slice(1, 4);   // 3 text items below image
-  const col2Items   = articles.slice(4, 8);   // Must Read 01–04
-  const col3Items   = articles.slice(8, 12);  // Must Read 05–08
+  const col2Items   = articles.slice(4, 9);   // Must Read 01–05
+  const col3Items   = articles.slice(9, 14);  // Must Read 06–10
 
   return (
     <section className={styles.wrapper}>

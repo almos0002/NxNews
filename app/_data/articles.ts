@@ -484,6 +484,28 @@ export const techArticles: Article[] = [
     readTime: "6 min",
     imageUrl: "",
   },
+  {
+    id: "t13",
+    title: "Biotech Startup Raises $2B to Mass-Produce Lab-Grown Organs",
+    excerpt: "",
+    category: "Science",
+    author: "Dr. Sarah Okonkwo",
+    date: "March 23, 2026",
+    time: "",
+    readTime: "5 min",
+    imageUrl: "",
+  },
+  {
+    id: "t14",
+    title: "TSMC Breaks Ground on World's Largest Chip Fabrication Plant in Arizona",
+    excerpt: "",
+    category: "Technology",
+    author: "Wei Zhang",
+    date: "March 23, 2026",
+    time: "",
+    readTime: "4 min",
+    imageUrl: "",
+  },
 ];
 
 export const opinionArticles: Article[] = [
