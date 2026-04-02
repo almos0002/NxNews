@@ -10,10 +10,9 @@ export default function SplitPanel({
   title: string;
   articles: Article[];
 }) {
-  const leftArticles = articles.slice(0, 3);
-  const rightArticles = articles.slice(3, 6);
-  const leftLead = leftArticles[0];
-  const leftRest = leftArticles.slice(1);
+  const leftLead = articles[0];
+  const leftRest = articles.slice(1, 3);
+  const rightList = articles.slice(3, 6);
 
   return (
     <section className={styles.wrapper}>
@@ -25,7 +24,7 @@ export default function SplitPanel({
 
       <div className={styles.cols}>
 
-        {/* LEFT COLUMN — lead image card + text-only items stacked below */}
+        {/* LEFT COLUMN — image lead card + 2 text articles */}
         <div className={styles.colLeft}>
           {leftLead && (
             <a href={`/article/${leftLead.id}`} className={styles.leadCard}>
@@ -40,52 +39,45 @@ export default function SplitPanel({
                   />
                 </div>
               )}
-              <div className={styles.leadContent}>
+              <div className={styles.leadBody}>
                 <CategoryBadge category={leftLead.category} />
                 <h3 className={styles.leadTitle}>{leftLead.title}</h3>
-                <p className={styles.leadExcerpt}>{leftLead.excerpt}</p>
+                {leftLead.excerpt && (
+                  <p className={styles.leadExcerpt}>{leftLead.excerpt}</p>
+                )}
                 <div className={styles.meta}>
                   <span className={styles.author}>{leftLead.author}</span>
-                  <span className={styles.dot}>·</span>
+                  <span className={styles.sep}>·</span>
                   <span>{leftLead.readTime}</span>
                 </div>
               </div>
             </a>
           )}
+
           {leftRest.map((article) => (
-            <a href={`/article/${article.id}`} key={article.id} className={styles.textItem}>
+            <a key={article.id} href={`/article/${article.id}`} className={styles.textItem}>
               <CategoryBadge category={article.category} />
               <h4 className={styles.textTitle}>{article.title}</h4>
               <div className={styles.meta}>
                 <span className={styles.author}>{article.author}</span>
-                <span className={styles.dot}>·</span>
+                <span className={styles.sep}>·</span>
                 <span>{article.readTime}</span>
               </div>
             </a>
           ))}
         </div>
 
-        {/* RIGHT COLUMN — horizontal thumbnail rows (different design) */}
+        {/* RIGHT COLUMN — numbered editorial list, no images */}
         <div className={styles.colRight}>
-          {rightArticles.map((article) => (
-            <a href={`/article/${article.id}`} key={article.id} className={styles.rowCard}>
-              {article.imageUrl && (
-                <div className={styles.rowImage}>
-                  <Image
-                    src={article.imageUrl}
-                    alt={article.title}
-                    fill
-                    sizes="90px"
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              )}
-              <div className={styles.rowContent}>
-                <CategoryBadge category={article.category} />
-                <h4 className={styles.rowTitle}>{article.title}</h4>
+          <span className={styles.colRightLabel}>Also in {title.split("&")[0].trim()}</span>
+          {rightList.map((article, i) => (
+            <a key={article.id} href={`/article/${article.id}`} className={styles.numberedItem}>
+              <span className={styles.num}>0{i + 1}</span>
+              <div className={styles.numContent}>
+                <h4 className={styles.numTitle}>{article.title}</h4>
                 <div className={styles.meta}>
                   <span className={styles.author}>{article.author}</span>
-                  <span className={styles.dot}>·</span>
+                  <span className={styles.sep}>·</span>
                   <span>{article.readTime}</span>
                 </div>
               </div>

@@ -10,9 +10,11 @@ export default function ThreeColSection({
   title: string;
   articles: Article[];
 }) {
-  const col1 = articles.slice(0, 2);
-  const col2 = articles.slice(2, 5);
-  const col3 = articles.slice(5, 9);
+  const col1Lead = articles[0];
+  const col1Text = articles[1];
+  const col2Items = articles.slice(2, 5);
+  const col3Lead = articles[5];
+  const col3Rest = articles.slice(6, 9);
 
   return (
     <section className={styles.wrapper}>
@@ -24,68 +26,60 @@ export default function ThreeColSection({
 
       <div className={styles.cols}>
 
-        {/* COLUMN 1 — big image card + 1 text item */}
+        {/* COLUMN 1 — image lead + one text article */}
         <div className={styles.col1}>
-          {col1[0] && (
-            <a href={`/article/${col1[0].id}`} className={styles.bigCard}>
-              {col1[0].imageUrl && (
-                <div className={styles.bigImage}>
+          {col1Lead && (
+            <a href={`/article/${col1Lead.id}`} className={styles.c1Lead}>
+              {col1Lead.imageUrl && (
+                <div className={styles.c1Image}>
                   <Image
-                    src={col1[0].imageUrl}
-                    alt={col1[0].title}
+                    src={col1Lead.imageUrl}
+                    alt={col1Lead.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 35vw"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     style={{ objectFit: "cover" }}
                   />
                 </div>
               )}
-              <div className={styles.bigContent}>
-                <CategoryBadge category={col1[0].category} />
-                <h3 className={styles.bigTitle}>{col1[0].title}</h3>
-                <p className={styles.bigExcerpt}>{col1[0].excerpt}</p>
+              <div className={styles.c1Body}>
+                <CategoryBadge category={col1Lead.category} />
+                <h3 className={styles.c1Title}>{col1Lead.title}</h3>
+                {col1Lead.excerpt && (
+                  <p className={styles.c1Excerpt}>{col1Lead.excerpt}</p>
+                )}
                 <div className={styles.meta}>
-                  <span className={styles.author}>{col1[0].author}</span>
-                  <span className={styles.dot}>·</span>
-                  <span>{col1[0].readTime}</span>
+                  <span className={styles.author}>{col1Lead.author}</span>
+                  <span className={styles.sep}>·</span>
+                  <span>{col1Lead.readTime}</span>
                 </div>
               </div>
             </a>
           )}
-          {col1[1] && (
-            <a href={`/article/${col1[1].id}`} className={styles.textItem}>
-              <CategoryBadge category={col1[1].category} />
-              <h4 className={styles.textTitle}>{col1[1].title}</h4>
-              <p className={styles.textExcerpt}>{col1[1].excerpt}</p>
+          {col1Text && (
+            <a href={`/article/${col1Text.id}`} className={styles.c1TextItem}>
+              <CategoryBadge category={col1Text.category} />
+              <h4 className={styles.c1TextTitle}>{col1Text.title}</h4>
               <div className={styles.meta}>
-                <span className={styles.author}>{col1[1].author}</span>
-                <span className={styles.dot}>·</span>
-                <span>{col1[1].readTime}</span>
+                <span className={styles.author}>{col1Text.author}</span>
+                <span className={styles.sep}>·</span>
+                <span>{col1Text.readTime}</span>
               </div>
             </a>
           )}
         </div>
 
-        {/* COLUMN 2 — medium thumbnail rows (image left + title right) */}
+        {/* COLUMN 2 — bold editorial stacked headlines, no images */}
         <div className={styles.col2}>
-          {col2.map((article) => (
-            <a href={`/article/${article.id}`} key={article.id} className={styles.thumbRow}>
-              {article.imageUrl && (
-                <div className={styles.thumbImage}>
-                  <Image
-                    src={article.imageUrl}
-                    alt={article.title}
-                    fill
-                    sizes="80px"
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              )}
-              <div className={styles.thumbContent}>
+          <span className={styles.col2Label}>Must Read</span>
+          {col2Items.map((article, i) => (
+            <a key={article.id} href={`/article/${article.id}`} className={styles.c2Item}>
+              <span className={styles.c2Num}>{String(i + 1).padStart(2, "0")}</span>
+              <div className={styles.c2Content}>
                 <CategoryBadge category={article.category} />
-                <h4 className={styles.thumbTitle}>{article.title}</h4>
+                <h4 className={styles.c2Title}>{article.title}</h4>
                 <div className={styles.meta}>
                   <span className={styles.author}>{article.author}</span>
-                  <span className={styles.dot}>·</span>
+                  <span className={styles.sep}>·</span>
                   <span>{article.readTime}</span>
                 </div>
               </div>
@@ -93,15 +87,37 @@ export default function ThreeColSection({
           ))}
         </div>
 
-        {/* COLUMN 3 — headline-only text list */}
+        {/* COLUMN 3 — overlay image card + compact text list */}
         <div className={styles.col3}>
-          <span className={styles.col3Label}>More Headlines</span>
-          {col3.map((article) => (
-            <a href={`/article/${article.id}`} key={article.id} className={styles.headlineItem}>
-              <h4 className={styles.headlineTitle}>{article.title}</h4>
+          {col3Lead && col3Lead.imageUrl && (
+            <a href={`/article/${col3Lead.id}`} className={styles.c3OverlayCard}>
+              <div className={styles.c3OverlayImage}>
+                <Image
+                  src={col3Lead.imageUrl}
+                  alt={col3Lead.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 25vw"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              <div className={styles.c3OverlayBody}>
+                <CategoryBadge category={col3Lead.category} variant="light" />
+                <h3 className={styles.c3OverlayTitle}>{col3Lead.title}</h3>
+                <div className={styles.metaLight}>
+                  <span className={styles.authorLight}>{col3Lead.author}</span>
+                  <span className={styles.sep}>·</span>
+                  <span>{col3Lead.readTime}</span>
+                </div>
+              </div>
+            </a>
+          )}
+          {col3Rest.map((article) => (
+            <a key={article.id} href={`/article/${article.id}`} className={styles.c3TextItem}>
+              <CategoryBadge category={article.category} />
+              <h4 className={styles.c3TextTitle}>{article.title}</h4>
               <div className={styles.meta}>
                 <span className={styles.author}>{article.author}</span>
-                <span className={styles.dot}>·</span>
+                <span className={styles.sep}>·</span>
                 <span>{article.readTime}</span>
               </div>
             </a>

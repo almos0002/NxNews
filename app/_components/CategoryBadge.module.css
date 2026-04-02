@@ -24,6 +24,12 @@
   border-radius: 2px;
 }
 
+.light {
+  color: rgba(255, 255, 255, 0.9);
+  background: none;
+  padding: 0;
+}
+
 .dot {
   display: inline-block;
   width: 5px;

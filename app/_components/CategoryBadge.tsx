@@ -5,7 +5,7 @@ export default function CategoryBadge({
   variant = "default",
 }: {
   category: string;
-  variant?: "default" | "accent";
+  variant?: "default" | "accent" | "light";
 }) {
   return (
     <span className={`${styles.badge} ${styles[variant]}`}>
