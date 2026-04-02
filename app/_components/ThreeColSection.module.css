@@ -155,11 +155,12 @@
 
 .thumbRow {
   display: grid;
-  grid-template-columns: 80px 1fr;
+  grid-template-columns: 88px 1fr;
+  align-items: stretch;
   text-decoration: none;
   transition: background-color 0.12s ease;
   border-bottom: 1px solid var(--color-border);
-  flex: 1;
+  min-height: 90px;
 }
 
 .thumbRow:last-child {
@@ -172,9 +173,8 @@
 
 .thumbImage {
   position: relative;
-  width: 80px;
-  height: 100%;
-  min-height: 78px;
+  width: 88px;
+  align-self: stretch;
   overflow: hidden;
   background-color: var(--color-tag-bg);
 }

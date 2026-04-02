@@ -145,11 +145,13 @@
 
 .rowCard {
   display: grid;
-  grid-template-columns: 90px 1fr;
+  grid-template-columns: 96px 1fr;
   gap: 0;
+  align-items: stretch;
   text-decoration: none;
   transition: background-color 0.15s ease;
   border-bottom: 1px solid var(--color-border);
+  min-height: 96px;
 }
 
 .rowCard:last-child {
@@ -162,12 +164,10 @@
 
 .rowImage {
   position: relative;
-  width: 90px;
-  height: 100%;
-  min-height: 84px;
+  width: 96px;
+  align-self: stretch;
   overflow: hidden;
   background-color: var(--color-tag-bg);
-  flex-shrink: 0;
 }
 
 .rowContent {
