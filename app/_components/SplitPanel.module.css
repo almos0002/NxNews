@@ -40,94 +40,183 @@
   opacity: 0.7;
 }
 
-/* ── 2-col grid ──────────────────────────────────── */
-.grid {
+/* ── 2-column grid ───────────────────────────────── */
+.cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2px;
   background-color: var(--color-border);
   border-radius: var(--radius);
   overflow: hidden;
+  align-items: stretch;
 }
 
-/* ── Each card — full image with overlay ─────────── */
-.card {
-  display: block;
+/* ── Left column — lead card + text items ────────── */
+.colLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background-color: var(--color-surface);
+}
+
+.leadCard {
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
-  position: relative;
+  transition: background-color 0.15s ease;
 }
 
-.image {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
+.leadCard:hover {
   background-color: var(--color-tag-bg);
 }
 
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.88) 0%,
-    rgba(0, 0, 0, 0.2) 55%,
-    transparent 100%
-  );
+.leadImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--color-tag-bg);
+  flex-shrink: 0;
+}
+
+.leadContent {
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 20px;
-  gap: 8px;
+  gap: 6px;
 }
 
-.title {
+.leadTitle {
   font-family: var(--font-serif);
-  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  font-size: 1.05rem;
   font-weight: 700;
   line-height: 1.28;
-  color: #ffffff;
-  letter-spacing: -0.01em;
+  color: var(--color-ink);
 }
 
-.card:hover .title {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.leadCard:hover .leadTitle {
+  color: var(--color-accent);
 }
 
-.excerpt {
+.leadExcerpt {
   font-family: var(--font-serif);
   font-size: 0.8rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--color-ink-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+.textItem {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 16px;
+  text-decoration: none;
+  border-top: 1px solid var(--color-border);
+  transition: background-color 0.15s ease;
+}
+
+.textItem:hover {
+  background-color: var(--color-tag-bg);
+}
+
+.textTitle {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.32;
+  color: var(--color-ink);
+}
+
+.textItem:hover .textTitle {
+  color: var(--color-accent);
+}
+
+/* ── Right column — horizontal thumbnail rows ────── */
+.colRight {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background-color: var(--color-surface);
+}
+
+.rowCard {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 0;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.rowCard:last-child {
+  border-bottom: none;
+}
+
+.rowCard:hover {
+  background-color: var(--color-tag-bg);
+}
+
+.rowImage {
+  position: relative;
+  width: 90px;
+  height: 100%;
+  min-height: 84px;
+  overflow: hidden;
+  background-color: var(--color-tag-bg);
+  flex-shrink: 0;
+}
+
+.rowContent {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rowCard:hover .rowTitle {
+  color: var(--color-accent);
+}
+
+/* ── Shared meta ─────────────────────────────────── */
 .meta {
   display: flex;
   align-items: center;
   gap: 5px;
   font-family: var(--font-serif);
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--color-ink-muted);
 }
 
 .author {
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--color-ink-secondary);
 }
 
 .dot {
   font-size: 0.28rem;
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 /* ── Responsive ──────────────────────────────────── */
-@media (max-width: 640px) {
-  .grid {
+@media (max-width: 768px) {
+  .cols {
     grid-template-columns: 1fr;
   }
 }

@@ -10,9 +10,9 @@ export default function ThreeColSection({
   title: string;
   articles: Article[];
 }) {
-  const lead = articles[0];
-  const mid = articles.slice(1, 3);
-  const list = articles.slice(3, 7);
+  const col1 = articles.slice(0, 2);
+  const col2 = articles.slice(2, 5);
+  const col3 = articles.slice(5, 9);
 
   return (
     <section className={styles.wrapper}>
@@ -24,49 +24,65 @@ export default function ThreeColSection({
 
       <div className={styles.cols}>
 
-        {/* Column 1 — large lead card */}
-        <div className={styles.colLead}>
-          {lead && (
-            <a href={`/article/${lead.id}`} className={styles.leadCard}>
-              <div className={styles.leadImage}>
-                <Image
-                  src={lead.imageUrl}
-                  alt={lead.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 40vw"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-              <div className={styles.leadContent}>
-                <CategoryBadge category={lead.category} />
-                <h3 className={styles.leadTitle}>{lead.title}</h3>
-                <p className={styles.leadExcerpt}>{lead.excerpt}</p>
-                <div className={styles.meta}>
-                  <span className={styles.author}>{lead.author}</span>
-                  <span className={styles.dot}>·</span>
-                  <span>{lead.readTime}</span>
+        {/* COLUMN 1 — big image card + 1 text item */}
+        <div className={styles.col1}>
+          {col1[0] && (
+            <a href={`/article/${col1[0].id}`} className={styles.bigCard}>
+              {col1[0].imageUrl && (
+                <div className={styles.bigImage}>
+                  <Image
+                    src={col1[0].imageUrl}
+                    alt={col1[0].title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 35vw"
+                    style={{ objectFit: "cover" }}
+                  />
                 </div>
+              )}
+              <div className={styles.bigContent}>
+                <CategoryBadge category={col1[0].category} />
+                <h3 className={styles.bigTitle}>{col1[0].title}</h3>
+                <p className={styles.bigExcerpt}>{col1[0].excerpt}</p>
+                <div className={styles.meta}>
+                  <span className={styles.author}>{col1[0].author}</span>
+                  <span className={styles.dot}>·</span>
+                  <span>{col1[0].readTime}</span>
+                </div>
+              </div>
+            </a>
+          )}
+          {col1[1] && (
+            <a href={`/article/${col1[1].id}`} className={styles.textItem}>
+              <CategoryBadge category={col1[1].category} />
+              <h4 className={styles.textTitle}>{col1[1].title}</h4>
+              <p className={styles.textExcerpt}>{col1[1].excerpt}</p>
+              <div className={styles.meta}>
+                <span className={styles.author}>{col1[1].author}</span>
+                <span className={styles.dot}>·</span>
+                <span>{col1[1].readTime}</span>
               </div>
             </a>
           )}
         </div>
 
-        {/* Column 2 — 2 medium cards with image + title */}
-        <div className={styles.colMid}>
-          {mid.map((article) => (
-            <a href={`/article/${article.id}`} key={article.id} className={styles.midCard}>
-              <div className={styles.midImage}>
-                <Image
-                  src={article.imageUrl}
-                  alt={article.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 30vw"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-              <div className={styles.midContent}>
+        {/* COLUMN 2 — medium thumbnail rows (image left + title right) */}
+        <div className={styles.col2}>
+          {col2.map((article) => (
+            <a href={`/article/${article.id}`} key={article.id} className={styles.thumbRow}>
+              {article.imageUrl && (
+                <div className={styles.thumbImage}>
+                  <Image
+                    src={article.imageUrl}
+                    alt={article.title}
+                    fill
+                    sizes="80px"
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              )}
+              <div className={styles.thumbContent}>
                 <CategoryBadge category={article.category} />
-                <h3 className={styles.midTitle}>{article.title}</h3>
+                <h4 className={styles.thumbTitle}>{article.title}</h4>
                 <div className={styles.meta}>
                   <span className={styles.author}>{article.author}</span>
                   <span className={styles.dot}>·</span>
@@ -77,13 +93,12 @@ export default function ThreeColSection({
           ))}
         </div>
 
-        {/* Column 3 — compact text-only list */}
-        <div className={styles.colList}>
-          {list.map((article, i) => (
-            <a href={`/article/${article.id}`} key={article.id} className={styles.listItem}>
-              {i > 0 && <div className={styles.listDivider} />}
-              <CategoryBadge category={article.category} />
-              <h4 className={styles.listTitle}>{article.title}</h4>
+        {/* COLUMN 3 — headline-only text list */}
+        <div className={styles.col3}>
+          <span className={styles.col3Label}>More Headlines</span>
+          {col3.map((article) => (
+            <a href={`/article/${article.id}`} key={article.id} className={styles.headlineItem}>
+              <h4 className={styles.headlineTitle}>{article.title}</h4>
               <div className={styles.meta}>
                 <span className={styles.author}>{article.author}</span>
                 <span className={styles.dot}>·</span>
