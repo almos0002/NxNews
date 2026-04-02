@@ -10,10 +10,10 @@ export default function ThreeColSection({
   title: string;
   articles: Article[];
 }) {
-  const col1Lead = articles[0];
-  const col1Text = articles[1];
-  const col2Items = articles.slice(2, 6);   // numbered 01–04
-  const col3Items = articles.slice(6, 9);   // numbered 05–07
+  const col1Lead    = articles[0];
+  const col1Texts   = articles.slice(1, 4);   // 3 text items below image
+  const col2Items   = articles.slice(4, 8);   // Must Read 01–04
+  const col3Items   = articles.slice(8, 12);  // Must Read 05–08
 
   return (
     <section className={styles.wrapper}>
@@ -25,7 +25,7 @@ export default function ThreeColSection({
 
       <div className={styles.cols}>
 
-        {/* COLUMN 1 — image lead + one text article */}
+        {/* COLUMN 1 — shorter image + more text articles */}
         <div className={styles.col1}>
           {col1Lead && (
             <a href={`/article/${col1Lead.id}`} className={styles.c1Lead}>
@@ -35,7 +35,7 @@ export default function ThreeColSection({
                     src={col1Lead.imageUrl}
                     alt={col1Lead.title}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, 30vw"
                     style={{ objectFit: "cover" }}
                   />
                 </div>
@@ -54,20 +54,21 @@ export default function ThreeColSection({
               </div>
             </a>
           )}
-          {col1Text && (
-            <a href={`/article/${col1Text.id}`} className={styles.c1TextItem}>
-              <CategoryBadge category={col1Text.category} />
-              <h4 className={styles.c1TextTitle}>{col1Text.title}</h4>
+
+          {col1Texts.map((article) => (
+            <a key={article.id} href={`/article/${article.id}`} className={styles.c1TextItem}>
+              <CategoryBadge category={article.category} />
+              <h4 className={styles.c1TextTitle}>{article.title}</h4>
               <div className={styles.meta}>
-                <span className={styles.author}>{col1Text.author}</span>
+                <span className={styles.author}>{article.author}</span>
                 <span className={styles.sep}>·</span>
-                <span>{col1Text.readTime}</span>
+                <span>{article.readTime}</span>
               </div>
             </a>
-          )}
+          ))}
         </div>
 
-        {/* RIGHT SECTION — Must Read header spans col2 + col3 */}
+        {/* RIGHT SECTION — Must Read header spans both sub-columns */}
         <div className={styles.rightSection}>
           <div className={styles.mustReadHeader}>
             <span className={styles.mustReadLabel}>Must Read</span>
@@ -92,7 +93,7 @@ export default function ThreeColSection({
               ))}
             </div>
 
-            {/* col3 — continues numbering 05–07 */}
+            {/* col3 — continues numbering 05–08 */}
             <div className={styles.col3}>
               {col3Items.map((article, i) => (
                 <a key={article.id} href={`/article/${article.id}`} className={styles.numberedItem}>
