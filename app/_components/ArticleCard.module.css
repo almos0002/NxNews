@@ -105,7 +105,7 @@
 .gridImage {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   background-color: var(--color-tag-bg);
   flex-shrink: 0;
@@ -115,7 +115,8 @@
   padding: 12px 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
+  flex: 1;
 }
 
 .gridTitle {
@@ -125,13 +126,24 @@
   line-height: 1.3;
   color: var(--color-ink);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .grid:hover .gridTitle {
   color: var(--color-accent);
+}
+
+.gridExcerpt {
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-ink-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* ── Compact variant (opinion / text-only) ───────── */
@@ -198,6 +210,7 @@
   font-size: 0.7rem;
   color: var(--color-ink-muted);
   flex-wrap: wrap;
+  margin-top: auto;
 }
 
 .author {

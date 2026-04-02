@@ -159,12 +159,21 @@
   }
 
   .secondaryImage {
-    min-height: 120px;
+    min-height: 140px;
   }
 }
 
 @media (max-width: 560px) {
   .secondaryStack {
     flex-direction: column;
+    gap: 2px;
+  }
+
+  .secondary {
+    flex: none;
+  }
+
+  .secondaryImage {
+    min-height: 180px;
   }
 }

@@ -102,6 +102,9 @@ export default function ArticleCard({
       <div className={styles.gridContent}>
         <CategoryBadge category={article.category} />
         <h3 className={styles.gridTitle}>{article.title}</h3>
+        {article.excerpt && (
+          <p className={styles.gridExcerpt}>{article.excerpt}</p>
+        )}
         <div className={styles.meta}>
           <span className={styles.author}>{article.author}</span>
           <span className={styles.separator}>·</span>

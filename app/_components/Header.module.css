@@ -25,6 +25,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
 }
 
 .logoMark {
@@ -97,6 +98,7 @@
   padding: 8px 20px;
   border-radius: var(--radius);
   transition: background-color 0.15s ease;
+  text-decoration: none;
 }
 
 .subscribeLink:hover {
@@ -113,13 +115,31 @@
   }
 }
 
+/* ── Mobile: hamburger left, logo centred, hide desktop nav ── */
 @media (max-width: 600px) {
   .inner {
     height: 52px;
-    gap: 12px;
+    gap: 0;
+    position: relative;
+  }
+
+  /* Logo is absolutely centred horizontally */
+  .brand {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Show logoText again on mobile (centred logo looks better with text) */
+  .logoText {
+    display: block;
   }
 
   .nav {
+    display: none;
+  }
+
+  .actions {
     display: none;
   }
 }

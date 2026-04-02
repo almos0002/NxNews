@@ -1,0 +1,193 @@
+/* ── Hamburger button ────────────────────────────── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.hamburger:hover {
+  background-color: var(--color-tag-bg);
+}
+
+.bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-ink);
+  border-radius: 2px;
+}
+
+/* ── Overlay ─────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Drawer ──────────────────────────────────────── */
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  background-color: var(--color-surface);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+/* ── Drawer header ───────────────────────────────── */
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 60px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.drawerLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.drawerLogoMark {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.drawerLogoText {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-ink-secondary);
+  border-radius: var(--radius);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover {
+  background-color: var(--color-tag-bg);
+  color: var(--color-ink);
+}
+
+/* ── Drawer nav ──────────────────────────────────── */
+.drawerNav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.drawerList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.drawerLink {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  padding: 14px 20px;
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.drawerLink:hover {
+  background-color: var(--color-tag-bg);
+  color: var(--color-accent);
+}
+
+/* ── Drawer footer ───────────────────────────────── */
+.drawerFooter {
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.drawerSubscribe {
+  display: block;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-accent);
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.drawerSubscribe:hover {
+  background-color: var(--color-accent-hover);
+}
+
+/* ── Only show on mobile ─────────────────────────── */
+@media (min-width: 601px) {
+  .hamburger {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .hamburger {
+    display: flex;
+  }
+}

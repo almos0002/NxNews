@@ -1,10 +1,15 @@
 import styles from "./Header.module.css";
 import { categories } from "@/app/_data/articles";
+import MobileNav from "./MobileNav";
 
 export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
+
+        {/* Mobile: hamburger (left) */}
+        <MobileNav />
+
         <div className={styles.brand}>
           <a href="/" className={styles.logo}>
             <span className={styles.logoMark}>DR</span>
@@ -27,6 +32,7 @@ export default function Header() {
         <div className={styles.actions}>
           <a href="/subscribe" className={styles.subscribeLink}>Subscribe</a>
         </div>
+
       </div>
     </header>
   );
