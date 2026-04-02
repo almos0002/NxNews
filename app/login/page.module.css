@@ -1,0 +1,232 @@
+.main {
+  min-height: calc(100vh - 220px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+}
+
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+}
+
+/* ── Card header ──────────────────────────────────── */
+.cardHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logoLink {
+  display: inline-flex;
+  margin-bottom: 20px;
+  text-decoration: none;
+}
+
+.logoMark {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.heading {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.subheading {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  color: var(--color-ink-muted);
+  line-height: 1.5;
+}
+
+/* ── Form ─────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.forgotLink {
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.forgotLink:hover {
+  opacity: 0.75;
+}
+
+.input {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.input::placeholder {
+  color: var(--color-ink-muted);
+}
+
+.input:focus {
+  border-color: var(--color-ink);
+  box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.06);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  color: var(--color-ink-secondary);
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.submitBtn {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: var(--color-accent);
+  padding: 12px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  margin-top: 4px;
+}
+
+.submitBtn:hover {
+  background-color: var(--color-accent-hover);
+}
+
+/* ── Divider ──────────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+.dividerText {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+/* ── Social buttons ───────────────────────────────── */
+.socialRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.socialBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-serif);
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 11px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.socialBtn:hover {
+  background-color: var(--color-tag-bg);
+}
+
+/* ── Footer link ──────────────────────────────────── */
+.footer {
+  text-align: center;
+  margin-top: 24px;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: var(--color-ink-muted);
+}
+
+.footerLink {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.footerLink:hover {
+  opacity: 0.75;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 500px) {
+  .card {
+    padding: 32px 20px;
+  }
+}
