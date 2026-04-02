@@ -111,7 +111,7 @@ export default async function ArticlePage({
 
   if (!article) notFound();
 
-  const related = getRelatedArticles(article, 3);
+  const related = getRelatedArticles(article, 4);
   const body = getBodyParagraphs(article.category);
 
   return (
@@ -233,7 +233,7 @@ export default async function ArticlePage({
         {related.length > 0 && (
           <section className={styles.related}>
             <div className={styles.relatedHeading}>
-              <h2 className={styles.relatedTitle}>More to Read</h2>
+              <h2 className={styles.relatedTitle}>Related News</h2>
               <div className={styles.relatedRule} />
             </div>
             <div className={styles.relatedGrid}>
@@ -253,6 +253,9 @@ export default async function ArticlePage({
                   <div className={styles.relatedBody}>
                     <CategoryBadge category={r.category} />
                     <h3 className={styles.relatedCardTitle}>{r.title}</h3>
+                    {r.excerpt && (
+                      <p className={styles.relatedExcerpt}>{r.excerpt}</p>
+                    )}
                     <div className={styles.relatedMeta}>
                       <span className={styles.relatedAuthor}>{r.author}</span>
                       <span className={styles.relatedDot} />
