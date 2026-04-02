@@ -12,7 +12,7 @@ export default function FeaturedPanel({
 }) {
   return (
     <div className={styles.panel}>
-      {/* Primary — large left card with overlay */}
+      {/* Primary — large left overlay card */}
       <a href={`/article/${primary.id}`} className={styles.primary}>
         <div className={styles.primaryImage}>
           <Image
@@ -37,29 +37,28 @@ export default function FeaturedPanel({
         </div>
       </a>
 
-      {/* Secondaries — compact horizontal rows stacked on the right */}
+      {/* Secondaries — each is a full-image overlay card stacked vertically */}
       <div className={styles.secondaryStack}>
-        {secondary.map((article, i) => (
+        {secondary.map((article) => (
           <a href={`/article/${article.id}`} key={article.id} className={styles.secondary}>
             <div className={styles.secondaryImage}>
               <Image
                 src={article.imageUrl}
                 alt={article.title}
                 fill
-                sizes="96px"
+                sizes="(max-width: 900px) 33vw, 40vw"
                 style={{ objectFit: "cover" }}
               />
-            </div>
-            <div className={styles.secondaryContent}>
-              <CategoryBadge category={article.category} />
-              <h3 className={styles.secondaryTitle}>{article.title}</h3>
-              <div className={styles.meta}>
-                <span className={styles.author}>{article.author}</span>
-                <span className={styles.dot}>·</span>
-                <span>{article.readTime}</span>
+              <div className={styles.secondaryOverlay}>
+                <CategoryBadge category={article.category} variant="accent" />
+                <h3 className={styles.secondaryTitle}>{article.title}</h3>
+                <div className={styles.meta}>
+                  <span className={styles.author}>{article.author}</span>
+                  <span className={styles.dot}>·</span>
+                  <span>{article.readTime}</span>
+                </div>
               </div>
             </div>
-            {i < secondary.length - 1 && <div className={styles.divider} />}
           </a>
         ))}
       </div>

@@ -1,12 +1,13 @@
 import BreakingTicker from "./_components/BreakingTicker";
 import Header from "./_components/Header";
-import ArticleCard from "./_components/ArticleCard";
 import SectionHeading from "./_components/SectionHeading";
 import TrendingSidebar from "./_components/TrendingSidebar";
 import FeaturedPanel from "./_components/FeaturedPanel";
 import LatestFeed from "./_components/LatestFeed";
 import EditorsPick from "./_components/EditorsPick";
-import TopicSection from "./_components/TopicSection";
+import ThreeColSection from "./_components/ThreeColSection";
+import SplitPanel from "./_components/SplitPanel";
+import ArticleCard from "./_components/ArticleCard";
 import Footer from "./_components/Footer";
 import {
   breakingHeadline,
@@ -29,7 +30,7 @@ export default function Home() {
 
       <main className={styles.main}>
 
-        {/* Featured first */}
+        {/* Hero — big featured + 3 overlay secondary cards */}
         <section className={styles.section}>
           <FeaturedPanel primary={featuredArticle} secondary={secondaryFeatured} />
         </section>
@@ -44,32 +45,27 @@ export default function Home() {
           <EditorsPick articles={editorsPicks} />
         </section>
 
-        {/* Top Stories — 3-col grid + trending sidebar */}
+        {/* Top Stories — 3 distinct column designs + trending sidebar */}
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
-            <SectionHeading title="Top Stories" />
-            <div className={styles.articleGrid}>
-              {gridArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} variant="grid" />
-              ))}
-            </div>
+            <ThreeColSection title="Top Stories" articles={gridArticles} />
           </div>
           <div className={styles.storiesSide}>
             <TrendingSidebar />
           </div>
         </section>
 
-        {/* Business & Markets — 3-column equal cards */}
+        {/* Business & Markets — 2-col hero split */}
         <div className={styles.topicDivider}>
-          <TopicSection title="Business & Markets" articles={businessArticles} columns={3} />
+          <SplitPanel title="Business & Markets" articles={businessArticles} />
         </div>
 
-        {/* Science & Technology — 2-column lead layout */}
+        {/* Science & Technology — 2-col hero split */}
         <div className={styles.topicDivider}>
-          <TopicSection title="Science & Technology" articles={techArticles} columns={2} />
+          <SplitPanel title="Science & Technology" articles={techArticles} />
         </div>
 
-        {/* Opinion — 3-column */}
+        {/* Opinion — 3-column compact */}
         <section className={styles.opinionSection}>
           <SectionHeading title="Opinion" />
           <div className={styles.opinionGrid}>
