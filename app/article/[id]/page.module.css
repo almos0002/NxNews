@@ -388,13 +388,7 @@
   }
 
   .sidebar {
-    position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .sidebarCard {
-    flex: 1 1 200px;
+    display: none;
   }
 
   .relatedGrid {
