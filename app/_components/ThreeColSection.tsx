@@ -12,9 +12,8 @@ export default function ThreeColSection({
 }) {
   const col1Lead = articles[0];
   const col1Text = articles[1];
-  const col2Items = articles.slice(2, 5);
-  const col3Lead = articles[5];
-  const col3Rest = articles.slice(6, 9);
+  const col2Items = articles.slice(2, 6);   // numbered 01–04
+  const col3Items = articles.slice(6, 9);   // numbered 05–07
 
   return (
     <section className={styles.wrapper}>
@@ -68,60 +67,49 @@ export default function ThreeColSection({
           )}
         </div>
 
-        {/* COLUMN 2 — bold editorial stacked headlines, no images */}
-        <div className={styles.col2}>
-          <span className={styles.col2Label}>Must Read</span>
-          {col2Items.map((article, i) => (
-            <a key={article.id} href={`/article/${article.id}`} className={styles.c2Item}>
-              <span className={styles.c2Num}>{String(i + 1).padStart(2, "0")}</span>
-              <div className={styles.c2Content}>
-                <CategoryBadge category={article.category} />
-                <h4 className={styles.c2Title}>{article.title}</h4>
-                <div className={styles.meta}>
-                  <span className={styles.author}>{article.author}</span>
-                  <span className={styles.sep}>·</span>
-                  <span>{article.readTime}</span>
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
+        {/* RIGHT SECTION — Must Read header spans col2 + col3 */}
+        <div className={styles.rightSection}>
+          <div className={styles.mustReadHeader}>
+            <span className={styles.mustReadLabel}>Must Read</span>
+          </div>
 
-        {/* COLUMN 3 — overlay image card + compact text list */}
-        <div className={styles.col3}>
-          {col3Lead && col3Lead.imageUrl && (
-            <a href={`/article/${col3Lead.id}`} className={styles.c3OverlayCard}>
-              <div className={styles.c3OverlayImage}>
-                <Image
-                  src={col3Lead.imageUrl}
-                  alt={col3Lead.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 25vw"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-              <div className={styles.c3OverlayBody}>
-                <CategoryBadge category={col3Lead.category} variant="light" />
-                <h3 className={styles.c3OverlayTitle}>{col3Lead.title}</h3>
-                <div className={styles.metaLight}>
-                  <span className={styles.authorLight}>{col3Lead.author}</span>
-                  <span className={styles.sep}>·</span>
-                  <span>{col3Lead.readTime}</span>
-                </div>
-              </div>
-            </a>
-          )}
-          {col3Rest.map((article) => (
-            <a key={article.id} href={`/article/${article.id}`} className={styles.c3TextItem}>
-              <CategoryBadge category={article.category} />
-              <h4 className={styles.c3TextTitle}>{article.title}</h4>
-              <div className={styles.meta}>
-                <span className={styles.author}>{article.author}</span>
-                <span className={styles.sep}>·</span>
-                <span>{article.readTime}</span>
-              </div>
-            </a>
-          ))}
+          <div className={styles.rightCols}>
+            {/* col2 — numbered 01–04 */}
+            <div className={styles.col2}>
+              {col2Items.map((article, i) => (
+                <a key={article.id} href={`/article/${article.id}`} className={styles.numberedItem}>
+                  <span className={styles.num}>{String(i + 1).padStart(2, "0")}</span>
+                  <div className={styles.numContent}>
+                    <CategoryBadge category={article.category} />
+                    <h4 className={styles.numTitle}>{article.title}</h4>
+                    <div className={styles.meta}>
+                      <span className={styles.author}>{article.author}</span>
+                      <span className={styles.sep}>·</span>
+                      <span>{article.readTime}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            {/* col3 — continues numbering 05–07 */}
+            <div className={styles.col3}>
+              {col3Items.map((article, i) => (
+                <a key={article.id} href={`/article/${article.id}`} className={styles.numberedItem}>
+                  <span className={styles.num}>{String(col2Items.length + i + 1).padStart(2, "0")}</span>
+                  <div className={styles.numContent}>
+                    <CategoryBadge category={article.category} />
+                    <h4 className={styles.numTitle}>{article.title}</h4>
+                    <div className={styles.meta}>
+                      <span className={styles.author}>{article.author}</span>
+                      <span className={styles.sep}>·</span>
+                      <span>{article.readTime}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
       </div>

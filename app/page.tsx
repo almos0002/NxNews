@@ -6,7 +6,7 @@ import TrendingSidebar from "./_components/TrendingSidebar";
 import FeaturedPanel from "./_components/FeaturedPanel";
 import LatestFeed from "./_components/LatestFeed";
 import EditorsPick from "./_components/EditorsPick";
-import SplitPanel from "./_components/SplitPanel";
+import CategoryLists from "./_components/CategoryLists";
 import ThreeColSection from "./_components/ThreeColSection";
 import Footer from "./_components/Footer";
 import {
@@ -23,6 +23,12 @@ import {
 import styles from "./page.module.css";
 
 export default function Home() {
+  const categoryColumns = [
+    { label: "Business", articles: businessArticles.slice(0, 5) },
+    { label: "Technology", articles: techArticles.slice(0, 5) },
+    { label: "Around the World", articles: gridArticles.slice(0, 5) },
+  ];
+
   return (
     <>
       <BreakingTicker headline={breakingHeadline} />
@@ -45,7 +51,7 @@ export default function Home() {
           <EditorsPick articles={editorsPicks} />
         </section>
 
-        {/* Top Stories — grid cards + trending sidebar (unchanged) */}
+        {/* Top Stories — grid cards + trending sidebar */}
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
             <SectionHeading title="Top Stories" />
@@ -60,12 +66,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Business & Markets — 2-col: lead + text items | thumbnail rows */}
-        <div className={styles.topicDivider}>
-          <SplitPanel title="Business & Markets" articles={businessArticles} />
-        </div>
+        {/* 3 category columns — Business | Technology | World (small thumbnail list) */}
+        <CategoryLists columns={categoryColumns} />
 
-        {/* Science & Technology — 3-col: image card | thumb rows | headlines */}
+        {/* Science & Technology — 3-col with Must Read spanning right two columns */}
         <div className={styles.topicDivider}>
           <ThreeColSection title="Science & Technology" articles={techArticles} />
         </div>
