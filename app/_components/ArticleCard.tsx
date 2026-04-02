@@ -20,7 +20,7 @@ export default function ArticleCard({
             src={article.imageUrl}
             alt={article.title}
             fill
-            sizes="(max-width: 768px) 100vw, 66vw"
+            sizes="(max-width: 768px) 100vw, 55vw"
             priority
             style={{ objectFit: "cover" }}
           />
@@ -31,9 +31,9 @@ export default function ArticleCard({
           <p className={styles.heroExcerpt}>{article.excerpt}</p>
           <div className={styles.meta}>
             <span className={styles.author}>{article.author}</span>
-            <span className={styles.separator}>/</span>
+            <span className={styles.separator}>·</span>
             <time className={styles.date}>{article.date}</time>
-            <span className={styles.separator}>/</span>
+            <span className={styles.separator}>·</span>
             <span className={styles.readTime}>{article.readTime}</span>
           </div>
         </div>
@@ -43,14 +43,14 @@ export default function ArticleCard({
 
   if (variant === "sidebar") {
     return (
-      <article className={styles.sidebar}>
+      <a href={`/article/${article.id}`} className={styles.sidebar}>
         {article.imageUrl && (
           <div className={styles.sidebarImage}>
             <Image
               src={article.imageUrl}
               alt={article.title}
               fill
-              sizes="96px"
+              sizes="76px"
               style={{ objectFit: "cover" }}
             />
           </div>
@@ -60,39 +60,41 @@ export default function ArticleCard({
           <h3 className={styles.sidebarTitle}>{article.title}</h3>
           <div className={styles.meta}>
             <span className={styles.author}>{article.author}</span>
-            <span className={styles.separator}>/</span>
+            <span className={styles.separator}>·</span>
             <span className={styles.readTime}>{article.readTime}</span>
           </div>
         </div>
-      </article>
+      </a>
     );
   }
 
   if (variant === "compact") {
     return (
-      <article className={styles.compact}>
-        <div className={styles.compactNumber} aria-hidden="true" />
+      <a href={`/article/${article.id}`} className={styles.compact}>
+        <div className={styles.compactBar} aria-hidden="true" />
         <div className={styles.compactContent}>
           <CategoryBadge category={article.category} />
           <h3 className={styles.compactTitle}>{article.title}</h3>
           <p className={styles.compactExcerpt}>{article.excerpt}</p>
           <div className={styles.meta}>
             <span className={styles.author}>{article.author}</span>
+            <span className={styles.separator}>·</span>
+            <span className={styles.readTime}>{article.readTime}</span>
           </div>
         </div>
-      </article>
+      </a>
     );
   }
 
   return (
-    <article className={styles.grid}>
+    <a href={`/article/${article.id}`} className={styles.grid}>
       {article.imageUrl && (
         <div className={styles.gridImage}>
           <Image
             src={article.imageUrl}
             alt={article.title}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
             style={{ objectFit: "cover" }}
           />
         </div>
@@ -102,10 +104,10 @@ export default function ArticleCard({
         <h3 className={styles.gridTitle}>{article.title}</h3>
         <div className={styles.meta}>
           <span className={styles.author}>{article.author}</span>
-          <span className={styles.separator}>/</span>
+          <span className={styles.separator}>·</span>
           <span className={styles.readTime}>{article.readTime}</span>
         </div>
       </div>
-    </article>
+    </a>
   );
 }

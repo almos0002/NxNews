@@ -1,8 +1,9 @@
+/* ── Hero variant ────────────────────────────────── */
 .hero {
   display: grid;
   grid-template-columns: 1.1fr 1fr;
-  gap: 40px;
-  align-items: center;
+  gap: 0;
+  align-items: stretch;
   background-color: var(--color-surface);
   border-radius: var(--radius);
   overflow: hidden;
@@ -17,15 +18,15 @@
 }
 
 .heroContent {
-  padding: 32px 40px 32px 0;
+  padding: 28px 32px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .heroTitle {
   font-family: var(--font-serif);
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-size: clamp(1.3rem, 2vw, 1.75rem);
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.02em;
@@ -38,20 +39,22 @@
 }
 
 .heroExcerpt {
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  line-height: 1.65;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  line-height: 1.6;
   color: var(--color-ink-secondary);
 }
 
+/* ── Sidebar variant ─────────────────────────────── */
 .sidebar {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: flex-start;
-  padding: 16px;
+  padding: 12px;
   background-color: var(--color-surface);
   border-radius: var(--radius);
   transition: background-color 0.15s ease;
+  text-decoration: none;
 }
 
 .sidebar:hover {
@@ -60,8 +63,8 @@
 
 .sidebarImage {
   position: relative;
-  width: 88px;
-  height: 88px;
+  width: 76px;
+  height: 76px;
   flex-shrink: 0;
   overflow: hidden;
   background-color: var(--color-tag-bg);
@@ -72,70 +75,84 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
 }
 
 .sidebarTitle {
   font-family: var(--font-serif);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
   color: var(--color-ink);
 }
 
+/* ── Grid variant (3-col top stories) ────────────── */
 .grid {
   background-color: var(--color-surface);
   border-radius: var(--radius);
   overflow: hidden;
-  transition: transform 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.15s ease;
 }
 
 .grid:hover {
-  transform: translateY(-2px);
+  background-color: var(--color-tag-bg);
 }
 
 .gridImage {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   background-color: var(--color-tag-bg);
+  flex-shrink: 0;
 }
 
 .gridContent {
-  padding: 20px;
+  padding: 12px 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
 }
 
 .gridTitle {
   font-family: var(--font-serif);
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
   color: var(--color-ink);
-  transition: color 0.15s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.gridTitle:hover {
+.grid:hover .gridTitle {
   color: var(--color-accent);
 }
 
+/* ── Compact variant (opinion / text-only) ───────── */
 .compact {
   display: flex;
-  gap: 20px;
+  gap: 14px;
   align-items: flex-start;
-  padding: 24px;
+  padding: 16px;
   background-color: var(--color-surface);
   border-radius: var(--radius);
+  text-decoration: none;
+  transition: background-color 0.15s ease;
 }
 
-.compactNumber {
-  width: 4px;
-  height: 100%;
-  min-height: 40px;
+.compact:hover {
+  background-color: var(--color-tag-bg);
+}
+
+.compactBar {
+  width: 3px;
+  align-self: stretch;
   background-color: var(--color-accent);
   border-radius: 2px;
   flex-shrink: 0;
@@ -144,25 +161,27 @@
 .compactContent {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
 }
 
 .compactTitle {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
+  font-size: 0.92rem;
   font-weight: 700;
   line-height: 1.35;
   color: var(--color-ink);
 }
 
-.compactTitle:hover {
+.compact:hover .compactTitle {
   color: var(--color-accent);
 }
 
 .compactExcerpt {
-  font-family: var(--font-sans);
-  font-size: 0.88rem;
-  line-height: 1.6;
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  line-height: 1.55;
   color: var(--color-ink-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -170,22 +189,24 @@
   overflow: hidden;
 }
 
+/* ── Shared meta ─────────────────────────────────── */
 .meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
+  gap: 6px;
+  font-family: var(--font-serif);
+  font-size: 0.7rem;
   color: var(--color-ink-muted);
+  flex-wrap: wrap;
 }
 
 .author {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-ink-secondary);
 }
 
 .separator {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   opacity: 0.4;
 }
 
@@ -194,12 +215,13 @@
   font-weight: 400;
 }
 
+/* ── Responsive ──────────────────────────────────── */
 @media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr;
   }
 
   .heroContent {
-    padding: 24px;
+    padding: 20px;
   }
 }
