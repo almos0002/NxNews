@@ -388,7 +388,9 @@
   }
 
   .sidebar {
-    display: none;
+    position: static;
+    display: flex;
+    flex-direction: column;
   }
 
   .relatedGrid {
