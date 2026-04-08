@@ -7,6 +7,7 @@ import ArchiveLayout from "@/app/_components/ArchiveLayout";
 import SearchInput from "@/app/_components/SearchInput";
 import { searchArticles } from "@/app/_data/getAllArticles";
 import { tags } from "@/app/_data/tags";
+import { localizeArticles, getBreakingHeadline } from "@/app/_data/localize";
 import { Link } from "@/i18n/navigation";
 import styles from "@/app/search/page.module.css";
 
@@ -15,18 +16,22 @@ export const metadata: Metadata = {
 };
 
 type Props = {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ q?: string }>;
 };
 
-export default async function LocaleSearchPage({ searchParams }: Props) {
+export default async function LocaleSearchPage({ params, searchParams }: Props) {
+  const { locale } = await params;
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
-  const results = searchArticles(query);
+  const rawResults = searchArticles(query);
+  const results = localizeArticles(rawResults, locale);
   const t = await getTranslations("search");
+  const headline = getBreakingHeadline(locale);
 
   return (
     <>
-      <BreakingTicker />
+      <BreakingTicker headline={headline} />
       <Header />
 
       <div className={styles.hero}>
@@ -54,11 +59,7 @@ export default async function LocaleSearchPage({ searchParams }: Props) {
             <h2 className={styles.browseTitle}>{t("byTopic")}</h2>
             <div className={styles.tagGrid}>
               {tags.map((tag) => (
-                <Link
-                  key={tag.slug}
-                  href={`/tags/${tag.slug}`}
-                  className={styles.tagPill}
-                >
+                <Link key={tag.slug} href={`/tags/${tag.slug}`} className={styles.tagPill}>
                   {tag.label}
                 </Link>
               ))}

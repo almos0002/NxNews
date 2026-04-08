@@ -7,6 +7,7 @@ import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
 import { authors, getAuthorBySlug, nameToSlug } from "@/app/_data/authors";
 import { getAllArticles, getArticlesByAuthor } from "@/app/_data/getAllArticles";
+import { localizeArticles, getBreakingHeadline } from "@/app/_data/localize";
 import { routing } from "@/i18n/routing";
 import styles from "@/app/author/[slug]/page.module.css";
 
@@ -24,15 +25,12 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, slug } = await params;
+  const { slug } = await params;
   const profile = getAuthorBySlug(slug);
   const name = profile?.name ?? slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   return {
     title: `${name} — The Daily Report`,
     description: profile?.bio,
-    alternates: {
-      languages: { en: `/en/author/${slug}`, ne: `/ne/author/${slug}` },
-    },
   };
 }
 
@@ -77,9 +75,10 @@ function AuthorProfile({
 }
 
 export default async function AuthorPage({ params }: Props) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const profile = getAuthorBySlug(slug);
   const t = await getTranslations("archive");
+  const headline = getBreakingHeadline(locale);
 
   const authorName = (() => {
     if (profile) return profile.name;
@@ -89,11 +88,12 @@ export default async function AuthorPage({ params }: Props) {
 
   if (!authorName) notFound();
 
-  const articles = getArticlesByAuthor(authorName);
+  const rawArticles = getArticlesByAuthor(authorName);
+  const articles = localizeArticles(rawArticles, locale);
 
   return (
     <>
-      <BreakingTicker />
+      <BreakingTicker headline={headline} />
       <Header />
       <ArchiveLayout
         badge={t("journalistBadge")}

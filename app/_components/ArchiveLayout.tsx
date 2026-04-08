@@ -1,8 +1,10 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import type { Article } from "@/app/_data/articles";
 import { tags } from "@/app/_data/tags";
 import { trendingArticles } from "@/app/_data/articles";
+import { localizeArticles, localizeTrending } from "@/app/_data/localize";
 import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
 import styles from "./ArchiveLayout.module.css";
@@ -19,14 +21,15 @@ interface ArchiveLayoutProps {
 async function ArchiveSidebar() {
   const tArchive = await getTranslations("archive");
   const tNewsletter = await getTranslations("newsletter");
+  const locale = await getLocale();
+  const localizedTrending = localizeTrending(trendingArticles, locale);
 
   return (
     <aside className={styles.sidebar}>
-      {/* Trending Now */}
       <div className={styles.sidebarCard}>
         <h2 className={styles.sidebarHeading}>{tArchive("trendingNow")}</h2>
         <ol className={styles.trendingList}>
-          {trendingArticles.map((article, i) => (
+          {localizedTrending.map((article, i) => (
             <li key={article.id} className={styles.trendingItem}>
               <span className={styles.trendingRank}>
                 {String(i + 1).padStart(2, "0")}
@@ -42,7 +45,6 @@ async function ArchiveSidebar() {
         </ol>
       </div>
 
-      {/* Browse Topics */}
       <div className={styles.sidebarCard}>
         <h2 className={styles.sidebarHeading}>{tArchive("browseTopics")}</h2>
         <div className={styles.topicList}>
@@ -54,7 +56,6 @@ async function ArchiveSidebar() {
         </div>
       </div>
 
-      {/* Newsletter */}
       <div className={`${styles.sidebarCard} ${styles.newsletter}`}>
         <p className={styles.newsletterEyebrow}>{tNewsletter("eyebrow")}</p>
         <h2 className={styles.newsletterTitle}>{tNewsletter("title")}</h2>
@@ -87,7 +88,6 @@ export default async function ArchiveLayout({
 
   return (
     <div className={styles.wrapper}>
-      {/* Page hero header */}
       <div className={styles.hero}>
         <div className={styles.heroInner}>
           <span className={styles.badge}>{badge}</span>

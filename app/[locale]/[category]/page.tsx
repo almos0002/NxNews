@@ -7,6 +7,8 @@ import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
 import { categories } from "@/app/_data/articles";
 import { getArticlesByCategory } from "@/app/_data/getAllArticles";
+import { localizeArticles, getBreakingHeadline } from "@/app/_data/localize";
+import { categoryDescriptionsNe } from "@/app/_data/articlesNe";
 import { routing } from "@/i18n/routing";
 
 const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author"]);
@@ -24,13 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const label = categories.find((c) => c.toLowerCase() === category) ?? category;
   return {
     title: `${label} — The Daily Report`,
-    alternates: {
-      languages: { en: `/en/${category}`, ne: `/ne/${category}` },
-    },
+    alternates: { languages: { en: `/en/${category}`, ne: `/ne/${category}` } },
   };
 }
 
-const categoryDescriptions: Record<string, string> = {
+const categoryDescriptionsEn: Record<string, string> = {
   world: "On-the-ground reporting from every corner of the globe — conflict, diplomacy, development, and the events that shape our interconnected world.",
   politics: "In-depth analysis and breaking coverage of national and international politics, policy, and governance.",
   business: "Markets, companies, economics, and the forces driving the global economy.",
@@ -42,7 +42,7 @@ const categoryDescriptions: Record<string, string> = {
 };
 
 export default async function CategoryPage({ params }: Props) {
-  const { category } = await params;
+  const { category, locale } = await params;
 
   if (RESERVED.has(category)) notFound();
 
@@ -50,18 +50,21 @@ export default async function CategoryPage({ params }: Props) {
   if (!label) notFound();
 
   const t = await getTranslations("archive");
-  const articles = getArticlesByCategory(label);
-  const count = articles.length;
+  const rawArticles = getArticlesByCategory(label);
+  const articles = localizeArticles(rawArticles, locale);
+  const headline = getBreakingHeadline(locale);
+
+  const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
 
   return (
     <>
-      <BreakingTicker />
+      <BreakingTicker headline={headline} />
       <Header />
       <ArchiveLayout
         badge={t("categoryBadge")}
         title={label}
-        description={categoryDescriptions[category]}
-        count={count}
+        description={descriptions[category]}
+        count={articles.length}
         articles={articles}
       />
       <Footer />
