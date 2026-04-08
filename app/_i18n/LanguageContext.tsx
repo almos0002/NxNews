@@ -4,7 +4,7 @@ import {
   createContext,
   useContext,
   useState,
-  useEffect,
+  useLayoutEffect,
   useCallback,
   type ReactNode,
 } from "react";
@@ -32,42 +32,33 @@ const LanguageContext = createContext<LanguageContextValue>({
 const STORAGE_KEY = "tdr-lang";
 const VALID_CODES = languages.map((l) => l.code);
 
-function getInitialLang(): LangCode {
-  /* The anti-flash script in layout.tsx already set data-lang on <html>
-     before React hydrated. Reading it here is instant — no localStorage
-     delay, no flash. Falls back to localStorage then "en". */
-  try {
-    const fromAttr = document.documentElement.getAttribute("data-lang") as LangCode;
-    if (fromAttr && VALID_CODES.includes(fromAttr)) return fromAttr;
-    const fromStorage = localStorage.getItem(STORAGE_KEY) as LangCode;
-    if (fromStorage && VALID_CODES.includes(fromStorage)) return fromStorage;
-  } catch {}
-  return "en";
+function applyToDOM(code: LangCode) {
+  const meta = languages.find((l) => l.code === code)!;
+  const root = document.documentElement;
+  root.setAttribute("data-lang", code);
+  root.setAttribute("lang", code);
+  root.setAttribute("dir", meta.dir);
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<LangCode>("en");
 
-  useEffect(() => {
-    /* On mount, read the lang that the anti-flash script already applied */
-    const initial = getInitialLang();
-    if (initial !== "en") {
-      setLangState(initial);
-    }
+  /* useLayoutEffect runs synchronously after DOM paint — the user never
+     sees the default "en" render if they have another language saved. */
+  useLayoutEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY) as LangCode | null;
+      if (stored && VALID_CODES.includes(stored) && stored !== "en") {
+        setLangState(stored);
+        applyToDOM(stored);
+      }
+    } catch {}
   }, []);
-
-  function applyLang(code: LangCode) {
-    const meta = languages.find((l) => l.code === code)!;
-    const root = document.documentElement;
-    root.setAttribute("data-lang", code);
-    root.setAttribute("lang", code);
-    root.setAttribute("dir", meta.dir);
-  }
 
   const setLang = useCallback((code: LangCode) => {
     setLangState(code);
-    localStorage.setItem(STORAGE_KEY, code);
-    applyLang(code);
+    try { localStorage.setItem(STORAGE_KEY, code); } catch {}
+    applyToDOM(code);
   }, []);
 
   const t = useCallback(
@@ -92,7 +83,6 @@ export function useT() {
   return useContext(LanguageContext).t;
 }
 
-/** Inline translated text — safe to use inside Server Components. */
 export function T({ id }: { id: string }) {
   const t = useT();
   return <>{t(id)}</>;

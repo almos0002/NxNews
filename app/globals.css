@@ -34,18 +34,6 @@ html[data-lang="ne"] h4 {
   letter-spacing: 0;
 }
 
-/* Scale up clamp values aren't enough for Devanagari, so we nudge key elements */
-html[data-lang="ne"] p,
-html[data-lang="ne"] a,
-html[data-lang="ne"] li,
-html[data-lang="ne"] span,
-html[data-lang="ne"] label,
-html[data-lang="ne"] button,
-html[data-lang="ne"] input {
-  font-size: 1.05em;
-  line-height: 1.75;
-}
-
 /* Arabic — Noto Naskh Arabic (also switches to RTL) */
 html[data-lang="ar"] {
   --font-serif: var(--font-arabic), "Noto Naskh Arabic", serif;
