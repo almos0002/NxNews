@@ -121,7 +121,7 @@ export default async function AuthorPage({ params }: Props) {
       <BreakingTicker />
       <Header />
       <ArchiveLayout
-        badge="Journalist"
+        badgeKey="archive.journalist"
         title={authorName}
         count={articles.length}
         articles={articles}

@@ -37,7 +37,7 @@ export default async function TagPage({ params }: Props) {
       <BreakingTicker />
       <Header />
       <ArchiveLayout
-        badge="Topic"
+        badgeKey="archive.topic"
         title={tagData.label}
         description={tagData.description}
         count={articles.length}

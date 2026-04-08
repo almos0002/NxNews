@@ -43,7 +43,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
       {query ? (
         <ArchiveLayout
-          badge="Search Results"
+          badgeKey="archive.searchResults"
           title={`"${query}"`}
           description={results.length > 0 ? undefined : "Try a different keyword or browse our topics below."}
           count={results.length}

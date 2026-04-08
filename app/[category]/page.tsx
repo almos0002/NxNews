@@ -52,7 +52,7 @@ export default async function CategoryPage({ params }: Props) {
       <BreakingTicker />
       <Header />
       <ArchiveLayout
-        badge="Category"
+        badgeKey="archive.category"
         title={label}
         description={categoryDescriptions[category] ?? `Latest ${label} coverage from The Daily Report.`}
         count={articles.length}

@@ -1,12 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import type { Article } from "@/app/_data/articles";
 import { tags } from "@/app/_data/tags";
 import { trendingArticles } from "@/app/_data/articles";
 import CategoryBadge from "./CategoryBadge";
+import { useT } from "@/app/_i18n/LanguageContext";
 import styles from "./ArchiveLayout.module.css";
 
 interface ArchiveLayoutProps {
-  badge: string;
+  badgeKey: string;
   title: string;
   description?: string;
   count: number;
@@ -15,11 +18,11 @@ interface ArchiveLayoutProps {
 }
 
 function ArchiveSidebar() {
+  const t = useT();
   return (
     <aside className={styles.sidebar}>
-      {/* Trending Now */}
       <div className={styles.sidebarCard}>
-        <h2 className={styles.sidebarHeading}>Trending Now</h2>
+        <h2 className={styles.sidebarHeading}>{t("sections.trendingNow")}</h2>
         <ol className={styles.trendingList}>
           {trendingArticles.map((article, i) => (
             <li key={article.id} className={styles.trendingItem}>
@@ -37,34 +40,30 @@ function ArchiveSidebar() {
         </ol>
       </div>
 
-      {/* Browse Topics */}
       <div className={styles.sidebarCard}>
-        <h2 className={styles.sidebarHeading}>Browse Topics</h2>
+        <h2 className={styles.sidebarHeading}>{t("sections.browseTopics")}</h2>
         <div className={styles.topicList}>
-          {tags.map((t) => (
-            <a key={t.slug} href={`/tags/${t.slug}`} className={styles.topicPill}>
-              {t.label}
+          {tags.map((tag) => (
+            <a key={tag.slug} href={`/tags/${tag.slug}`} className={styles.topicPill}>
+              {tag.label}
             </a>
           ))}
         </div>
       </div>
 
-      {/* Newsletter */}
       <div className={`${styles.sidebarCard} ${styles.newsletter}`}>
-        <p className={styles.newsletterEyebrow}>Free, daily</p>
-        <h2 className={styles.newsletterTitle}>The Daily Briefing</h2>
-        <p className={styles.newsletterDesc}>
-          The most important stories, explained — in your inbox every morning.
-        </p>
+        <p className={styles.newsletterEyebrow}>{t("newsletter.eyebrow")}</p>
+        <h2 className={styles.newsletterTitle}>{t("newsletter.morningTitle")}</h2>
+        <p className={styles.newsletterDesc}>{t("newsletter.morningDesc")}</p>
         <form className={styles.newsletterForm} action="#" method="post">
           <input
             type="email"
-            placeholder="Your email address"
+            placeholder={t("newsletter.placeholder")}
             className={styles.newsletterInput}
-            aria-label="Email address"
+            aria-label={t("newsletter.placeholder")}
           />
           <button type="submit" className={styles.newsletterBtn}>
-            Subscribe
+            {t("newsletter.btn")}
           </button>
         </form>
       </div>
@@ -73,16 +72,19 @@ function ArchiveSidebar() {
 }
 
 export default function ArchiveLayout({
-  badge,
+  badgeKey,
   title,
   description,
   count,
   articles,
   profileSlot,
 }: ArchiveLayoutProps) {
+  const t = useT();
+  const badge = t(badgeKey) || badgeKey;
+  const articleWord = count === 1 ? t("archive.article") : t("archive.articles");
+
   return (
     <div className={styles.wrapper}>
-      {/* Page hero header */}
       <div className={styles.hero}>
         <div className={styles.heroInner}>
           <span className={styles.badge}>{badge}</span>
@@ -90,28 +92,26 @@ export default function ArchiveLayout({
           {description && <p className={styles.description}>{description}</p>}
           <p className={styles.count}>
             {count === 0
-              ? "No articles found"
-              : `${count} article${count !== 1 ? "s" : ""}`}
+              ? t("archive.noArticles")
+              : `${count} ${articleWord}`}
           </p>
         </div>
       </div>
 
       <div className={styles.content}>
-        {/* Optional profile slot (author page) */}
         {profileSlot && (
           <div className={styles.profileSlot}>{profileSlot}</div>
         )}
 
         <div className={styles.layout}>
-          {/* Main — article grid */}
           <div className={styles.main}>
             {articles.length === 0 ? (
               <div className={styles.empty}>
                 <p className={styles.emptyText}>
-                  No articles found for this {badge.toLowerCase()}.
+                  {t("archive.noArticles")}
                 </p>
                 <a href="/" className={styles.emptyLink}>
-                  Back to homepage →
+                  {t("archive.backHome")}
                 </a>
               </div>
             ) : (
@@ -144,7 +144,7 @@ export default function ArchiveLayout({
                           {article.author}
                         </span>
                         <span className={styles.cardDot} />
-                        <span>{article.readTime} read</span>
+                        <span>{article.readTime}</span>
                         {article.date && (
                           <>
                             <span className={styles.cardDot} />
@@ -159,7 +159,6 @@ export default function ArchiveLayout({
             )}
           </div>
 
-          {/* Sidebar */}
           <ArchiveSidebar />
         </div>
       </div>
