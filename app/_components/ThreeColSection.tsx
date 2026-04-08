@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import type { Article } from "@/app/_data/articles";
 import { Link } from "@/i18n/navigation";
@@ -59,39 +58,10 @@ export default async function ThreeColSection({
       </div>
 
       <div className={styles.cols}>
-        {/* ── Column 1: hero image (numbered 01) + 2 numbered text items ── */}
+        {/* ── Column 1: all numbered items 01, 02, 03 ── */}
         <div className={styles.col1}>
-          {col1Lead && (
-            <Link href={`/article/${col1Lead.id}`} className={styles.c1Lead}>
-              {col1Lead.imageUrl && (
-                <div className={styles.c1Image}>
-                  <Image
-                    src={col1Lead.imageUrl}
-                    alt={col1Lead.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 30vw"
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              )}
-              {/* Number badge 01 on the lead card */}
-              <span className={styles.leadNum}>01</span>
-              <div className={styles.c1Body}>
-                <CategoryBadge category={col1Lead.category} />
-                <h3 className={styles.c1Title}>{col1Lead.title}</h3>
-                {col1Lead.excerpt && (
-                  <p className={styles.c1Excerpt}>{col1Lead.excerpt}</p>
-                )}
-                <div className={styles.meta}>
-                  <span className={styles.author}>{col1Lead.author}</span>
-                  <span className={styles.sep}>·</span>
-                  <span>{col1Lead.readTime}</span>
-                </div>
-              </div>
-            </Link>
-          )}
+          {col1Lead && numberedItem(col1Lead, 1)}
 
-          {/* Col 1 numbered text items: 02, 03 */}
           {col1Texts.map((article, i) =>
             numberedItem(article, i + 2)
           )}
