@@ -77,24 +77,35 @@
   background-color: var(--color-tag-bg);
 }
 
-/* Number 01 badge overlaid on the lead image bottom-left */
-.leadNum {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  font-family: var(--font-serif);
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 1;
-  color: white;
-  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%);
-  padding: 18px 18px 12px;
-  pointer-events: none;
-  width: 100%;
-  text-align: left;
-  letter-spacing: -0.02em;
-  opacity: 0.75;
+/* ── Lead item: thumbnail + numbered row ── */
+.leadItem {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.15s ease;
 }
+.leadItem:hover { background-color: var(--color-tag-bg); }
+
+.leadImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--color-tag-bg);
+  flex-shrink: 0;
+}
+
+.leadBody {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.leadBody .numTitle { color: var(--color-ink); }
+.leadItem:hover .numTitle { color: var(--color-accent); }
+.leadItem:hover .num { color: var(--color-accent); }
 
 .c1Body {
   padding: 13px 16px;
