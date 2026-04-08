@@ -10,6 +10,9 @@ import LatestFeed from "@/app/_components/LatestFeed";
 import EditorsPick from "@/app/_components/EditorsPick";
 import CategoryLists from "@/app/_components/CategoryLists";
 import ThreeColSection from "@/app/_components/ThreeColSection";
+import VideoSection from "@/app/_components/VideoSection";
+import WeatherSection from "@/app/_components/WeatherSection";
+import EntertainmentSection from "@/app/_components/EntertainmentSection";
 import Footer from "@/app/_components/Footer";
 import AdSlot from "@/app/_components/AdSlot";
 import {
@@ -20,7 +23,7 @@ import {
   gridArticles,
   businessArticles,
   techArticles,
-  opinionArticles,
+  entertainmentArticles,
 } from "@/app/_data/articles";
 import { localizeArticle, localizeArticles, getBreakingHeadline } from "@/app/_data/localize";
 import styles from "@/app/page.module.css";
@@ -49,7 +52,7 @@ export default async function LocaleHomePage({ params }: Props) {
   const grid = localizeArticles(gridArticles, locale);
   const business = localizeArticles(businessArticles, locale);
   const tech = localizeArticles(techArticles, locale);
-  const opinion = localizeArticles(opinionArticles, locale);
+  const entertainment = localizeArticles(entertainmentArticles, locale);
 
   const categoryColumns = [
     { label: tNav("business"), articles: business.slice(0, 5) },
@@ -70,7 +73,7 @@ export default async function LocaleHomePage({ params }: Props) {
           <FeaturedPanel primary={featured} secondary={secondary} />
         </section>
 
-        {/* Ad 1 — Leaderboard after hero */}
+        {/* Ad 1 — after hero */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
@@ -80,7 +83,7 @@ export default async function LocaleHomePage({ params }: Props) {
           <LatestFeed articles={latest} />
         </section>
 
-        {/* Ad 2 — Leaderboard after latest */}
+        {/* Ad 2 — after latest */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
@@ -105,7 +108,7 @@ export default async function LocaleHomePage({ params }: Props) {
           </div>
         </section>
 
-        {/* Ad 3 — Leaderboard after Top Stories */}
+        {/* Ad 3 — after Top Stories */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
@@ -113,7 +116,7 @@ export default async function LocaleHomePage({ params }: Props) {
         {/* Category columns */}
         <CategoryLists columns={categoryColumns} />
 
-        {/* Ad 4 — Billboard after category columns */}
+        {/* Ad 4 — billboard after categories */}
         <div className={styles.adSection}>
           <AdSlot variant="billboard" />
         </div>
@@ -123,22 +126,32 @@ export default async function LocaleHomePage({ params }: Props) {
           <ThreeColSection title={t("scienceTech")} articles={tech} />
         </div>
 
-        {/* Ad 5 — Leaderboard after Science section */}
+        {/* Ad 5 — after Science */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
 
-        {/* Opinion */}
-        <section className={styles.opinionSection}>
-          <SectionHeading title={t("opinion")} />
-          <div className={styles.opinionGrid}>
-            {opinion.map((article) => (
-              <ArticleCard key={article.id} article={article} variant="grid" />
-            ))}
-          </div>
+        {/* Videos */}
+        <section className={styles.section}>
+          <VideoSection />
         </section>
 
-        {/* Ad 6 — Leaderboard before newsletter */}
+        {/* Ad 6 — after Videos */}
+        <div className={styles.adSection}>
+          <AdSlot variant="leaderboard" />
+        </div>
+
+        {/* World Weather */}
+        <section className={styles.section}>
+          <WeatherSection />
+        </section>
+
+        {/* Entertainment */}
+        <section className={styles.section}>
+          <EntertainmentSection articles={entertainment} />
+        </section>
+
+        {/* Ad 7 — before newsletter */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
