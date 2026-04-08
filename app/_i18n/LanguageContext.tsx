@@ -30,15 +30,29 @@ const LanguageContext = createContext<LanguageContextValue>({
 });
 
 const STORAGE_KEY = "tdr-lang";
+const VALID_CODES = languages.map((l) => l.code);
+
+function getInitialLang(): LangCode {
+  /* The anti-flash script in layout.tsx already set data-lang on <html>
+     before React hydrated. Reading it here is instant — no localStorage
+     delay, no flash. Falls back to localStorage then "en". */
+  try {
+    const fromAttr = document.documentElement.getAttribute("data-lang") as LangCode;
+    if (fromAttr && VALID_CODES.includes(fromAttr)) return fromAttr;
+    const fromStorage = localStorage.getItem(STORAGE_KEY) as LangCode;
+    if (fromStorage && VALID_CODES.includes(fromStorage)) return fromStorage;
+  } catch {}
+  return "en";
+}
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<LangCode>("en");
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as LangCode | null;
-    if (stored && languages.some((l) => l.code === stored)) {
-      applyLang(stored);
-      setLangState(stored);
+    /* On mount, read the lang that the anti-flash script already applied */
+    const initial = getInitialLang();
+    if (initial !== "en") {
+      setLangState(initial);
     }
   }, []);
 
@@ -74,15 +88,11 @@ export function useLanguage() {
   return useContext(LanguageContext);
 }
 
-/** Shorthand hook — just returns the t() function */
 export function useT() {
   return useContext(LanguageContext).t;
 }
 
-/**
- * `<T id="key" />` — Inline translated text.
- * Use inside Server Components: they can render Client Components.
- */
+/** Inline translated text — safe to use inside Server Components. */
 export function T({ id }: { id: string }) {
   const t = useT();
   return <>{t(id)}</>;
