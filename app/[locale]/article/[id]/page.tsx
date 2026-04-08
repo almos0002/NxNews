@@ -119,12 +119,19 @@ export default async function ArticlePage({ params }: Props) {
   const t = await getTranslations("article");
   const headline = getBreakingHeadline(locale);
 
+  // Split body into three chunks for in-article ads
+  const third = Math.ceil(body.length / 3);
+  const chunk1 = body.slice(0, third);
+  const chunk2 = body.slice(third, third * 2);
+  const chunk3 = body.slice(third * 2);
+
   return (
     <>
       <BreakingTicker headline={headline} />
       <Header />
 
       <main className={styles.main}>
+        {/* ── Article header ── */}
         <div className={styles.articleHeader}>
           <div className={styles.categoryRow}>
             <CategoryBadge category={article.category} />
@@ -168,6 +175,12 @@ export default async function ArticlePage({ params }: Props) {
           </div>
         </div>
 
+        {/* ── Pre-content leaderboard ── */}
+        <div className={styles.inArticleAd}>
+          <AdSlot variant="leaderboard" />
+        </div>
+
+        {/* ── Hero image ── */}
         {article.imageUrl && (
           <div className={styles.heroImage}>
             <Image src={article.imageUrl} alt={loc.title} fill
@@ -175,17 +188,39 @@ export default async function ArticlePage({ params }: Props) {
           </div>
         )}
 
+        {/* ── Body + sidebar ── */}
         <div className={styles.layout}>
           <article className={styles.body}>
-            {body.slice(0, Math.ceil(body.length / 2)).map((para, i) => (
-              <p key={i} className={styles.para}>{para}</p>
+            {/* Chunk 1 */}
+            {chunk1.map((para, i) => (
+              <p key={`c1-${i}`} className={styles.para}>{para}</p>
             ))}
+
+            {/* In-article ad 1 */}
+            <div className={styles.inBodyAd}>
+              <AdSlot variant="leaderboard" />
+            </div>
+
+            {/* Pull quote */}
             <div className={styles.pullQuote}>
               <blockquote className={styles.quote}>{loc.excerpt || body[1]}</blockquote>
             </div>
-            {body.slice(Math.ceil(body.length / 2)).map((para, i) => (
-              <p key={`b${i}`} className={styles.para}>{para}</p>
+
+            {/* Chunk 2 */}
+            {chunk2.map((para, i) => (
+              <p key={`c2-${i}`} className={styles.para}>{para}</p>
             ))}
+
+            {/* In-article ad 2 */}
+            <div className={styles.inBodyAd}>
+              <AdSlot variant="leaderboard" />
+            </div>
+
+            {/* Chunk 3 */}
+            {chunk3.map((para, i) => (
+              <p key={`c3-${i}`} className={styles.para}>{para}</p>
+            ))}
+
             <div className={styles.tagRow}>
               <span className={styles.tagLabel}>{t("topics")}</span>
               <span className={styles.tag}>{article.category}</span>
@@ -212,9 +247,16 @@ export default async function ArticlePage({ params }: Props) {
               <Link href="/subscribe" className={styles.sidebarCta}>{t("subscribeFree")}</Link>
             </div>
             <AdSlot variant="rectangle" />
+            <AdSlot variant="halfpage" />
           </aside>
         </div>
 
+        {/* ── Post-article leaderboard ── */}
+        <div className={styles.postArticleAd}>
+          <AdSlot variant="leaderboard" />
+        </div>
+
+        {/* ── Related articles ── */}
         {related.length > 0 && (
           <section className={styles.related}>
             <div className={styles.relatedHeading}>
@@ -245,6 +287,11 @@ export default async function ArticlePage({ params }: Props) {
             </div>
           </section>
         )}
+
+        {/* ── Post-related billboard ── */}
+        <div className={styles.billboardAd}>
+          <AdSlot variant="billboard" />
+        </div>
       </main>
 
       <Footer />

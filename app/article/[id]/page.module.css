@@ -376,6 +376,37 @@
   flex-shrink: 0;
 }
 
+/* ── Ad placements ────────────────────────────────── */
+.inArticleAd {
+  margin: 24px 0 0;
+  display: flex;
+  justify-content: center;
+}
+
+.inBodyAd {
+  margin: 32px 0;
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.postArticleAd {
+  margin: 48px 0 0;
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.billboardAd {
+  margin: 48px 0 0;
+  display: flex;
+  justify-content: center;
+}
+
 /* ── Responsive ───────────────────────────────────── */
 @media (max-width: 700px) {
   .main {

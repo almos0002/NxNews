@@ -65,22 +65,32 @@ export default async function LocaleHomePage({ params }: Props) {
       <Header />
 
       <main className={styles.main}>
+        {/* Featured panel */}
         <section className={styles.section}>
           <FeaturedPanel primary={featured} secondary={secondary} />
         </section>
 
-        <section className={styles.adSection}>
+        {/* Ad 1 — Leaderboard after hero */}
+        <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
-        </section>
+        </div>
 
+        {/* Latest feed */}
         <section className={styles.section}>
           <LatestFeed articles={latest} />
         </section>
 
+        {/* Ad 2 — Leaderboard after latest */}
+        <div className={styles.adSection}>
+          <AdSlot variant="leaderboard" />
+        </div>
+
+        {/* Editor's Pick */}
         <section className={styles.section}>
           <EditorsPick articles={picks} />
         </section>
 
+        {/* Top Stories + Trending sidebar */}
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
             <SectionHeading title={t("topStories")} />
@@ -95,16 +105,30 @@ export default async function LocaleHomePage({ params }: Props) {
           </div>
         </section>
 
+        {/* Ad 3 — Leaderboard after Top Stories */}
+        <div className={styles.adSection}>
+          <AdSlot variant="leaderboard" />
+        </div>
+
+        {/* Category columns */}
         <CategoryLists columns={categoryColumns} />
 
-        <section className={styles.adSection}>
-          <AdSlot variant="leaderboard" />
-        </section>
+        {/* Ad 4 — Billboard after category columns */}
+        <div className={styles.adSection}>
+          <AdSlot variant="billboard" />
+        </div>
 
+        {/* Science & Technology */}
         <div className={styles.topicDivider}>
           <ThreeColSection title={t("scienceTech")} articles={tech} />
         </div>
 
+        {/* Ad 5 — Leaderboard after Science section */}
+        <div className={styles.adSection}>
+          <AdSlot variant="leaderboard" />
+        </div>
+
+        {/* Opinion */}
         <section className={styles.opinionSection}>
           <SectionHeading title={t("opinion")} />
           <div className={styles.opinionGrid}>
@@ -114,6 +138,12 @@ export default async function LocaleHomePage({ params }: Props) {
           </div>
         </section>
 
+        {/* Ad 6 — Leaderboard before newsletter */}
+        <div className={styles.adSection}>
+          <AdSlot variant="leaderboard" />
+        </div>
+
+        {/* Newsletter */}
         <section className={styles.newsletterSection}>
           <div className={styles.newsletterInner}>
             <p className={styles.newsletterEyebrow}>{t("newsletterEyebrow")}</p>
