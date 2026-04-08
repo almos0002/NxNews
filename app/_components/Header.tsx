@@ -18,6 +18,9 @@ export default async function Header() {
     Culture: "culture",
     Opinion: "opinion",
     Sports: "sports",
+    Videos: "videos",
+    Weather: "weather",
+    Entertainment: "entertainment",
   };
 
   return (

@@ -20,6 +20,9 @@ export const categories = [
   "Culture",
   "Opinion",
   "Sports",
+  "Videos",
+  "Weather",
+  "Entertainment",
 ];
 
 export const breakingHeadline =
