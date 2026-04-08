@@ -1,28 +1,32 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
 import { categories } from "@/app/_data/articles";
 import { getArticlesByCategory } from "@/app/_data/getAllArticles";
+import { routing } from "@/i18n/routing";
 
 const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author"]);
 
-type Props = {
-  params: Promise<{ category: string }>;
-};
+type Props = { params: Promise<{ locale: string; category: string }> };
 
 export async function generateStaticParams() {
-  return categories.map((cat) => ({ category: cat.toLowerCase() }));
+  return routing.locales.flatMap((locale) =>
+    categories.map((cat) => ({ locale, category: cat.toLowerCase() }))
+  );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { category } = await params;
+  const { locale, category } = await params;
   const label = categories.find((c) => c.toLowerCase() === category) ?? category;
   return {
-    title: `${label} | The Daily Report`,
-    description: `Latest ${label} news, analysis, and reporting from The Daily Report.`,
+    title: `${label} — The Daily Report`,
+    alternates: {
+      languages: { en: `/en/${category}`, ne: `/ne/${category}` },
+    },
   };
 }
 
@@ -45,17 +49,19 @@ export default async function CategoryPage({ params }: Props) {
   const label = categories.find((c) => c.toLowerCase() === category);
   if (!label) notFound();
 
+  const t = await getTranslations("archive");
   const articles = getArticlesByCategory(label);
+  const count = articles.length;
 
   return (
     <>
       <BreakingTicker />
       <Header />
       <ArchiveLayout
-        badge="Category"
+        badge={t("categoryBadge")}
         title={label}
-        description={categoryDescriptions[category] ?? `Latest ${label} coverage from The Daily Report.`}
-        count={articles.length}
+        description={categoryDescriptions[category]}
+        count={count}
         articles={articles}
       />
       <Footer />

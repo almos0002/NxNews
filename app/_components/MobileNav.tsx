@@ -1,21 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { categories } from "@/app/_data/articles";
+import { Link } from "@/i18n/navigation";
 import styles from "./MobileNav.module.css";
+
+const catKeys: Record<string, string> = {
+  World: "world",
+  Politics: "politics",
+  Business: "business",
+  Technology: "technology",
+  Science: "science",
+  Culture: "culture",
+  Opinion: "opinion",
+  Sports: "sports",
+};
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("nav");
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   return (
@@ -23,7 +31,7 @@ export default function MobileNav() {
       <button
         className={styles.hamburger}
         onClick={() => setOpen(true)}
-        aria-label="Open menu"
+        aria-label={t("openMenu")}
         aria-expanded={open}
       >
         <span className={styles.bar} />
@@ -41,14 +49,14 @@ export default function MobileNav() {
 
       <div className={`${styles.drawer} ${open ? styles.drawerOpen : ""}`} aria-hidden={!open}>
         <div className={styles.drawerHeader}>
-          <a href="/" className={styles.drawerLogo} onClick={() => setOpen(false)}>
+          <Link href="/" className={styles.drawerLogo} onClick={() => setOpen(false)}>
             <span className={styles.drawerLogoMark}>DR</span>
             <span className={styles.drawerLogoText}>The Daily Report</span>
-          </a>
+          </Link>
           <button
             className={styles.closeBtn}
             onClick={() => setOpen(false)}
-            aria-label="Close menu"
+            aria-label={t("closeMenu")}
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
               <line x1="1" y1="1" x2="17" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -61,22 +69,26 @@ export default function MobileNav() {
           <ul className={styles.drawerList}>
             {categories.map((cat) => (
               <li key={cat}>
-                <a
+                <Link
                   href={`/${cat.toLowerCase()}`}
                   className={styles.drawerLink}
                   onClick={() => setOpen(false)}
                 >
-                  {cat}
-                </a>
+                  {t(catKeys[cat] ?? cat.toLowerCase())}
+                </Link>
               </li>
             ))}
           </ul>
         </nav>
 
         <div className={styles.drawerFooter}>
-          <a href="/subscribe" className={styles.drawerSubscribe} onClick={() => setOpen(false)}>
-            Subscribe
-          </a>
+          <Link
+            href="/subscribe"
+            className={styles.drawerSubscribe}
+            onClick={() => setOpen(false)}
+          >
+            {t("subscribe")}
+          </Link>
         </div>
       </div>
     </>

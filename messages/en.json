@@ -1,0 +1,116 @@
+{
+  "site": {
+    "name": "The Daily Report",
+    "tagline": "Independent, in-depth journalism for a complex world.",
+    "description": "The Daily Report delivers independent, in-depth journalism covering world affairs, politics, business, technology, science, and culture."
+  },
+  "nav": {
+    "world": "World",
+    "politics": "Politics",
+    "business": "Business",
+    "technology": "Technology",
+    "science": "Science",
+    "culture": "Culture",
+    "opinion": "Opinion",
+    "sports": "Sports",
+    "subscribe": "Subscribe",
+    "search": "Search",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "footer": {
+    "description": "Independent, in-depth journalism for a complex world. Delivering clarity through rigorous reporting since 2024.",
+    "sections": "Sections",
+    "company": "Company",
+    "about": "About",
+    "careers": "Careers",
+    "contact": "Contact",
+    "advertise": "Advertise",
+    "ethics": "Ethics Policy",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies",
+    "copyright": "© 2026 The Daily Report"
+  },
+  "ticker": {
+    "live": "LIVE"
+  },
+  "article": {
+    "relatedNews": "Related News",
+    "share": "Share",
+    "copyLink": "Copy link",
+    "linkCopied": "Copied!",
+    "by": "By",
+    "minRead": "read"
+  },
+  "archive": {
+    "categoryBadge": "Category",
+    "topicBadge": "Topic",
+    "journalistBadge": "Journalist",
+    "noArticles": "No articles found for this section.",
+    "backHome": "Back to homepage →",
+    "trendingNow": "Trending Now",
+    "browseTopics": "Browse Topics",
+    "articles": "articles",
+    "article": "article"
+  },
+  "search": {
+    "findAnyStory": "Find any story",
+    "resultsFor": "Results for \"{query}\"",
+    "subtitle": "Search across all articles, topics, categories, and authors.",
+    "placeholder": "Search articles, topics, authors…",
+    "button": "Search",
+    "clearSearch": "Clear search",
+    "byTopic": "Browse by topic",
+    "noResults": "Try a different keyword or browse our topics below.",
+    "badge": "Search"
+  },
+  "newsletter": {
+    "eyebrow": "Free, daily",
+    "title": "The Daily Briefing",
+    "description": "The most important stories, explained — in your inbox every morning.",
+    "placeholder": "Your email address",
+    "button": "Subscribe"
+  },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to your Daily Report account",
+    "email": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "keepSignedIn": "Keep me signed in for 30 days",
+    "signIn": "Sign in",
+    "orWith": "or continue with",
+    "withGoogle": "Sign in with Google",
+    "withGithub": "Sign in with GitHub",
+    "noAccount": "Don't have an account?",
+    "createOne": "Create one free"
+  },
+  "signup": {
+    "title": "Join The Daily Report",
+    "subtitle": "Create your account",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Create a password",
+    "confirmPassword": "Confirm password",
+    "confirmPlaceholder": "Repeat your password",
+    "newsletter": "Subscribe to the Daily Briefing newsletter",
+    "terms": "I agree to the Terms of Service and Privacy Policy",
+    "createAccount": "Create account",
+    "orWith": "or sign up with",
+    "withGoogle": "Sign up with Google",
+    "withGithub": "Sign up with GitHub",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
+  "language": {
+    "en": "EN",
+    "ne": "NE",
+    "switchTo": "Switch language"
+  }
+}

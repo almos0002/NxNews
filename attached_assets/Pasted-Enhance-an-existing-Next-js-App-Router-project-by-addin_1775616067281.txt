@@ -1,0 +1,63 @@
+Enhance an existing Next.js App Router project by adding a complete multilingual translation system using next-intl.
+
+Context:
+
+The news portal UI, routing, and CMS integration are already implemented
+Only the translation (i18n) system needs to be added without breaking existing functionality
+
+Requirements:
+
+Library Setup:
+Install and configure next-intl
+Use TypeScript with strict typing for translations
+Localization Strategy:
+Implement URL-based localization using [locale] dynamic segment
+Supported locales: en (English), ne (Nepali)
+Update existing routes to support /en/* and /ne/* without breaking current pages
+Middleware:
+Create middleware.ts to:
+Detect user language from Accept-Language header
+Redirect from / to /[locale]
+Preserve existing routes (e.g., /news → /en/news)
+Translation Files:
+Create messages/en.json and messages/ne.json
+Move all UI text (navbar, buttons, labels, footer, etc.) into translation files
+Ensure consistent key structure across languages
+Add fallback locale (en)
+Server Components Integration:
+Use getTranslations in layouts and pages
+Replace hardcoded strings with translation keys
+Ensure no unnecessary client-side translation logic
+Client Components:
+Use useTranslations hook where required
+Avoid converting server components to client unless necessary
+Language Switcher:
+Implement a client component to switch languages
+Use useRouter and usePathname from next/navigation
+Preserve current route and dynamic params (slug, category, etc.)
+Example: /en/article/abc → /ne/article/abc
+CMS Content Handling:
+Fetch localized content using locale from params
+Ensure articles load correct language version
+Handle missing translations gracefully
+SEO:
+Add hreflang tags using Next.js metadata API
+Add canonical URLs per locale
+Translate metadata (title, description) dynamically
+Performance:
+Keep translation logic server-side where possible
+Avoid adding unnecessary client-side JS
+Ensure no impact on existing SSR/ISR setup
+Error Handling:
+Fallback to English if translation key is missing
+Prevent crashes due to missing locale or messages
+
+Deliverables:
+
+Updated folder structure with [locale]
+middleware.ts implementation
+next-intl config setup
+Sample translated components
+Language switcher component
+Example of replacing existing hardcoded UI text
+Fully working integration without breaking current features

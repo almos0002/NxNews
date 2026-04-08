@@ -1,6 +1,11 @@
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import styles from "./Footer.module.css";
 
-export default function Footer() {
+export default async function Footer() {
+  const t = await getTranslations("footer");
+  const tNav = await getTranslations("nav");
+
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
@@ -10,43 +15,40 @@ export default function Footer() {
               <span className={styles.logoMark}>DR</span>
               <span className={styles.logoText}>The Daily Report</span>
             </div>
-            <p className={styles.description}>
-              Independent, in-depth journalism for a complex world. Delivering
-              clarity through rigorous reporting since 2024.
-            </p>
+            <p className={styles.description}>{t("description")}</p>
           </div>
 
           <div className={styles.links}>
             <div className={styles.column}>
-              <h3 className={styles.columnTitle}>Sections</h3>
+              <h3 className={styles.columnTitle}>{t("sections")}</h3>
               <ul className={styles.linkList}>
-                <li><a href="/world">World</a></li>
-                <li><a href="/politics">Politics</a></li>
-                <li><a href="/business">Business</a></li>
-                <li><a href="/technology">Technology</a></li>
-                <li><a href="/science">Science</a></li>
-                <li><a href="/culture">Culture</a></li>
+                <li><Link href="/world">{tNav("world")}</Link></li>
+                <li><Link href="/politics">{tNav("politics")}</Link></li>
+                <li><Link href="/business">{tNav("business")}</Link></li>
+                <li><Link href="/technology">{tNav("technology")}</Link></li>
+                <li><Link href="/science">{tNav("science")}</Link></li>
+                <li><Link href="/culture">{tNav("culture")}</Link></li>
               </ul>
             </div>
             <div className={styles.column}>
-              <h3 className={styles.columnTitle}>Company</h3>
+              <h3 className={styles.columnTitle}>{t("company")}</h3>
               <ul className={styles.linkList}>
-                <li><a href="/about">About</a></li>
-                <li><a href="/careers">Careers</a></li>
-                <li><a href="/contact">Contact</a></li>
-                <li><a href="/advertise">Advertise</a></li>
-                <li><a href="/ethics">Ethics Policy</a></li>
+                <li><Link href="/about">{t("about")}</Link></li>
+                <li><Link href="/careers">{t("careers")}</Link></li>
+                <li><Link href="/contact">{t("contact")}</Link></li>
+                <li><Link href="/advertise">{t("advertise")}</Link></li>
+                <li><Link href="/ethics">{t("ethics")}</Link></li>
               </ul>
             </div>
           </div>
         </div>
 
         <div className={styles.bottom}>
-          <span>&copy; 2026 The Daily Report</span>
+          <span>{t("copyright")}</span>
           <div className={styles.bottomLinks}>
-            <a href="/privacy">Privacy</a>
-            <a href="/terms">Terms</a>
-            <a href="/cookies">Cookies</a>
+            <Link href="/privacy">{t("privacy")}</Link>
+            <Link href="/terms">{t("terms")}</Link>
+            <Link href="/cookies">{t("cookies")}</Link>
           </div>
         </div>
       </div>

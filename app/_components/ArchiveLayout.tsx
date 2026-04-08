@@ -1,7 +1,9 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import type { Article } from "@/app/_data/articles";
 import { tags } from "@/app/_data/tags";
 import { trendingArticles } from "@/app/_data/articles";
+import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
 import styles from "./ArchiveLayout.module.css";
 
@@ -14,12 +16,15 @@ interface ArchiveLayoutProps {
   profileSlot?: React.ReactNode;
 }
 
-function ArchiveSidebar() {
+async function ArchiveSidebar() {
+  const tArchive = await getTranslations("archive");
+  const tNewsletter = await getTranslations("newsletter");
+
   return (
     <aside className={styles.sidebar}>
       {/* Trending Now */}
       <div className={styles.sidebarCard}>
-        <h2 className={styles.sidebarHeading}>Trending Now</h2>
+        <h2 className={styles.sidebarHeading}>{tArchive("trendingNow")}</h2>
         <ol className={styles.trendingList}>
           {trendingArticles.map((article, i) => (
             <li key={article.id} className={styles.trendingItem}>
@@ -28,9 +33,9 @@ function ArchiveSidebar() {
               </span>
               <div className={styles.trendingContent}>
                 <span className={styles.trendingCategory}>{article.category}</span>
-                <a href={`/article/${article.id}`} className={styles.trendingTitle}>
+                <Link href={`/article/${article.id}`} className={styles.trendingTitle}>
                   {article.title}
-                </a>
+                </Link>
               </div>
             </li>
           ))}
@@ -39,32 +44,30 @@ function ArchiveSidebar() {
 
       {/* Browse Topics */}
       <div className={styles.sidebarCard}>
-        <h2 className={styles.sidebarHeading}>Browse Topics</h2>
+        <h2 className={styles.sidebarHeading}>{tArchive("browseTopics")}</h2>
         <div className={styles.topicList}>
           {tags.map((t) => (
-            <a key={t.slug} href={`/tags/${t.slug}`} className={styles.topicPill}>
+            <Link key={t.slug} href={`/tags/${t.slug}`} className={styles.topicPill}>
               {t.label}
-            </a>
+            </Link>
           ))}
         </div>
       </div>
 
       {/* Newsletter */}
       <div className={`${styles.sidebarCard} ${styles.newsletter}`}>
-        <p className={styles.newsletterEyebrow}>Free, daily</p>
-        <h2 className={styles.newsletterTitle}>The Daily Briefing</h2>
-        <p className={styles.newsletterDesc}>
-          The most important stories, explained — in your inbox every morning.
-        </p>
+        <p className={styles.newsletterEyebrow}>{tNewsletter("eyebrow")}</p>
+        <h2 className={styles.newsletterTitle}>{tNewsletter("title")}</h2>
+        <p className={styles.newsletterDesc}>{tNewsletter("description")}</p>
         <form className={styles.newsletterForm} action="#" method="post">
           <input
             type="email"
-            placeholder="Your email address"
+            placeholder={tNewsletter("placeholder")}
             className={styles.newsletterInput}
             aria-label="Email address"
           />
           <button type="submit" className={styles.newsletterBtn}>
-            Subscribe
+            {tNewsletter("button")}
           </button>
         </form>
       </div>
@@ -72,7 +75,7 @@ function ArchiveSidebar() {
   );
 }
 
-export default function ArchiveLayout({
+export default async function ArchiveLayout({
   badge,
   title,
   description,
@@ -80,6 +83,8 @@ export default function ArchiveLayout({
   articles,
   profileSlot,
 }: ArchiveLayoutProps) {
+  const t = await getTranslations("archive");
+
   return (
     <div className={styles.wrapper}>
       {/* Page hero header */}
@@ -90,34 +95,26 @@ export default function ArchiveLayout({
           {description && <p className={styles.description}>{description}</p>}
           <p className={styles.count}>
             {count === 0
-              ? "No articles found"
-              : `${count} article${count !== 1 ? "s" : ""}`}
+              ? t("noArticles")
+              : `${count} ${count !== 1 ? t("articles") : t("article")}`}
           </p>
         </div>
       </div>
 
       <div className={styles.content}>
-        {/* Optional profile slot (author page) */}
-        {profileSlot && (
-          <div className={styles.profileSlot}>{profileSlot}</div>
-        )}
+        {profileSlot && <div className={styles.profileSlot}>{profileSlot}</div>}
 
         <div className={styles.layout}>
-          {/* Main — article grid */}
           <div className={styles.main}>
             {articles.length === 0 ? (
               <div className={styles.empty}>
-                <p className={styles.emptyText}>
-                  No articles found for this {badge.toLowerCase()}.
-                </p>
-                <a href="/" className={styles.emptyLink}>
-                  Back to homepage →
-                </a>
+                <p className={styles.emptyText}>{t("noArticles")}</p>
+                <Link href="/" className={styles.emptyLink}>{t("backHome")}</Link>
               </div>
             ) : (
               <div className={styles.grid}>
                 {articles.map((article) => (
-                  <a
+                  <Link
                     key={article.id}
                     href={`/article/${article.id}`}
                     className={styles.card}
@@ -140,9 +137,7 @@ export default function ArchiveLayout({
                         <p className={styles.cardExcerpt}>{article.excerpt}</p>
                       )}
                       <div className={styles.cardMeta}>
-                        <span className={styles.cardAuthor}>
-                          {article.author}
-                        </span>
+                        <span className={styles.cardAuthor}>{article.author}</span>
                         <span className={styles.cardDot} />
                         <span>{article.readTime} read</span>
                         {article.date && (
@@ -153,13 +148,12 @@ export default function ArchiveLayout({
                         )}
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Sidebar */}
           <ArchiveSidebar />
         </div>
       </div>
