@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { Article } from "@/app/_data/articles";
 import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
+import AdSlot from "./AdSlot";
 import styles from "./ThreeColSection.module.css";
 
 export default async function ThreeColSection({
@@ -16,8 +17,9 @@ export default async function ThreeColSection({
 
   const col1Lead  = articles[0];
   const col1Texts = articles.slice(1, 4);
-  const col2Items = articles.slice(4, 9);
-  const col3Items = articles.slice(9, 14);
+  // Reduced by 1 each: was [4..8] and [9..13], now [4..7] and [9..12]
+  const col2Items = articles.slice(4, 8);
+  const col3Items = articles.slice(9, 13);
 
   return (
     <section className={styles.wrapper}>
@@ -76,6 +78,7 @@ export default async function ThreeColSection({
           </div>
 
           <div className={styles.rightCols}>
+            {/* Column 2 — 4 articles + 1 ad cell */}
             <div className={styles.col2}>
               {col2Items.map((article, i) => (
                 <Link key={article.id} href={`/article/${article.id}`} className={styles.numberedItem}>
@@ -91,8 +94,13 @@ export default async function ThreeColSection({
                   </div>
                 </Link>
               ))}
+              {/* Ad replacing the removed 5th article */}
+              <div className={styles.adCell} aria-hidden="true">
+                <AdSlot variant="rectangle" />
+              </div>
             </div>
 
+            {/* Column 3 — 4 articles + 1 ad cell */}
             <div className={styles.col3}>
               {col3Items.map((article, i) => (
                 <Link key={article.id} href={`/article/${article.id}`} className={styles.numberedItem}>
@@ -108,6 +116,10 @@ export default async function ThreeColSection({
                   </div>
                 </Link>
               ))}
+              {/* Ad replacing the removed 5th article */}
+              <div className={styles.adCell} aria-hidden="true">
+                <AdSlot variant="rectangle" />
+              </div>
             </div>
           </div>
         </div>
