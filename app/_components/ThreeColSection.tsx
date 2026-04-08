@@ -96,7 +96,7 @@ export default async function ThreeColSection({
               ))}
               {/* Ad replacing the removed 5th article */}
               <div className={styles.adCell} aria-hidden="true">
-                <AdSlot variant="rectangle" />
+                <AdSlot variant="fluid" />
               </div>
             </div>
 
@@ -118,7 +118,7 @@ export default async function ThreeColSection({
               ))}
               {/* Ad replacing the removed 5th article */}
               <div className={styles.adCell} aria-hidden="true">
-                <AdSlot variant="rectangle" />
+                <AdSlot variant="fluid" />
               </div>
             </div>
           </div>

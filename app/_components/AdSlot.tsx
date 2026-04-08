@@ -1,12 +1,13 @@
 import styles from "./AdSlot.module.css";
 
-type AdVariant = "leaderboard" | "billboard" | "rectangle" | "halfpage";
+type AdVariant = "leaderboard" | "billboard" | "rectangle" | "halfpage" | "fluid";
 
 const AD_SPECS: Record<AdVariant, { w: number; h: number; label: string }> = {
   leaderboard: { w: 728, h: 90,  label: "Leaderboard" },
   billboard:   { w: 970, h: 250, label: "Billboard" },
   rectangle:   { w: 300, h: 250, label: "Medium Rectangle" },
   halfpage:    { w: 300, h: 600, label: "Half Page" },
+  fluid:       { w: 0,   h: 0,   label: "Sponsored" },
 };
 
 interface AdSlotProps {

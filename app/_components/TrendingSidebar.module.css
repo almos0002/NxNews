@@ -71,13 +71,14 @@
   color: var(--color-accent);
 }
 
-/* Inline ad slot — sits in the list like an item */
+/* Inline ad — same height footprint as a regular article row */
 .adItem {
   list-style: none;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--color-border);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  height: 80px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .adItem:last-child {

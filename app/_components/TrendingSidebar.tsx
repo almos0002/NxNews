@@ -35,9 +35,9 @@ export default async function TrendingSidebar() {
           </li>
         ))}
 
-        {/* Inline ad — same visual rhythm as list items */}
+        {/* Inline ad — occupies the same slot as a removed article */}
         <li className={styles.adItem} aria-hidden="true">
-          <AdSlot variant="rectangle" />
+          <AdSlot variant="fluid" />
         </li>
 
         {bottomItems.map((article, index) => (

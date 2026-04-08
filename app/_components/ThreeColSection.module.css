@@ -232,14 +232,14 @@
   opacity: 0.4;
 }
 
-/* Ad cell — fills the slot where the removed article was */
+/* Ad cell — same flex slot as a removed numbered article */
 .adCell {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   padding: 14px 16px;
   flex: 1;
   border-top: 1px solid var(--color-border);
+  min-height: 80px;
 }
 
 /* ── Responsive ──────────────────────────────────── */
