@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { categories } from "@/app/_data/articles";
 import { Link } from "@/i18n/navigation";
+import LanguageSwitcher from "./LanguageSwitcher";
 import styles from "./MobileNav.module.css";
 
 const catKeys: Record<string, string> = {
@@ -89,6 +90,10 @@ export default function MobileNav() {
           >
             {t("subscribe")}
           </Link>
+          <div className={styles.drawerLangRow}>
+            <span className={styles.drawerLangLabel}>Language</span>
+            <LanguageSwitcher variant="drawer" />
+          </div>
         </div>
       </div>
     </>

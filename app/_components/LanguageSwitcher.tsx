@@ -5,32 +5,42 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { useTransition } from "react";
 import styles from "./LanguageSwitcher.module.css";
 
-export default function LanguageSwitcher() {
+interface Props {
+  variant?: "header" | "drawer";
+}
+
+export default function LanguageSwitcher({ variant = "header" }: Props) {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("language");
   const [isPending, startTransition] = useTransition();
 
-  const other = locale === "en" ? "ne" : "en";
-
-  const handleSwitch = () => {
+  const switchTo = (target: string) => {
+    if (target === locale) return;
     startTransition(() => {
-      router.replace(pathname, { locale: other });
+      router.replace(pathname, { locale: target });
     });
   };
 
   return (
-    <button
-      onClick={handleSwitch}
-      className={styles.btn}
-      title={t("switchTo")}
+    <div
+      className={`${styles.toggle} ${variant === "drawer" ? styles.drawer : ""}`}
       aria-label={t("switchTo")}
-      disabled={isPending}
+      role="group"
     >
-      <span className={styles.active}>{t(locale as "en" | "ne")}</span>
-      <span className={styles.sep}>|</span>
-      <span className={styles.inactive}>{t(other as "en" | "ne")}</span>
-    </button>
+      {(["en", "ne"] as const).map((lang) => (
+        <button
+          key={lang}
+          onClick={() => switchTo(lang)}
+          className={`${styles.option} ${locale === lang ? styles.active : styles.inactive}`}
+          disabled={isPending || locale === lang}
+          aria-pressed={locale === lang}
+          aria-label={`Switch to ${lang.toUpperCase()}`}
+        >
+          {lang.toUpperCase()}
+        </button>
+      ))}
+    </div>
   );
 }

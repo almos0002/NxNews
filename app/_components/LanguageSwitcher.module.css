@@ -1,47 +1,62 @@
-.btn {
-  display: flex;
+.toggle {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-family: var(--font-serif);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  background: none;
+  background-color: var(--color-tag-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 5px 10px;
+  border-radius: 99px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.option {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: none;
   cursor: pointer;
-  color: var(--color-ink-secondary);
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   white-space: nowrap;
-}
-
-.btn:hover {
-  border-color: var(--color-ink);
-  color: var(--color-ink);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  line-height: 1;
 }
 
 .active {
-  color: var(--color-ink);
-  font-weight: 800;
-}
-
-.sep {
-  color: var(--color-border);
-  font-weight: 400;
+  background-color: var(--color-ink);
+  color: #ffffff;
+  cursor: default;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
 
 .inactive {
-  color: var(--color-ink-muted);
+  background-color: transparent;
+  color: var(--color-ink-secondary);
 }
 
-@media (max-width: 600px) {
-  .btn {
-    display: none;
-  }
+.inactive:hover:not(:disabled) {
+  background-color: var(--color-border);
+  color: var(--color-ink);
+}
+
+.toggle:has(.option:disabled:not(.active)) {
+  opacity: 0.6;
+}
+
+/* Drawer variant — slightly larger for easier tap */
+.drawer {
+  background-color: transparent;
+  border-color: var(--color-border);
+  padding: 3px;
+  gap: 3px;
+}
+
+.drawer .option {
+  font-size: 0.78rem;
+  padding: 6px 16px;
+}
+
+.drawer .active {
+  background-color: var(--color-accent);
+  color: #ffffff;
 }

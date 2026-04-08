@@ -159,6 +159,9 @@
   padding: 16px 20px;
   border-top: 1px solid var(--color-border);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .drawerSubscribe {
@@ -179,7 +182,22 @@
   background-color: var(--color-accent-hover);
 }
 
-/* ── Only show on mobile ─────────────────────────── */
+.drawerLangRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.drawerLangLabel {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-ink-secondary);
+  letter-spacing: 0.02em;
+}
+
+/* ── Only show hamburger on mobile ───────────────── */
 @media (min-width: 601px) {
   .hamburger {
     display: none !important;
