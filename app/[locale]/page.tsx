@@ -38,6 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LocaleHomePage({ params }: Props) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "home" });
+  const tNav = await getTranslations({ locale, namespace: "nav" });
 
   const featured = localizeArticle(featuredArticle, locale);
   const secondary = localizeArticles(secondaryFeatured, locale);
@@ -49,9 +51,9 @@ export default async function LocaleHomePage({ params }: Props) {
   const opinion = localizeArticles(opinionArticles, locale);
 
   const categoryColumns = [
-    { label: "Business", articles: business.slice(0, 5) },
-    { label: "Technology", articles: tech.slice(0, 5) },
-    { label: "Around the World", articles: grid.slice(0, 5) },
+    { label: tNav("business"), articles: business.slice(0, 5) },
+    { label: tNav("technology"), articles: tech.slice(0, 5) },
+    { label: t("aroundTheWorld"), articles: grid.slice(0, 5) },
   ];
 
   const headline = getBreakingHeadline(locale);
@@ -76,7 +78,7 @@ export default async function LocaleHomePage({ params }: Props) {
 
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
-            <SectionHeading title="Top Stories" />
+            <SectionHeading title={t("topStories")} />
             <div className={styles.articleGrid}>
               {grid.map((article) => (
                 <ArticleCard key={article.id} article={article} variant="grid" />
@@ -91,11 +93,11 @@ export default async function LocaleHomePage({ params }: Props) {
         <CategoryLists columns={categoryColumns} />
 
         <div className={styles.topicDivider}>
-          <ThreeColSection title="Science & Technology" articles={tech} />
+          <ThreeColSection title={t("scienceTech")} articles={tech} />
         </div>
 
         <section className={styles.opinionSection}>
-          <SectionHeading title="Opinion" />
+          <SectionHeading title={t("opinion")} />
           <div className={styles.opinionGrid}>
             {opinion.map((article) => (
               <ArticleCard key={article.id} article={article} variant="grid" />
@@ -105,21 +107,19 @@ export default async function LocaleHomePage({ params }: Props) {
 
         <section className={styles.newsletterSection}>
           <div className={styles.newsletterInner}>
-            <p className={styles.newsletterEyebrow}>Free, every morning</p>
-            <h2 className={styles.newsletterTitle}>The Daily Briefing</h2>
-            <p className={styles.newsletterDesc}>
-              The most important stories, explained. Delivered to your inbox every morning.
-            </p>
+            <p className={styles.newsletterEyebrow}>{t("newsletterEyebrow")}</p>
+            <h2 className={styles.newsletterTitle}>{t("newsletterTitle")}</h2>
+            <p className={styles.newsletterDesc}>{t("newsletterDesc")}</p>
             <form className={styles.newsletterForm} action="#" method="post">
               <input
                 type="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder={t("emailPlaceholder")}
                 className={styles.newsletterInput}
-                aria-label="Email address"
+                aria-label={t("emailPlaceholder")}
               />
               <button type="submit" className={styles.newsletterButton}>
-                Subscribe free
+                {t("subscribeFree")}
               </button>
             </form>
           </div>

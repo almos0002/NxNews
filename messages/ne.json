@@ -35,6 +35,24 @@
   "ticker": {
     "live": "लाइभ"
   },
+  "home": {
+    "latest": "ताजा खबर",
+    "updatedContinuously": "निरन्तर अद्यावधिक",
+    "editorsPick": "सम्पादकको छनोट",
+    "editorsPickSub": "हाम्रो टोलीका छानिएका पठनीयहरू",
+    "topStories": "शीर्ष समाचारहरू",
+    "opinion": "विचार",
+    "scienceTech": "विज्ञान र प्रविधि",
+    "seeAll": "सबै हेर्नुहोस् →",
+    "mustRead": "अवश्य पढ्नुहोस्",
+    "readMin": "पढ्न",
+    "aroundTheWorld": "विश्वभरि",
+    "subscribeFree": "नि:शुल्क सदस्यता",
+    "newsletterEyebrow": "नि:शुल्क, प्रत्येक बिहान",
+    "newsletterTitle": "द डेली ब्रिफिङ",
+    "newsletterDesc": "सबैभन्दा महत्वपूर्ण कथाहरू, व्याख्या गरिएको। प्रत्येक बिहान तपाईंको इनबक्समा।",
+    "emailPlaceholder": "आफ्नो इमेल लेख्नुहोस्"
+  },
   "article": {
     "relatedNews": "सम्बन्धित समाचार",
     "share": "साझा गर्नुहोस्",

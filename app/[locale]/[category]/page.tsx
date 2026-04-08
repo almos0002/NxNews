@@ -50,11 +50,19 @@ export default async function CategoryPage({ params }: Props) {
   if (!label) notFound();
 
   const t = await getTranslations("archive");
+  const tNav = await getTranslations({ locale, namespace: "nav" });
   const rawArticles = getArticlesByCategory(label);
   const articles = localizeArticles(rawArticles, locale);
   const headline = getBreakingHeadline(locale);
 
   const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
+  const navKeys: Record<string, "world" | "politics" | "business" | "technology" | "science" | "culture" | "opinion" | "sports"> = {
+    world: "world", politics: "politics", business: "business",
+    technology: "technology", science: "science", culture: "culture",
+    opinion: "opinion", sports: "sports",
+  };
+  const navKey = navKeys[category];
+  const translatedTitle = navKey ? tNav(navKey) : label;
 
   return (
     <>
@@ -62,7 +70,7 @@ export default async function CategoryPage({ params }: Props) {
       <Header />
       <ArchiveLayout
         badge={t("categoryBadge")}
-        title={label}
+        title={translatedTitle}
         description={descriptions[category]}
         count={articles.length}
         articles={articles}

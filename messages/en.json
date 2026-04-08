@@ -35,6 +35,24 @@
   "ticker": {
     "live": "LIVE"
   },
+  "home": {
+    "latest": "Latest",
+    "updatedContinuously": "Updated continuously",
+    "editorsPick": "Editor's Pick",
+    "editorsPickSub": "Selected reads from our team",
+    "topStories": "Top Stories",
+    "opinion": "Opinion",
+    "scienceTech": "Science & Technology",
+    "seeAll": "See all →",
+    "mustRead": "Must Read",
+    "readMin": "read",
+    "aroundTheWorld": "Around the World",
+    "subscribeFree": "Subscribe free",
+    "newsletterEyebrow": "Free, every morning",
+    "newsletterTitle": "The Daily Briefing",
+    "newsletterDesc": "The most important stories, explained. Delivered to your inbox every morning.",
+    "emailPlaceholder": "Enter your email"
+  },
   "article": {
     "relatedNews": "Related News",
     "share": "Share",

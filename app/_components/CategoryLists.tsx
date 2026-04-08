@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Article } from "@/app/_data/articles";
+import { Link } from "@/i18n/navigation";
 import styles from "./CategoryLists.module.css";
 
 type Column = {
@@ -16,15 +17,12 @@ export default function CategoryLists({ columns }: { columns: Column[] }) {
           const rest = col.articles.slice(1);
           return (
             <div key={ci} className={styles.card}>
-
-              {/* Column header */}
               <div className={styles.cardHeader}>
                 <span className={styles.cardLabel}>{col.label}</span>
               </div>
 
-              {/* Lead article — big image + title below */}
               {lead && (
-                <a href={`/article/${lead.id}`} className={styles.lead}>
+                <Link href={`/article/${lead.id}`} className={styles.lead}>
                   {lead.imageUrl && (
                     <div className={styles.leadImage}>
                       <Image
@@ -48,12 +46,11 @@ export default function CategoryLists({ columns }: { columns: Column[] }) {
                       <span>{lead.readTime}</span>
                     </div>
                   </div>
-                </a>
+                </Link>
               )}
 
-              {/* Remaining articles — text only, no image */}
               {rest.map((article) => (
-                <a key={article.id} href={`/article/${article.id}`} className={styles.textRow}>
+                <Link key={article.id} href={`/article/${article.id}`} className={styles.textRow}>
                   <span className={styles.textCat}>{article.category}</span>
                   <h4 className={styles.textTitle}>{article.title}</h4>
                   <div className={styles.meta}>
@@ -61,9 +58,8 @@ export default function CategoryLists({ columns }: { columns: Column[] }) {
                     <span className={styles.dot}>·</span>
                     <span>{article.readTime}</span>
                   </div>
-                </a>
+                </Link>
               ))}
-
             </div>
           );
         })}

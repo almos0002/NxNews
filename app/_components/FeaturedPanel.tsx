@@ -1,19 +1,22 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import type { Article } from "@/app/_data/articles";
+import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
 import styles from "./FeaturedPanel.module.css";
 
-export default function FeaturedPanel({
+export default async function FeaturedPanel({
   primary,
   secondary,
 }: {
   primary: Article;
   secondary: Article[];
 }) {
+  const t = await getTranslations("home");
+
   return (
     <div className={styles.panel}>
-      {/* Primary — large left overlay card */}
-      <a href={`/article/${primary.id}`} className={styles.primary}>
+      <Link href={`/article/${primary.id}`} className={styles.primary}>
         <div className={styles.primaryImage}>
           <Image
             src={primary.imageUrl}
@@ -31,16 +34,15 @@ export default function FeaturedPanel({
               <span className={styles.dot}>·</span>
               <span>{primary.time}</span>
               <span className={styles.dot}>·</span>
-              <span>{primary.readTime} read</span>
+              <span>{primary.readTime} {t("readMin")}</span>
             </div>
           </div>
         </div>
-      </a>
+      </Link>
 
-      {/* Secondaries — each is a full-image overlay card stacked vertically */}
       <div className={styles.secondaryStack}>
         {secondary.map((article) => (
-          <a href={`/article/${article.id}`} key={article.id} className={styles.secondary}>
+          <Link href={`/article/${article.id}`} key={article.id} className={styles.secondary}>
             <div className={styles.secondaryImage}>
               <Image
                 src={article.imageUrl}
@@ -59,7 +61,7 @@ export default function FeaturedPanel({
                 </div>
               </div>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

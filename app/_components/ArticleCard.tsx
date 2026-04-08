@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Article } from "@/app/_data/articles";
+import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
 import styles from "./ArticleCard.module.css";
 
@@ -43,7 +44,7 @@ export default function ArticleCard({
 
   if (variant === "sidebar") {
     return (
-      <a href={`/article/${article.id}`} className={styles.sidebar}>
+      <Link href={`/article/${article.id}`} className={styles.sidebar}>
         {article.imageUrl && (
           <div className={styles.sidebarImage}>
             <Image
@@ -64,13 +65,13 @@ export default function ArticleCard({
             <span className={styles.readTime}>{article.readTime}</span>
           </div>
         </div>
-      </a>
+      </Link>
     );
   }
 
   if (variant === "compact") {
     return (
-      <a href={`/article/${article.id}`} className={styles.compact}>
+      <Link href={`/article/${article.id}`} className={styles.compact}>
         <div className={styles.compactBar} aria-hidden="true" />
         <div className={styles.compactContent}>
           <CategoryBadge category={article.category} />
@@ -82,12 +83,12 @@ export default function ArticleCard({
             <span className={styles.readTime}>{article.readTime}</span>
           </div>
         </div>
-      </a>
+      </Link>
     );
   }
 
   return (
-    <a href={`/article/${article.id}`} className={styles.grid}>
+    <Link href={`/article/${article.id}`} className={styles.grid}>
       {article.imageUrl && (
         <div className={styles.gridImage}>
           <Image
@@ -111,6 +112,6 @@ export default function ArticleCard({
           <span className={styles.readTime}>{article.readTime}</span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
