@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import type { Article } from "@/app/_data/articles";
+import { useT } from "@/app/_i18n/LanguageContext";
 import CategoryBadge from "./CategoryBadge";
 import styles from "./FeaturedPanel.module.css";
 
@@ -10,6 +13,7 @@ export default function FeaturedPanel({
   primary: Article;
   secondary: Article[];
 }) {
+  const t = useT();
   return (
     <div className={styles.panel}>
       {/* Primary — large left overlay card */}
@@ -31,7 +35,7 @@ export default function FeaturedPanel({
               <span className={styles.dot}>·</span>
               <span>{primary.time}</span>
               <span className={styles.dot}>·</span>
-              <span>{primary.readTime} read</span>
+              <span>{primary.readTime}</span>
             </div>
           </div>
         </div>

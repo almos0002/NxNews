@@ -30,7 +30,7 @@ export default function EditorsPick({ articles }: { articles: Article[] }) {
               <CategoryBadge category={article.category} />
               <h3 className={styles.title}>{article.title}</h3>
               <p className={styles.excerpt}>{article.excerpt}</p>
-              <span className={styles.readTime}>{article.readTime} {t("article.minRead")}</span>
+              <span className={styles.readTime}>{article.readTime}</span>
             </div>
           </a>
         ))}

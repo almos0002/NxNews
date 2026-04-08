@@ -16,22 +16,10 @@
 
 /* ── Language-specific fonts ──────────────────────────────── */
 
-/* Nepali — Noto Serif Devanagari
-   Devanagari glyphs are optically smaller than Latin at the same px,
-   so we bump the base size and relax line-height across the board. */
+/* Nepali — Noto Serif Devanagari */
 html[data-lang="ne"] {
   --font-serif: var(--font-devanagari), "Noto Serif Devanagari", serif;
   --font-sans: var(--font-devanagari), "Noto Serif Devanagari", serif;
-  font-size: 18px;
-  line-height: 1.75;
-}
-
-html[data-lang="ne"] h1,
-html[data-lang="ne"] h2,
-html[data-lang="ne"] h3,
-html[data-lang="ne"] h4 {
-  line-height: 1.45;
-  letter-spacing: 0;
 }
 
 /* Arabic — Noto Naskh Arabic (also switches to RTL) */
