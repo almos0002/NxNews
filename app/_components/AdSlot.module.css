@@ -62,22 +62,24 @@
   max-width: 300px;
 }
 
-/* Fluid — no fixed dimensions, fills the parent slot exactly */
-.fluid {
+/* Fluid banner — covers the full slot, no card chrome */
+.fluidBanner {
   flex: 1;
-  align-self: stretch;
-  height: 100%;
-}
-
-.fluid .placeholder {
-  flex: 1;
-  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: none;
+  background-color: var(--color-tag-bg);
 }
 
-.fluid .dims {
-  display: none;
+.fluidLabel {
+  font-family: var(--font-sans);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  user-select: none;
 }
 
 /* ── Responsive ── */

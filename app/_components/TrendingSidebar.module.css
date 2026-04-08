@@ -71,14 +71,14 @@
   color: var(--color-accent);
 }
 
-/* Inline ad — same height footprint as a regular article row */
+/* Inline ad — banner fills the full row, no padding */
 .adItem {
   list-style: none;
   display: flex;
   flex-direction: column;
   height: 80px;
-  padding: 10px 0;
   border-bottom: 1px solid var(--color-border);
+  overflow: hidden;
 }
 
 .adItem:last-child {

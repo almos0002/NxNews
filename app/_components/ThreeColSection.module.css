@@ -232,14 +232,14 @@
   opacity: 0.4;
 }
 
-/* Ad cell — same flex slot as a removed numbered article */
+/* Ad cell — banner fills the entire slot, no padding */
 .adCell {
   display: flex;
   flex-direction: column;
-  padding: 14px 16px;
   flex: 1;
   border-top: 1px solid var(--color-border);
   min-height: 80px;
+  overflow: hidden;
 }
 
 /* ── Responsive ──────────────────────────────────── */

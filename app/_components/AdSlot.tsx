@@ -18,6 +18,14 @@ interface AdSlotProps {
 export default function AdSlot({ variant = "leaderboard", className }: AdSlotProps) {
   const spec = AD_SPECS[variant];
 
+  if (variant === "fluid") {
+    return (
+      <div className={`${styles.fluidBanner} ${className ?? ""}`}>
+        <span className={styles.fluidLabel}>Advertisement</span>
+      </div>
+    );
+  }
+
   return (
     <div className={`${styles.wrapper} ${styles[variant]} ${className ?? ""}`}>
       <p className={styles.label}>Advertisement</p>
