@@ -1,8 +1,14 @@
-import styles from "./Header.module.css";
-import { categories } from "@/app/_data/articles";
+"use client";
+
+import { useT } from "@/app/_i18n/LanguageContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 import MobileNav from "./MobileNav";
+import { categories } from "@/app/_data/articles";
+import styles from "./Header.module.css";
 
 export default function Header() {
+  const t = useT();
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -22,7 +28,7 @@ export default function Header() {
             {categories.map((cat) => (
               <li key={cat}>
                 <a href={`/${cat.toLowerCase()}`} className={styles.navLink}>
-                  {cat}
+                  {t(`nav.${cat.toLowerCase()}`)}
                 </a>
               </li>
             ))}
@@ -30,7 +36,10 @@ export default function Header() {
         </nav>
 
         <div className={styles.actions}>
-          <a href="/subscribe" className={styles.subscribeLink}>Subscribe</a>
+          <LanguageSwitcher />
+          <a href="/subscribe" className={styles.subscribeLink}>
+            {t("nav.subscribe")}
+          </a>
         </div>
 
       </div>

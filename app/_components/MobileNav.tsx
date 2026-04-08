@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { categories } from "@/app/_data/articles";
+import { useT } from "@/app/_i18n/LanguageContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 import styles from "./MobileNav.module.css";
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
+  const t = useT();
 
   useEffect(() => {
     if (open) {
@@ -66,7 +69,7 @@ export default function MobileNav() {
                   className={styles.drawerLink}
                   onClick={() => setOpen(false)}
                 >
-                  {cat}
+                  {t(`nav.${cat.toLowerCase()}`)}
                 </a>
               </li>
             ))}
@@ -74,8 +77,11 @@ export default function MobileNav() {
         </nav>
 
         <div className={styles.drawerFooter}>
+          <div className={styles.drawerLangWrap}>
+            <LanguageSwitcher />
+          </div>
           <a href="/subscribe" className={styles.drawerSubscribe} onClick={() => setOpen(false)}>
-            Subscribe
+            {t("nav.subscribe")}
           </a>
         </div>
       </div>

@@ -1,10 +1,14 @@
+"use client";
+
 import { trendingArticles } from "@/app/_data/articles";
+import { useT } from "@/app/_i18n/LanguageContext";
 import styles from "./TrendingSidebar.module.css";
 
 export default function TrendingSidebar() {
+  const t = useT();
   return (
     <aside className={styles.aside}>
-      <h2 className={styles.heading}>Trending Now</h2>
+      <h2 className={styles.heading}>{t("sections.trendingNow")}</h2>
       <ol className={styles.list}>
         {trendingArticles.map((article, index) => (
           <li key={article.id} className={styles.item}>
