@@ -15,21 +15,17 @@ export default async function ThreeColSection({
 }) {
   const t = await getTranslations("home");
 
+  // col1Lead = articles[0] → numbered 01
   const col1Lead  = articles[0];
-  // Col 1 text items: 2 articles → numbered 01, 02
+  // col1Texts: articles[1..2] → numbered 02, 03
   const col1Texts = articles.slice(1, 3);
-  // Col 2: 4 articles → numbered 03–06 (offset = col1Texts.length = 2)
-  const col2Items = articles.slice(4, 8);
-  const col2Offset = col1Texts.length; // 2
-  // Col 3: 4 articles → numbered 07–10 (offset = col1Texts.length + col2Items.length = 6)
-  const col3Items = articles.slice(9, 13);
-  const col3Offset = col1Texts.length + col2Items.length; // 6
+  // col2: articles[4..7] → numbered 04..07  (offset = 1 lead + 2 text = 3)
+  const col2Items  = articles.slice(4, 8);
+  const col2Offset = 3; // 1 (lead) + 2 (col1Texts)
+  // col3: articles[9..12] → numbered 08..11  (offset = 3 + 4 = 7)
+  const col3Items  = articles.slice(9, 13);
+  const col3Offset = col2Offset + col2Items.length; // 7
 
-  // Ad positions (staggered across columns)
-  // Col 1 ad: after text item 0  → "up"
-  // Col 2 ad: after article 1    → "middle"
-  // Col 3 ad: after article 2    → "down"
-  const COL1_AD_AT = 1;
   const COL2_AD_AT = 2;
   const COL3_AD_AT = 3;
 
@@ -63,7 +59,7 @@ export default async function ThreeColSection({
       </div>
 
       <div className={styles.cols}>
-        {/* ── Column 1: hero image + 2 numbered text items with ad between ── */}
+        {/* ── Column 1: hero image (numbered 01) + 2 numbered text items ── */}
         <div className={styles.col1}>
           {col1Lead && (
             <Link href={`/article/${col1Lead.id}`} className={styles.c1Lead}>
@@ -78,6 +74,8 @@ export default async function ThreeColSection({
                   />
                 </div>
               )}
+              {/* Number badge 01 on the lead card */}
+              <span className={styles.leadNum}>01</span>
               <div className={styles.c1Body}>
                 <CategoryBadge category={col1Lead.category} />
                 <h3 className={styles.c1Title}>{col1Lead.title}</h3>
@@ -93,16 +91,13 @@ export default async function ThreeColSection({
             </Link>
           )}
 
-          {col1Texts.slice(0, COL1_AD_AT).map((article, i) =>
-            numberedItem(article, i + 1)
+          {/* Col 1 numbered text items: 02, 03 */}
+          {col1Texts.map((article, i) =>
+            numberedItem(article, i + 2)
           )}
 
-          {/* Col 1 ad — "up" position */}
+          {/* Col 1 fluid ad at bottom */}
           {adCell}
-
-          {col1Texts.slice(COL1_AD_AT).map((article, i) =>
-            numberedItem(article, COL1_AD_AT + i + 1)
-          )}
         </div>
 
         {/* ── Right section: Must Read header + col2 + col3 ── */}
@@ -112,7 +107,7 @@ export default async function ThreeColSection({
           </div>
 
           <div className={styles.rightCols}>
-            {/* Column 2 — ad in "middle" position (after item 1) */}
+            {/* Column 2 — numbered 04..07, ad in middle */}
             <div className={styles.col2}>
               {col2Items.slice(0, COL2_AD_AT).map((article, i) =>
                 numberedItem(article, col2Offset + i + 1)
@@ -125,7 +120,7 @@ export default async function ThreeColSection({
               )}
             </div>
 
-            {/* Column 3 — ad in "down" position (after item 2) */}
+            {/* Column 3 — numbered 08..11, ad near bottom */}
             <div className={styles.col3}>
               {col3Items.slice(0, COL3_AD_AT).map((article, i) =>
                 numberedItem(article, col3Offset + i + 1)
