@@ -11,6 +11,7 @@ import EditorsPick from "@/app/_components/EditorsPick";
 import CategoryLists from "@/app/_components/CategoryLists";
 import ThreeColSection from "@/app/_components/ThreeColSection";
 import Footer from "@/app/_components/Footer";
+import AdSlot from "@/app/_components/AdSlot";
 import {
   featuredArticle,
   secondaryFeatured,
@@ -68,6 +69,10 @@ export default async function LocaleHomePage({ params }: Props) {
           <FeaturedPanel primary={featured} secondary={secondary} />
         </section>
 
+        <section className={styles.adSection}>
+          <AdSlot variant="leaderboard" />
+        </section>
+
         <section className={styles.section}>
           <LatestFeed articles={latest} />
         </section>
@@ -91,6 +96,10 @@ export default async function LocaleHomePage({ params }: Props) {
         </section>
 
         <CategoryLists columns={categoryColumns} />
+
+        <section className={styles.adSection}>
+          <AdSlot variant="leaderboard" />
+        </section>
 
         <div className={styles.topicDivider}>
           <ThreeColSection title={t("scienceTech")} articles={tech} />

@@ -59,7 +59,13 @@
     "copyLink": "लिंक कपी गर्नुहोस्",
     "linkCopied": "कपी भयो!",
     "by": "द्वारा",
-    "minRead": "पढ्न"
+    "minRead": "पढ्न",
+    "topics": "विषयहरू:",
+    "aboutAuthor": "लेखकबारे",
+    "correspondent": "संवाददाता",
+    "newsletter": "न्यूजलेटर",
+    "sidebarText": "प्रत्येक बिहान आफ्नो इनबक्समा द डेली रिपोर्टका उत्कृष्ट कथाहरू पाउनुहोस्।",
+    "subscribeFree": "नि:शुल्क सदस्यता लिनुहोस्"
   },
   "archive": {
     "categoryBadge": "श्रेणी",

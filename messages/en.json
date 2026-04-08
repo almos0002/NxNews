@@ -59,7 +59,13 @@
     "copyLink": "Copy link",
     "linkCopied": "Copied!",
     "by": "By",
-    "minRead": "read"
+    "minRead": "read",
+    "topics": "Topics:",
+    "aboutAuthor": "About the author",
+    "correspondent": "Correspondent",
+    "newsletter": "Newsletter",
+    "sidebarText": "Get the best of The Daily Report in your inbox every morning.",
+    "subscribeFree": "Subscribe free"
   },
   "archive": {
     "categoryBadge": "Category",

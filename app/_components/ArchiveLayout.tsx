@@ -7,6 +7,7 @@ import { trendingArticles } from "@/app/_data/articles";
 import { localizeArticles, localizeTrending } from "@/app/_data/localize";
 import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
+import AdSlot from "./AdSlot";
 import styles from "./ArchiveLayout.module.css";
 
 interface ArchiveLayoutProps {
@@ -72,6 +73,8 @@ async function ArchiveSidebar() {
           </button>
         </form>
       </div>
+
+      <AdSlot variant="rectangle" />
     </aside>
   );
 }

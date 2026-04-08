@@ -6,8 +6,8 @@ import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import CategoryBadge from "@/app/_components/CategoryBadge";
+import AdSlot from "@/app/_components/AdSlot";
 import { getAllArticles, getArticleById, getRelatedArticles } from "@/app/_data/getAllArticles";
-import { breakingHeadline } from "@/app/_data/articles";
 import { localizeArticle, localizeArticles, getBreakingHeadline } from "@/app/_data/localize";
 import { bodyParagraphsNe } from "@/app/_data/articlesNe";
 import { Link } from "@/i18n/navigation";
@@ -187,7 +187,7 @@ export default async function ArticlePage({ params }: Props) {
               <p key={`b${i}`} className={styles.para}>{para}</p>
             ))}
             <div className={styles.tagRow}>
-              <span className={styles.tagLabel}>Topics:</span>
+              <span className={styles.tagLabel}>{t("topics")}</span>
               <span className={styles.tag}>{article.category}</span>
               <span className={styles.tag}>The Daily Report</span>
             </div>
@@ -195,22 +195,23 @@ export default async function ArticlePage({ params }: Props) {
 
           <aside className={styles.sidebar}>
             <div className={styles.sidebarCard}>
-              <span className={styles.sidebarLabel}>About the author</span>
+              <span className={styles.sidebarLabel}>{t("aboutAuthor")}</span>
               <div className={styles.authorCard}>
                 <div className={styles.authorAvatar}>
                   {article.author.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                 </div>
                 <div>
                   <p className={styles.authorName}>{article.author}</p>
-                  <p className={styles.authorRole}>{article.category} Correspondent</p>
+                  <p className={styles.authorRole}>{article.category} {t("correspondent")}</p>
                 </div>
               </div>
             </div>
             <div className={styles.sidebarCard}>
-              <span className={styles.sidebarLabel}>Newsletter</span>
-              <p className={styles.sidebarText}>Get the best of The Daily Report in your inbox every morning.</p>
-              <Link href="/subscribe" className={styles.sidebarCta}>Subscribe free</Link>
+              <span className={styles.sidebarLabel}>{t("newsletter")}</span>
+              <p className={styles.sidebarText}>{t("sidebarText")}</p>
+              <Link href="/subscribe" className={styles.sidebarCta}>{t("subscribeFree")}</Link>
             </div>
+            <AdSlot variant="rectangle" />
           </aside>
         </div>
 

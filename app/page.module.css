@@ -8,6 +8,13 @@
   padding: 16px 0;
 }
 
+.adSection {
+  padding: 20px 0;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: center;
+}
+
 /* Top Stories: grid cards + sidebar */
 .storiesSection {
   display: grid;

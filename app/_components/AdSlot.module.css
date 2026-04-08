@@ -1,0 +1,86 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background-color: var(--color-tag-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+}
+
+.adName {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-ink-secondary);
+}
+
+.dims {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  color: var(--color-ink-muted);
+}
+
+/* ── Variant sizes ── */
+
+.leaderboard .placeholder {
+  height: 90px;
+  max-width: 728px;
+}
+
+.billboard .placeholder {
+  height: 250px;
+  max-width: 970px;
+}
+
+.rectangle .placeholder {
+  height: 250px;
+  max-width: 300px;
+}
+
+.halfpage .placeholder {
+  height: 600px;
+  max-width: 300px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .leaderboard .placeholder,
+  .billboard .placeholder {
+    height: 60px;
+    max-width: 100%;
+  }
+
+  .leaderboard .dims::after {
+    content: " (mobile: 320×50)";
+  }
+
+  .billboard .dims::after {
+    content: " (mobile: 320×50)";
+  }
+}
+
+@media (max-width: 600px) {
+  .halfpage {
+    display: none;
+  }
+}
