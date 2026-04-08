@@ -6,90 +6,34 @@
   z-index: 100;
 }
 
-.inner {
+/* ── Row 1: logo centred, actions pinned right ── */
+.logoRow {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 24px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
-  gap: 32px;
-}
-
-.brand {
-  flex-shrink: 0;
+  position: relative;
 }
 
 .logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
-}
-
-.logoMark {
-  font-family: var(--font-serif);
-  font-size: 0.9rem;
-  font-weight: 700;
-  background-color: var(--color-accent);
-  color: #ffffff;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  letter-spacing: 0.02em;
-}
-
-.logoText {
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--color-ink);
-  letter-spacing: -0.02em;
-}
-
-.nav {
-  flex: 1;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.nav::-webkit-scrollbar {
-  display: none;
-}
-
-.navList {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-.navLink {
-  display: block;
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--color-ink-secondary);
-  padding: 8px 12px;
-  border-radius: var(--radius);
-  transition: background-color 0.15s ease, color 0.15s ease;
-  white-space: nowrap;
-}
-
-.navLink:hover {
-  background-color: var(--color-tag-bg);
-  color: var(--color-ink);
+  pointer-events: auto;
 }
 
 .actions {
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .subscribeLink {
@@ -109,49 +53,60 @@
   background-color: var(--color-accent-hover);
 }
 
-@media (max-width: 900px) {
-  .logoText {
-    display: none;
-  }
-
-  .navList {
-    justify-content: flex-start;
-  }
+/* ── Row 2: navigation ── */
+.navRow {
+  border-top: 1px solid var(--color-border);
 }
 
-/* ── Mobile: hamburger left, logo centred, lang switcher right ── */
+.nav {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
+}
+
+.navList {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.navLink {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-ink-secondary);
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.navLink:hover {
+  background-color: var(--color-tag-bg);
+  color: var(--color-ink);
+}
+
+/* ── Mobile ── */
 @media (max-width: 600px) {
-  .inner {
-    height: 52px;
-    gap: 0;
-    position: relative;
+  .logoRow {
+    height: 64px;
+    padding: 0 16px;
   }
 
-  /* Logo is absolutely centred horizontally */
-  .brand {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: auto;
-  }
-
-  /* Show logoText again on mobile */
-  .logoText {
-    display: block;
-  }
-
-  /* Hide desktop nav */
-  .nav {
+  .navRow {
     display: none;
   }
 
-  /* Keep actions visible for language switcher, push to far right */
-  .actions {
-    margin-left: auto;
-    gap: 0;
-  }
-
-  /* Hide subscribe button on mobile — it lives in the drawer */
   .subscribeLink {
     display: none;
   }

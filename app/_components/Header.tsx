@@ -22,22 +22,31 @@ export default async function Header() {
 
   return (
     <header className={styles.header}>
-      <div className={styles.inner}>
+      {/* ── Row 1: logo centred, actions right ── */}
+      <div className={styles.logoRow}>
         <MobileNav />
 
-        <div className={styles.brand}>
-          <Link href="/" className={styles.logo}>
-            <Image
-              src="/logo.png"
-              alt="KumariHub"
-              width={180}
-              height={52}
-              style={{ objectFit: "contain", height: "42px", width: "auto" }}
-              priority
-            />
+        <Link href="/" className={styles.logo}>
+          <Image
+            src="/logo.png"
+            alt="KumariHub"
+            width={260}
+            height={75}
+            style={{ objectFit: "contain", height: "58px", width: "auto" }}
+            priority
+          />
+        </Link>
+
+        <div className={styles.actions}>
+          <LanguageSwitcher />
+          <Link href="/subscribe" className={styles.subscribeLink}>
+            {t("subscribe")}
           </Link>
         </div>
+      </div>
 
+      {/* ── Row 2: navigation ── */}
+      <div className={styles.navRow}>
         <nav className={styles.nav} aria-label="Main navigation">
           <ul className={styles.navList}>
             {categories.map((cat) => (
@@ -52,13 +61,6 @@ export default async function Header() {
             ))}
           </ul>
         </nav>
-
-        <div className={styles.actions}>
-          <LanguageSwitcher />
-          <Link href="/subscribe" className={styles.subscribeLink}>
-            {t("subscribe")}
-          </Link>
-        </div>
       </div>
     </header>
   );
