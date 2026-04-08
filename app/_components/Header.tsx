@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { categories } from "@/app/_data/articles";
 import { Link } from "@/i18n/navigation";
@@ -26,8 +27,14 @@ export default async function Header() {
 
         <div className={styles.brand}>
           <Link href="/" className={styles.logo}>
-            <span className={styles.logoMark}>DR</span>
-            <span className={styles.logoText}>The Daily Report</span>
+            <Image
+              src="/logo.png"
+              alt="KumariHub"
+              width={180}
+              height={52}
+              style={{ objectFit: "contain", height: "42px", width: "auto" }}
+              priority
+            />
           </Link>
         </div>
 
