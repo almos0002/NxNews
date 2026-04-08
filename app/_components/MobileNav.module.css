@@ -159,14 +159,6 @@
   padding: 16px 20px;
   border-top: 1px solid var(--color-border);
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.drawerLangWrap {
-  display: flex;
-  justify-content: flex-start;
 }
 
 .drawerSubscribe {

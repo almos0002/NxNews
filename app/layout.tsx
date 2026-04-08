@@ -1,13 +1,5 @@
 import type { Metadata } from "next";
-import {
-  noticiaText,
-  dmSans,
-  notoSerifDevanagari,
-  notoNaskhArabic,
-  notoSerifSC,
-  notoSerifTamil,
-} from "./fonts";
-import { LanguageProvider } from "./_i18n/LanguageContext";
+import { noticiaText, dmSans } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,23 +13,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
-  const fontVars = [
-    noticiaText.variable,
-    dmSans.variable,
-    notoSerifDevanagari.variable,
-    notoNaskhArabic.variable,
-    notoSerifSC.variable,
-    notoSerifTamil.variable,
-  ].join(" ");
-
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    /* suppressHydrationWarning: the language system modifies data-lang/dir
-       on the client after hydration — this suppresses the expected mismatch. */
-    <html lang="en" className={fontVars} suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <LanguageProvider>{children}</LanguageProvider>
-      </body>
+    <html lang="en" className={`${noticiaText.variable} ${dmSans.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }

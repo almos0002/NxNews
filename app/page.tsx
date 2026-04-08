@@ -1,5 +1,3 @@
-"use client";
-
 import BreakingTicker from "./_components/BreakingTicker";
 import Header from "./_components/Header";
 import ArticleCard from "./_components/ArticleCard";
@@ -11,7 +9,6 @@ import EditorsPick from "./_components/EditorsPick";
 import CategoryLists from "./_components/CategoryLists";
 import ThreeColSection from "./_components/ThreeColSection";
 import Footer from "./_components/Footer";
-import { useT } from "./_i18n/LanguageContext";
 import {
   breakingHeadline,
   featuredArticle,
@@ -26,12 +23,10 @@ import {
 import styles from "./page.module.css";
 
 export default function Home() {
-  const t = useT();
-
   const categoryColumns = [
-    { label: t("nav.business"),    articles: businessArticles.slice(0, 5) },
-    { label: t("nav.technology"),  articles: techArticles.slice(0, 5) },
-    { label: t("sections.aroundWorld"), articles: gridArticles.slice(0, 5) },
+    { label: "Business", articles: businessArticles.slice(0, 5) },
+    { label: "Technology", articles: techArticles.slice(0, 5) },
+    { label: "Around the World", articles: gridArticles.slice(0, 5) },
   ];
 
   return (
@@ -59,7 +54,7 @@ export default function Home() {
         {/* Top Stories — grid cards + trending sidebar */}
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
-            <SectionHeading title={t("sections.topStories")} />
+            <SectionHeading title="Top Stories" />
             <div className={styles.articleGrid}>
               {gridArticles.map((article) => (
                 <ArticleCard key={article.id} article={article} variant="grid" />
@@ -71,17 +66,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 3 category columns */}
+        {/* 3 category columns — Business | Technology | World (small thumbnail list) */}
         <CategoryLists columns={categoryColumns} />
 
-        {/* Science & Technology */}
+        {/* Science & Technology — 3-col with Must Read spanning right two columns */}
         <div className={styles.topicDivider}>
-          <ThreeColSection title={t("sections.scienceTech")} articles={techArticles} />
+          <ThreeColSection title="Science & Technology" articles={techArticles} />
         </div>
 
-        {/* Opinion */}
+        {/* Opinion — 3-column compact */}
         <section className={styles.opinionSection}>
-          <SectionHeading title={t("sections.opinionTitle")} />
+          <SectionHeading title="Opinion" />
           <div className={styles.opinionGrid}>
             {opinionArticles.map((article) => (
               <ArticleCard key={article.id} article={article} variant="compact" />
@@ -92,19 +87,22 @@ export default function Home() {
         {/* Newsletter */}
         <section className={styles.newsletter}>
           <div className={styles.newsletterInner}>
-            <span className={styles.newsletterLabel}>{t("sections.newsletter")}</span>
-            <h2 className={styles.newsletterTitle}>{t("newsletter.morningTitle")}</h2>
-            <p className={styles.newsletterText}>{t("newsletter.morningDesc")}</p>
+            <span className={styles.newsletterLabel}>Newsletter</span>
+            <h2 className={styles.newsletterTitle}>The Morning Briefing</h2>
+            <p className={styles.newsletterText}>
+              Start every day informed. Our editors curate the most important
+              stories delivered to your inbox before 7 AM.
+            </p>
             <form className={styles.newsletterForm} action="#">
               <input
                 type="email"
-                placeholder={t("newsletter.emailPlaceholder")}
+                placeholder="Enter your email"
                 className={styles.newsletterInput}
                 aria-label="Email address"
                 required
               />
               <button type="submit" className={styles.newsletterButton}>
-                {t("newsletter.morningBtn")}
+                Subscribe
               </button>
             </form>
           </div>

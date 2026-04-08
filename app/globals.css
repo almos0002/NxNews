@@ -14,31 +14,6 @@
   --radius: 6px;
 }
 
-/* ── Language-specific fonts ──────────────────────────────── */
-
-/* Nepali — Noto Serif Devanagari */
-html[data-lang="ne"] {
-  --font-serif: var(--font-devanagari), "Noto Serif Devanagari", serif;
-  --font-sans: var(--font-devanagari), "Noto Serif Devanagari", serif;
-}
-
-/* Arabic — Noto Naskh Arabic (also switches to RTL) */
-html[data-lang="ar"] {
-  --font-serif: var(--font-arabic), "Noto Naskh Arabic", serif;
-  --font-sans: var(--font-arabic), "Noto Naskh Arabic", serif;
-}
-
-/* Chinese Simplified — Noto Serif SC */
-html[data-lang="zh"] {
-  --font-serif: var(--font-chinese), "Noto Serif SC", serif;
-  --font-sans: var(--font-chinese), "Noto Serif SC", serif;
-}
-
-/* RTL layout tweaks for Arabic */
-html[dir="rtl"] .header__nav { flex-direction: row-reverse; }
-html[dir="rtl"] input,
-html[dir="rtl"] textarea { text-align: right; }
-
 *,
 *::before,
 *::after {

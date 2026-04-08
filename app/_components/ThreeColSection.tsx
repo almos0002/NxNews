@@ -1,8 +1,5 @@
-"use client";
-
 import Image from "next/image";
 import type { Article } from "@/app/_data/articles";
-import { useT } from "@/app/_i18n/LanguageContext";
 import CategoryBadge from "./CategoryBadge";
 import styles from "./ThreeColSection.module.css";
 
@@ -13,18 +10,17 @@ export default function ThreeColSection({
   title: string;
   articles: Article[];
 }) {
-  const t = useT();
   const col1Lead    = articles[0];
-  const col1Texts   = articles.slice(1, 4);
-  const col2Items   = articles.slice(4, 9);
-  const col3Items   = articles.slice(9, 14);
+  const col1Texts   = articles.slice(1, 4);   // 3 text items below image
+  const col2Items   = articles.slice(4, 9);   // Must Read 01–05
+  const col3Items   = articles.slice(9, 14);  // Must Read 06–10
 
   return (
     <section className={styles.wrapper}>
       <div className={styles.heading}>
         <h2 className={styles.sectionTitle}>{title}</h2>
         <div className={styles.rule} />
-        <a href="#" className={styles.seeAll}>{t("sections.seeAll")}</a>
+        <a href="#" className={styles.seeAll}>See all →</a>
       </div>
 
       <div className={styles.cols}>
@@ -75,7 +71,7 @@ export default function ThreeColSection({
         {/* RIGHT SECTION — Must Read header spans both sub-columns */}
         <div className={styles.rightSection}>
           <div className={styles.mustReadHeader}>
-            <span className={styles.mustReadLabel}>{t("sections.mustRead")}</span>
+            <span className={styles.mustReadLabel}>Must Read</span>
           </div>
 
           <div className={styles.rightCols}>
