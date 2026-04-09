@@ -109,7 +109,7 @@
   },
   "login": {
     "title": "Welcome back",
-    "subtitle": "Sign in to your Daily Report account",
+    "subtitle": "Sign in to your KumariHub account",
     "email": "Email address",
     "emailPlaceholder": "you@example.com",
     "password": "Password",
@@ -124,8 +124,8 @@
     "createOne": "Create one free"
   },
   "signup": {
-    "title": "Join The Daily Report",
-    "subtitle": "Create your account",
+    "title": "Join KumariHub",
+    "subtitle": "Create your free account",
     "firstName": "First name",
     "lastName": "Last name",
     "email": "Email address",

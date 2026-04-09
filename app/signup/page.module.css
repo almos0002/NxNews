@@ -1,54 +1,113 @@
+/* ── Page wrapper ─────────────────────────────────── */
 .main {
-  min-height: calc(100vh - 220px);
+  min-height: calc(100vh - 160px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 48px 20px;
+  background-color: var(--color-bg);
 }
 
-.card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 44px 40px;
+/* ── Two-panel card ───────────────────────────────── */
+.panel {
+  display: flex;
   width: 100%;
-  max-width: 460px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+  max-width: 920px;
+  min-height: 620px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12);
 }
 
-/* ── Card header ──────────────────────────────────── */
-.cardHeader {
-  text-align: center;
-  margin-bottom: 24px;
+/* ── Left: brand side ─────────────────────────────── */
+.brandSide {
+  flex: 0 0 320px;
+  background-color: #1a1a1a;
+  background-image: linear-gradient(155deg, #1a1a1a 0%, #2c0a0e 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 44px 32px;
+  color: #fff;
 }
 
-.logoLink {
-  display: inline-flex;
-  margin-bottom: 20px;
+.brandTop {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.brandLogo {
+  display: flex;
+  align-items: center;
   text-decoration: none;
 }
 
-.logoMark {
+.brandTagline {
   font-family: var(--font-serif);
-  font-size: 0.95rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  background-color: var(--color-accent);
-  color: #ffffff;
-  width: 40px;
-  height: 40px;
+  line-height: 1.3;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.brandTagline span {
+  color: var(--color-accent);
+}
+
+.brandPerks {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.brandPerk {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.4;
+}
+
+.perkCheck {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-accent);
+}
+
+.brandNote {
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.6;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 20px;
+}
+
+/* ── Right: form side ─────────────────────────────── */
+.formSide {
+  flex: 1;
+  background-color: var(--color-surface);
+  padding: 44px 44px;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  border-radius: 6px;
-  letter-spacing: 0.02em;
+  overflow-y: auto;
+}
+
+.formHeader {
+  margin-bottom: 28px;
 }
 
 .heading {
   font-family: var(--font-serif);
-  font-size: 1.55rem;
+  font-size: 1.65rem;
   font-weight: 700;
   color: var(--color-ink);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   margin-bottom: 6px;
 }
 
@@ -59,38 +118,11 @@
   line-height: 1.5;
 }
 
-/* ── Perks list ───────────────────────────────────── */
-.perks {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 16px;
-  background-color: var(--color-tag-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 24px;
-}
-
-.perk {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-serif);
-  font-size: 0.8rem;
-  color: var(--color-ink-secondary);
-}
-
-.perkIcon {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
 /* ── Form ─────────────────────────────────────────── */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 15px;
 }
 
 .nameRow {
@@ -130,8 +162,8 @@
 }
 
 .input:focus {
-  border-color: var(--color-ink);
-  box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.06);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.08);
 }
 
 .checkboxLabel {
@@ -166,20 +198,25 @@
 
 .submitBtn {
   font-family: var(--font-serif);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #ffffff;
   background-color: var(--color-accent);
-  padding: 12px;
+  padding: 13px;
   border-radius: var(--radius);
   border: none;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.1s ease;
   margin-top: 4px;
+  letter-spacing: 0.01em;
 }
 
 .submitBtn:hover {
   background-color: var(--color-accent-hover);
+}
+
+.submitBtn:active {
+  transform: scale(0.99);
 }
 
 /* ── Divider ──────────────────────────────────────── */
@@ -187,7 +224,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 24px 0;
+  margin: 18px 0;
 }
 
 .dividerLine {
@@ -206,35 +243,37 @@
 /* ── Social buttons ───────────────────────────────── */
 .socialRow {
   display: flex;
-  flex-direction: column;
   gap: 10px;
 }
 
 .socialBtn {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   font-family: var(--font-serif);
-  font-size: 0.87rem;
+  font-size: 0.83rem;
   font-weight: 600;
   color: var(--color-ink);
-  background-color: var(--color-surface);
+  background-color: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  padding: 11px;
+  padding: 10px 12px;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
 }
 
 .socialBtn:hover {
   background-color: var(--color-tag-bg);
+  border-color: var(--color-ink-muted);
 }
 
-/* ── Footer link ──────────────────────────────────── */
+/* ── Footer ───────────────────────────────────────── */
 .footer {
   text-align: center;
-  margin-top: 24px;
+  margin-top: 20px;
   font-family: var(--font-serif);
   font-size: 0.85rem;
   color: var(--color-ink-muted);
@@ -252,16 +291,45 @@
 }
 
 /* ── Responsive ───────────────────────────────────── */
-@media (max-width: 500px) {
-  .card {
-    padding: 32px 20px;
+@media (max-width: 760px) {
+  .panel {
+    flex-direction: column;
+    max-width: 480px;
   }
 
+  .brandSide {
+    flex: none;
+    padding: 28px 28px 24px;
+  }
+
+  .brandPerks {
+    display: none;
+  }
+
+  .brandNote {
+    display: none;
+  }
+
+  .brandTagline {
+    font-size: 1.1rem;
+  }
+
+  .formSide {
+    padding: 32px 28px 36px;
+  }
+}
+
+@media (max-width: 480px) {
   .nameRow {
     grid-template-columns: 1fr;
   }
 
-  .perks {
-    grid-template-columns: 1fr;
+  .socialRow {
+    flex-direction: column;
+  }
+
+  .main {
+    padding: 24px 12px;
+    align-items: flex-start;
   }
 }
