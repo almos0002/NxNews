@@ -273,15 +273,58 @@
   display: block;
 }
 
-/* Color swatch */
-.colorSwatch {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-right: 6px;
-  vertical-align: middle;
-  border: 1px solid rgba(0,0,0,0.1);
+/* Success / status banners */
+.successBanner {
+  padding: 10px 16px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  color: #166534;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Publish / draft status buttons */
+.publishBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1.5px solid #86efac;
+  transition: background 0.15s;
+}
+.publishBtn:hover { background: #dcfce7; }
+.publishBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.draftBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1.5px solid #cbd5e1;
+  transition: background 0.15s;
+}
+.draftBtn:hover { background: #f1f5f9; }
+.draftBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Page subtitle */
+.pageSubtitle {
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+  line-height: 1.5;
+  margin-top: 4px;
 }
 
 /* User avatar */

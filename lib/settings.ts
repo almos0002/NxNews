@@ -38,6 +38,38 @@ export async function setSetting(key: string, value: string): Promise<void> {
   );
 }
 
+export interface LocalizedSiteSettings {
+  siteTitle: string;
+  siteDescription: string;
+  copyrightText: string;
+  logoUrl: string;
+  faviconUrl: string;
+  social: {
+    twitter: string;
+    facebook: string;
+    instagram: string;
+    youtube: string;
+  };
+}
+
+export async function getSiteSettingsForLocale(locale: string): Promise<LocalizedSiteSettings> {
+  const s = await getAllSettings();
+  const isNe = locale === "ne";
+  return {
+    siteTitle:       isNe ? (s.site_title_ne       || s.site_title_en       || "KumariHub")   : (s.site_title_en       || "KumariHub"),
+    siteDescription: isNe ? (s.site_description_ne || s.site_description_en || "")            : (s.site_description_en || ""),
+    copyrightText:   s.copyright_text || `© ${new Date().getFullYear()} KumariHub. All rights reserved.`,
+    logoUrl:         s.logo_url       || "/logo.png",
+    faviconUrl:      s.favicon_url    || "/favicon.ico",
+    social: {
+      twitter:   s.social_twitter   || "",
+      facebook:  s.social_facebook  || "",
+      instagram: s.social_instagram || "",
+      youtube:   s.social_youtube   || "",
+    },
+  };
+}
+
 export async function setSettings(entries: Record<string, string>): Promise<void> {
   if (!Object.keys(entries).length) return;
   const values = Object.entries(entries)

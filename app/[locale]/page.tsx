@@ -14,7 +14,7 @@ import VideoSection from "@/app/_components/VideoSection";
 import WeatherSection from "@/app/_components/WeatherSection";
 import EntertainmentSection from "@/app/_components/EntertainmentSection";
 import Footer from "@/app/_components/Footer";
-import AdSlot from "@/app/_components/AdSlot";
+import AdUnit from "@/app/_components/AdUnit";
 import { getPublicArticles, getBreakingHeadline } from "@/lib/public";
 import styles from "@/app/page.module.css";
 
@@ -89,7 +89,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </section>
 
         <div className={styles.adSection}>
-          <AdSlot variant="leaderboard" />
+          <AdUnit variant="leaderboard" />
         </div>
 
         <section className={styles.section}>
@@ -97,7 +97,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </section>
 
         <div className={styles.adSection}>
-          <AdSlot variant="leaderboard" />
+          <AdUnit variant="leaderboard" />
         </div>
 
         <section className={styles.section}>
@@ -119,13 +119,13 @@ export default async function LocaleHomePage({ params }: Props) {
         </section>
 
         <div className={styles.adSection}>
-          <AdSlot variant="leaderboard" />
+          <AdUnit variant="leaderboard" />
         </div>
 
         <CategoryLists columns={categoryColumns} />
 
         <div className={styles.adSection}>
-          <AdSlot variant="billboard" />
+          <AdUnit variant="billboard" />
         </div>
 
         <div className={styles.topicDivider}>
@@ -133,7 +133,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </div>
 
         <div className={styles.adSection}>
-          <AdSlot variant="leaderboard" />
+          <AdUnit variant="leaderboard" />
         </div>
 
         <section className={styles.section}>
@@ -141,7 +141,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </section>
 
         <div className={styles.adSection}>
-          <AdSlot variant="leaderboard" />
+          <AdUnit variant="leaderboard" />
         </div>
 
         <section className={styles.section}>
@@ -153,7 +153,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </section>
 
         <div className={styles.adSection}>
-          <AdSlot variant="leaderboard" />
+          <AdUnit variant="leaderboard" />
         </div>
 
         <section className={styles.newsletterSection}>

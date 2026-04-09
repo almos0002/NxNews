@@ -87,9 +87,12 @@ next.config.ts            # Next.js config (next-intl plugin, remote images)
 | `rateLimit`   | Per-IP rate limit tracking               |
 | `article`     | Published articles (bilingual)           |
 | `pages`       | Static CMS pages (bilingual)             |
-| `categories`  | Article categories with color coding     |
+| `categories`  | Article categories (no color)            |
 | `tags`        | Article tags (bilingual)                 |
 | `videos`      | YouTube video entries (bilingual)        |
+| `settings`    | Key/value site settings (bilingual)      |
+| `menu_items`  | Header/footer nav menu items             |
+| `ads`         | Ad slot configs (enabled, code, dims)    |
 
 Migration script: `scripts/migrate.mjs`
 
@@ -116,6 +119,8 @@ Migration script: `scripts/migrate.mjs`
 | `/dashboard/moderation` | Moderator+ | Article review queue (approve/reject) |
 | `/dashboard/profile` | All roles | Edit own name, bio, change password |
 | `/dashboard/menu` | Moderator+ | Navbar & footer menu manager with page/URL links and sort order |
+| `/dashboard/ads` | Admin | Ad slot enable/disable + ad code/script editor |
+| `/dashboard/settings` | Admin | Site-wide settings (title, description, social links, etc.) |
 
 ### Key Client Components (app/_components/)
 | Component | Purpose |
@@ -123,7 +128,9 @@ Migration script: `scripts/migrate.mjs`
 | `ArticleEditor.tsx` | Full bilingual article editor with Quill, categories, tags, featured image |
 | `PageEditor.tsx` | Bilingual page editor (reuses ArticleEditor.module.css) |
 | `QuillEditor.tsx` | Dynamically imported Quill v2 rich text editor (SSR disabled) |
-| `TaxonomyClient.tsx` | Tabbed categories/tags CRUD client |
+| `TaxonomyClient.tsx` | Tabbed categories/tags CRUD client (no color field) |
+| `AdUnit.tsx` | Async server component wrapping `AdSlot` — DB-driven per-slot enable/code |
+| `AdsClient.tsx` | CMS ad slot toggle + code editor client |
 | `VideosClient.tsx` | Videos list + inline add/edit form with YouTube embed preview |
 | `UsersClient.tsx` | User table with role dropdown + ban toggle |
 | `ProfileClient.tsx` | Edit profile (name, bio) + change password via Better Auth |

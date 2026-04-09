@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { PublicArticle as Article } from "@/lib/public";
 import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
-import AdSlot from "./AdSlot";
+import AdUnit from "./AdUnit";
 import styles from "./ThreeColSection.module.css";
 
 export default async function ThreeColSection({
@@ -46,7 +46,7 @@ export default async function ThreeColSection({
 
   const adCell = (
     <div className={styles.adCell} aria-hidden="true">
-      <AdSlot variant="fluid" />
+      <AdUnit variant="fluid" />
     </div>
   );
 

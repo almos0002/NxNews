@@ -6,7 +6,8 @@ import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import CategoryBadge from "@/app/_components/CategoryBadge";
-import AdSlot from "@/app/_components/AdSlot";
+import AdUnit from "@/app/_components/AdUnit";
+
 import {
   getPublicArticleBySlug,
   getRelatedPublicArticles,
@@ -94,7 +95,7 @@ export default async function ArticlePage({ params }: Props) {
         </div>
 
         <div className={styles.inArticleAd}>
-          <AdSlot variant="leaderboard" />
+          <AdUnit variant="leaderboard" />
         </div>
 
         {article.imageUrl && (
@@ -153,13 +154,13 @@ export default async function ArticlePage({ params }: Props) {
               <p className={styles.sidebarText}>{t("sidebarText")}</p>
               <Link href="/subscribe" className={styles.sidebarCta}>{t("subscribeFree")}</Link>
             </div>
-            <AdSlot variant="rectangle" />
-            <AdSlot variant="halfpage" />
+            <AdUnit variant="rectangle" />
+            <AdUnit variant="halfpage" />
           </aside>
         </div>
 
         <div className={styles.postArticleAd}>
-          <AdSlot variant="leaderboard" />
+          <AdUnit variant="leaderboard" />
         </div>
 
         {related.length > 0 && (
@@ -199,7 +200,7 @@ export default async function ArticlePage({ params }: Props) {
         )}
 
         <div className={styles.billboardAd}>
-          <AdSlot variant="billboard" />
+          <AdUnit variant="billboard" />
         </div>
       </main>
 

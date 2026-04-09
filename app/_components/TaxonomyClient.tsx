@@ -14,17 +14,15 @@ function toSlug(s: string) {
   return s.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/--+/g, "-").slice(0, 60);
 }
 
-const COLORS = ["#e63946","#f4a261","#2a9d8f","#457b9d","#6a4c93","#606c38","#9b2226","#023e8a"];
-
 export default function TaxonomyClient({ initialCategories, initialTags }: Props) {
   const [tab, setTab] = useState<"categories" | "tags">("categories");
   const [categories, setCategories] = useState(initialCategories);
   const [tags, setTags] = useState(initialTags);
   const [err, setErr] = useState("");
 
-  const [newCat, setNewCat] = useState({ name_en: "", name_ne: "", color: COLORS[0] });
+  const [newCat, setNewCat] = useState({ name_en: "", name_ne: "" });
   const [editCatId, setEditCatId] = useState<string | null>(null);
-  const [editCat, setEditCat] = useState({ name_en: "", name_ne: "", color: "" });
+  const [editCat, setEditCat] = useState({ name_en: "", name_ne: "" });
   const [savingCat, setSavingCat] = useState(false);
 
   const [newTag, setNewTag] = useState({ name_en: "", name_ne: "" });
@@ -44,7 +42,7 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
       const data = await res.json();
       if (!res.ok) { setErr(data.error ?? "Failed"); return; }
       setCategories((p) => [...p, data.category].sort((a, b) => a.name_en.localeCompare(b.name_en)));
-      setNewCat({ name_en: "", name_ne: "", color: COLORS[0] });
+      setNewCat({ name_en: "", name_ne: "" });
     } finally { setSavingCat(false); }
   }
 
@@ -150,15 +148,6 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
                 <input className={styles.input} placeholder="e.g. राजनीति" value={newCat.name_ne}
                   onChange={(e) => setNewCat((p) => ({ ...p, name_ne: e.target.value }))} />
               </div>
-              <div className={styles.field}>
-                <label className={styles.label}>Color</label>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {COLORS.map((c) => (
-                    <button key={c} type="button" onClick={() => setNewCat((p) => ({ ...p, color: c }))}
-                      style={{ width: 24, height: 24, borderRadius: "50%", background: c, border: newCat.color === c ? "3px solid #222" : "2px solid transparent", cursor: "pointer" }} />
-                  ))}
-                </div>
-              </div>
               <button className={styles.submitBtn} onClick={addCategory} disabled={savingCat}>
                 {savingCat ? "Adding…" : "Add Category"}
               </button>
@@ -183,12 +172,6 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
                             onChange={(e) => setEditCat((p) => ({ ...p, name_en: e.target.value }))} placeholder="English name" />
                           <input className={styles.input} value={editCat.name_ne}
                             onChange={(e) => setEditCat((p) => ({ ...p, name_ne: e.target.value }))} placeholder="Nepali name" />
-                          <div style={{ display: "flex", gap: 6 }}>
-                            {COLORS.map((col) => (
-                              <button key={col} type="button" onClick={() => setEditCat((p) => ({ ...p, color: col }))}
-                                style={{ width: 20, height: 20, borderRadius: "50%", background: col, border: editCat.color === col ? "3px solid #222" : "2px solid transparent", cursor: "pointer" }} />
-                            ))}
-                          </div>
                           <div className={styles.actionRow}>
                             <button className={styles.submitBtn} onClick={saveCategory} disabled={savingCat}>{savingCat ? "Saving…" : "Save"}</button>
                             <button className={styles.cancelBtn} onClick={() => setEditCatId(null)}>Cancel</button>
@@ -198,14 +181,13 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
                     ) : (
                       <>
                         <td>
-                          <span className={styles.colorSwatch} style={{ background: c.color }} />
                           <strong>{c.name_en}</strong>
                           {c.name_ne && <span style={{ color: "var(--color-ink-muted)", fontSize: "0.8rem" }}> · {c.name_ne}</span>}
                         </td>
                         <td style={{ fontFamily: "monospace", fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>{c.slug}</td>
                         <td>
                           <div className={styles.actionRow}>
-                            <button className={styles.editBtn} onClick={() => { setEditCatId(c.id); setEditCat({ name_en: c.name_en, name_ne: c.name_ne, color: c.color }); }}>Edit</button>
+                            <button className={styles.editBtn} onClick={() => { setEditCatId(c.id); setEditCat({ name_en: c.name_en, name_ne: c.name_ne }); }}>Edit</button>
                             <button className={styles.deleteBtn} onClick={() => deleteCategory(c.id)}>Delete</button>
                           </div>
                         </td>

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
 import { getTrendingArticles } from "@/lib/public";
 import { Link } from "@/i18n/navigation";
-import AdSlot from "./AdSlot";
+import AdUnit from "./AdUnit";
 import styles from "./TrendingSidebar.module.css";
 
 export default async function TrendingSidebar() {
@@ -38,7 +38,7 @@ export default async function TrendingSidebar() {
         ))}
 
         <li className={styles.adItem} aria-hidden="true">
-          <AdSlot variant="fluid" />
+          <AdUnit variant="fluid" />
         </li>
 
         {bottomItems.map((article, index) => (

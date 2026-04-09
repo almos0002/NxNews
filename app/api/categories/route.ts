@@ -29,13 +29,12 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name_en, name_ne, color } = body;
+    const { name_en, name_ne } = body;
     if (!name_en?.trim()) return NextResponse.json({ error: "English name is required" }, { status: 400 });
 
     const slug = body.slug?.trim() || toSlug(name_en);
     const category = await createCategory({
-      name_en: name_en.trim(), name_ne: (name_ne ?? "").trim(),
-      slug, color: color ?? "#e63946",
+      name_en: name_en.trim(), name_ne: (name_ne ?? "").trim(), slug,
     });
     return NextResponse.json({ category }, { status: 201 });
   } catch (err: unknown) {

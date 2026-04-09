@@ -4,16 +4,16 @@ const ADMIN_EMAIL = "admin@kumarihub.com";
 const ADMIN_NAME = "Admin User";
 
 const CATEGORIES = [
-  { name_en: "World", name_ne: "विश्व", slug: "world", color: "#1a56db" },
-  { name_en: "Politics", name_ne: "राजनीति", slug: "politics", color: "#e63946" },
-  { name_en: "Business", name_ne: "व्यापार", slug: "business", color: "#16a34a" },
-  { name_en: "Technology", name_ne: "प्रविधि", slug: "technology", color: "#7c3aed" },
-  { name_en: "Science", name_ne: "विज्ञान", slug: "science", color: "#0891b2" },
-  { name_en: "Culture", name_ne: "संस्कृति", slug: "culture", color: "#d97706" },
-  { name_en: "Sports", name_ne: "खेलकुद", slug: "sports", color: "#dc2626" },
-  { name_en: "Entertainment", name_ne: "मनोरञ्जन", slug: "entertainment", color: "#9333ea" },
-  { name_en: "Opinion", name_ne: "विचार", slug: "opinion", color: "#475569" },
-  { name_en: "Videos", name_ne: "भिडियो", slug: "videos", color: "#be123c" },
+  { name_en: "World",         name_ne: "विश्व",        slug: "world"         },
+  { name_en: "Politics",      name_ne: "राजनीति",      slug: "politics"      },
+  { name_en: "Business",      name_ne: "व्यापार",      slug: "business"      },
+  { name_en: "Technology",    name_ne: "प्रविधि",      slug: "technology"    },
+  { name_en: "Science",       name_ne: "विज्ञान",      slug: "science"       },
+  { name_en: "Culture",       name_ne: "संस्कृति",     slug: "culture"       },
+  { name_en: "Sports",        name_ne: "खेलकुद",       slug: "sports"        },
+  { name_en: "Entertainment", name_ne: "मनोरञ्जन",     slug: "entertainment" },
+  { name_en: "Opinion",       name_ne: "विचार",        slug: "opinion"       },
+  { name_en: "Videos",        name_ne: "भिडियो",       slug: "videos"        },
 ];
 
 const TAGS = [
@@ -570,10 +570,10 @@ async function main() {
   let catCount = 0;
   for (const cat of CATEGORIES) {
     const { rowCount } = await pool.query(
-      `INSERT INTO categories (name_en, name_ne, slug, color)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO categories (name_en, name_ne, slug)
+       VALUES ($1, $2, $3)
        ON CONFLICT (slug) DO NOTHING`,
-      [cat.name_en, cat.name_ne, cat.slug, cat.color]
+      [cat.name_en, cat.name_ne, cat.slug]
     );
     if (rowCount && rowCount > 0) catCount++;
   }

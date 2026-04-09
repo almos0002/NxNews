@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
-import AdSlot from "@/app/_components/AdSlot";
+import AdUnit from "@/app/_components/AdUnit";
 import { Link } from "@/i18n/navigation";
 import { getPublicVideos, getPublicVideoById, getBreakingHeadline } from "@/lib/public";
 import styles from "./video.module.css";
@@ -88,7 +88,7 @@ export default async function VideoDetailPage({ params }: Props) {
             <p className={styles.excerpt}>{video.excerpt}</p>
 
             <div className={styles.adInBody}>
-              <AdSlot variant="leaderboard" />
+              <AdUnit variant="leaderboard" />
             </div>
           </main>
 
@@ -126,7 +126,7 @@ export default async function VideoDetailPage({ params }: Props) {
               ))}
             </div>
 
-            <AdSlot variant="rectangle" />
+            <AdUnit variant="rectangle" />
           </aside>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
-import AdSlot from "@/app/_components/AdSlot";
+import AdUnit from "@/app/_components/AdUnit";
 import { Link } from "@/i18n/navigation";
 import { getPublicVideos, getBreakingHeadline } from "@/lib/public";
 import styles from "./videos.module.css";
@@ -45,7 +45,7 @@ export default async function VideosPage({ params }: Props) {
 
         <div className={styles.content}>
           <div className={styles.adTop}>
-            <AdSlot variant="leaderboard" />
+            <AdUnit variant="leaderboard" />
           </div>
 
           {videos.length === 0 ? (

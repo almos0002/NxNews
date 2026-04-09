@@ -124,6 +124,15 @@ function IconMenu() {
   );
 }
 
+function IconAd() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="10" rx="2"/>
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+    </svg>
+  );
+}
+
 function IconSettings() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -199,6 +208,7 @@ export default function DashboardSidebar({ name, email, role }: Props) {
           <>
             <span className={styles.navLabel}>Admin</span>
             {link(`${base}/users`, <IconUsers />, "User Management")}
+            {link(`${base}/ads`, <IconAd />, "Ad Management")}
             {link(`${base}/settings`, <IconSettings />, "Settings")}
           </>
         )}

@@ -5,7 +5,7 @@ import type { PublicArticle as Article } from "@/lib/public";
 import { getTrendingArticles, getPublicTags } from "@/lib/public";
 import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
-import AdSlot from "./AdSlot";
+import AdUnit from "./AdUnit";
 import styles from "./ArchiveLayout.module.css";
 
 interface ArchiveLayoutProps {
@@ -80,7 +80,7 @@ async function ArchiveSidebar() {
         </form>
       </div>
 
-      <AdSlot variant="rectangle" />
+      <AdUnit variant="rectangle" />
     </aside>
   );
 }
