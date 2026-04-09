@@ -1,0 +1,175 @@
+.root {
+  position: relative;
+  width: 100%;
+}
+
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 11px;
+  background: #fff;
+  border: 1.5px solid var(--color-border, #ddd9ce);
+  border-radius: 7px;
+  font-family: var(--font-serif, serif);
+  font-size: 0.85rem;
+  color: var(--color-ink, #141414);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  min-height: 38px;
+}
+
+.trigger:hover:not(.disabled) {
+  border-color: #b8b0a0;
+}
+
+.triggerOpen {
+  border-color: var(--color-accent, #e63946);
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.08);
+}
+
+.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #f8f7f2;
+}
+
+.selectedLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-ink, #141414);
+}
+
+.placeholder {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-ink-muted, #aaa);
+}
+
+.caret {
+  flex-shrink: 0;
+  color: #b8b0a0;
+  transition: transform 0.18s ease;
+}
+
+.caretOpen {
+  transform: rotate(180deg);
+  color: var(--color-accent, #e63946);
+}
+
+/* ── Dropdown ── */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1.5px solid var(--color-border, #ddd9ce);
+  border-radius: 9px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+  min-width: 180px;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0ede6;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: var(--font-serif, serif);
+  font-size: 0.8rem;
+  color: var(--color-ink, #141414);
+  background: transparent;
+}
+
+.searchInput::placeholder {
+  color: #c0b8a8;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: #e2e0d8;
+  border-radius: 4px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: background 0.1s ease;
+  font-family: var(--font-serif, serif);
+  font-size: 0.83rem;
+  color: var(--color-ink, #141414);
+}
+
+.option:hover {
+  background: #f8f7f2;
+}
+
+.optionActive {
+  background: rgba(230, 57, 70, 0.05);
+  color: #c0313c;
+}
+
+.optionActive:hover {
+  background: rgba(230, 57, 70, 0.09);
+}
+
+.optionLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionHint {
+  font-size: 0.7rem;
+  color: var(--color-ink-muted, #aaa);
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+.check {
+  flex-shrink: 0;
+  color: var(--color-accent, #e63946);
+}
+
+.empty {
+  padding: 12px;
+  text-align: center;
+  font-family: var(--font-serif, serif);
+  font-size: 0.8rem;
+  color: var(--color-ink-muted, #aaa);
+}

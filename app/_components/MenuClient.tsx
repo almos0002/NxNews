@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import Combobox from "./Combobox";
+import type { ComboboxOption } from "./Combobox";
 import styles from "./cms.module.css";
 import type { MenuItem } from "@/lib/menu";
 
@@ -17,6 +19,12 @@ interface Props {
   pages: PageOpt[];
   categories: CategoryOpt[];
 }
+
+const LINK_TYPE_OPTS: ComboboxOption[] = [
+  { value: "category", label: "Category" },
+  { value: "page",     label: "CMS Page" },
+  { value: "external", label: "External URL" },
+];
 
 const EMPTY_FORM = {
   label_en: "", label_ne: "",
@@ -49,6 +57,10 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
     else setFooter(fn);
   }, [tab]);
 
+  /* ── Combobox option builders ── */
+  const pageOpts: ComboboxOption[] = pages.map((p) => ({ value: p.id, label: p.title_en, hint: `/${p.slug}` }));
+  const catOpts: ComboboxOption[] = categories.map((c) => ({ value: c.slug, label: c.label, hint: `/${c.slug}` }));
+
   function footerSections(arr: MenuItem[]): Map<string, MenuItem[]> {
     const map = new Map<string, MenuItem[]>();
     for (const it of arr) {
@@ -61,6 +73,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
 
   function resolveUrl(it: MenuItem): string {
     if (it.link_type === "page") return it.page_slug ? `/${it.page_slug}` : "#";
+    if (it.link_type === "category") return `/${it.url}`;
     return it.url;
   }
 
@@ -101,7 +114,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
         label_en: form.label_en.trim(), label_ne: form.label_ne.trim(),
         link_type: form.link_type,
         page_id: form.link_type === "page" ? form.page_id : null,
-        url: form.link_type === "external" ? form.url.trim() : form.link_type === "category" ? form.url.trim() : "",
+        url: form.link_type === "page" ? "" : form.url.trim(),
         open_new_tab: form.open_new_tab,
         sort_order: items.length,
         section_label_en: form.section_label_en.trim(),
@@ -127,7 +140,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
         label_en: editForm.label_en.trim(), label_ne: editForm.label_ne.trim(),
         link_type: editForm.link_type,
         page_id: editForm.link_type === "page" ? editForm.page_id : null,
-        url: editForm.link_type === "external" ? editForm.url.trim() : editForm.link_type === "category" ? editForm.url.trim() : "",
+        url: editForm.link_type === "page" ? "" : editForm.url.trim(),
         open_new_tab: editForm.open_new_tab,
         section_label_en: editForm.section_label_en.trim(),
         section_label_ne: editForm.section_label_ne.trim(),
@@ -164,8 +177,38 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
     });
   }
 
+  /* ── Move entire footer section up/down ── */
+  async function moveSection(sectionKey: string, dir: -1 | 1) {
+    const sectionEntries = Array.from(footerSections(footer).entries());
+    const idx = sectionEntries.findIndex(([k]) => k === sectionKey);
+    const nextIdx = idx + dir;
+    if (nextIdx < 0 || nextIdx >= sectionEntries.length) return;
+
+    // Swap the two sections
+    const reordered = [...sectionEntries];
+    [reordered[idx], reordered[nextIdx]] = [reordered[nextIdx], reordered[idx]];
+
+    // Flatten and assign sequential sort_orders
+    const allItemsOrdered: { id: string; sort_order: number }[] = [];
+    const updatedFooter: MenuItem[] = [];
+    let counter = 0;
+    for (const [, sItems] of reordered) {
+      for (const it of sItems) {
+        allItemsOrdered.push({ id: it.id, sort_order: counter });
+        updatedFooter.push({ ...it, sort_order: counter });
+        counter++;
+      }
+    }
+    setFooter(updatedFooter);
+    await fetch("/api/menu/reorder", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: allItemsOrdered }),
+    });
+  }
+
   const sections = footerSections(footer);
   const sectionKeys = Array.from(sections.keys()).filter(k => k !== "__none__");
+  const sectionEntries = Array.from(sections.entries());
 
   return (
     <div className={styles.page}>
@@ -191,32 +234,22 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
       {err && <p className={styles.errMsg}>{err}</p>}
       {ok && <p className={styles.successMsg}>{ok}</p>}
 
-      {/* ══════ NAVBAR + BOTTOM TABS — identical two-column layout ══════ */}
+      {/* ══════ NAVBAR + BOTTOM TABS ══════ */}
       {(tab === "navbar" || tab === "bottom") && (
         <div className={styles.twoCol}>
-          {/* Left: items list */}
           <div>
             <p className={styles.formTitle} style={{ marginBottom: 12 }}>
               {tab === "navbar" ? "Navbar links" : "Bottom bar links"} — use ▲ ▼ to reorder
             </p>
             <FlatList
-              items={items}
-              editId={editId}
-              editForm={editForm}
-              setEF={setEF}
-              pages={pages}
-              categories={categories}
-              saving={saving}
-              onEdit={openEdit}
-              onDelete={deleteItem}
+              items={items} editId={editId} editForm={editForm} setEF={setEF}
+              pages={pages} categories={categories} pageOpts={pageOpts} catOpts={catOpts}
+              saving={saving} onEdit={openEdit} onDelete={deleteItem}
               onMove={(idx, dir) => moveItem(items, idx, dir)}
-              onSaveEdit={submitEdit}
-              onCancelEdit={cancelEdit}
-              resolveUrl={resolveUrl}
+              onSaveEdit={submitEdit} onCancelEdit={cancelEdit} resolveUrl={resolveUrl}
             />
           </div>
 
-          {/* Right: always-visible add form */}
           <div className={styles.formCard} style={{ alignSelf: "start" }}>
             <p className={styles.formTitle}>
               {tab === "navbar" ? "Add Navbar Link" : "Add Bottom Bar Link"}
@@ -226,7 +259,8 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                 These links appear in the thin bar at the very bottom of the footer (e.g. Privacy, Terms, Cookies).
               </p>
             )}
-            <LinkForm form={addForm} setF={setAF} pages={pages} categories={categories} saving={saving} onSave={() => submitAdd()} showSectionPicker={false} />
+            <LinkForm form={addForm} setF={setAF} pageOpts={pageOpts} catOpts={catOpts}
+              saving={saving} onSave={() => submitAdd()} showSectionPicker={false} />
           </div>
         </div>
       )}
@@ -234,7 +268,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
       {/* ══════ FOOTER COLUMNS TAB ══════ */}
       {tab === "footer" && (
         <div className={styles.twoCol}>
-          {/* Left: sections + items */}
+          {/* Left: sections */}
           <div>
             <p className={styles.formTitle} style={{ marginBottom: 12 }}>Footer sections — each section is a column</p>
             {sections.size === 0 ? (
@@ -243,15 +277,22 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {Array.from(sections.entries()).map(([sKey, sItems]) => {
+                {sectionEntries.map(([sKey, sItems], sIdx) => {
                   const sLabelEn = sItems[0]?.section_label_en || "(Unnamed)";
                   const sLabelNe = sItems[0]?.section_label_ne || "";
                   return (
                     <div key={sKey} style={{ background: "#fff", border: "1.5px solid var(--color-border)", borderRadius: 10, overflow: "hidden" }}>
                       <div style={{ background: "#faf9f6", padding: "10px 16px", borderBottom: "1px solid var(--color-border)", display: "flex", alignItems: "center", gap: 8 }}>
+                        {/* Section-level reorder */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: 2, marginRight: 4 }}>
+                          <SortBtn disabled={sIdx === 0} onClick={() => moveSection(sKey, -1)}>▲</SortBtn>
+                          <SortBtn disabled={sIdx === sectionEntries.length - 1} onClick={() => moveSection(sKey, 1)}>▼</SortBtn>
+                        </div>
                         <span style={{ fontFamily: "var(--font-serif)", fontWeight: 700 }}>{sLabelEn}</span>
                         {sLabelNe && <span style={{ fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>· {sLabelNe}</span>}
-                        <span style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)", marginLeft: "auto" }}>{sItems.length} link{sItems.length !== 1 ? "s" : ""}</span>
+                        <span style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)", marginLeft: "auto" }}>
+                          {sItems.length} link{sItems.length !== 1 ? "s" : ""}
+                        </span>
                       </div>
                       <table className={styles.table}>
                         <tbody>
@@ -259,8 +300,8 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                             <tr key={it.id}>
                               {editId === it.id ? (
                                 <td colSpan={4} style={{ padding: "12px 14px" }}>
-                                  <LinkForm form={editForm} setF={setEF} pages={pages} categories={categories} saving={saving}
-                                    onSave={submitEdit} onCancel={cancelEdit}
+                                  <LinkForm form={editForm} setF={setEF} pageOpts={pageOpts} catOpts={catOpts}
+                                    saving={saving} onSave={submitEdit} onCancel={cancelEdit}
                                     showSectionPicker sectionOptions={sectionKeys} isEdit />
                                 </td>
                               ) : (
@@ -295,33 +336,32 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
             )}
           </div>
 
-          {/* Right: add link form */}
+          {/* Right: add link + create section */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16, alignSelf: "start" }}>
-            {/* Section picker or new section */}
             <div className={styles.formCard}>
               <p className={styles.formTitle}>Add Footer Link</p>
 
               {sectionKeys.length > 0 && (
                 <div className={styles.field} style={{ marginBottom: 12 }}>
                   <label className={styles.label}>Add to section</label>
-                  <select className={styles.select} value={addForm.section_label_en}
-                    onChange={(e) => {
-                      const chosen = sections.get(e.target.value)?.[0];
-                      setAF("section_label_en", e.target.value);
+                  <Combobox
+                    options={sectionKeys.map((s) => ({ value: s, label: s }))}
+                    value={addForm.section_label_en}
+                    placeholder="— choose section —"
+                    onChange={(v) => {
+                      const chosen = sections.get(v)?.[0];
+                      setAF("section_label_en", v);
                       setAF("section_label_ne", chosen?.section_label_ne ?? "");
-                    }}>
-                    <option value="">— choose section —</option>
-                    {sectionKeys.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                    }}
+                  />
                 </div>
               )}
 
-              <LinkForm form={addForm} setF={setAF} pages={pages} categories={categories} saving={saving}
-                onSave={() => submitAdd(addForm.section_label_en, addForm.section_label_ne)}
+              <LinkForm form={addForm} setF={setAF} pageOpts={pageOpts} catOpts={catOpts}
+                saving={saving} onSave={() => submitAdd(addForm.section_label_en, addForm.section_label_ne)}
                 showSectionPicker={false} />
             </div>
 
-            {/* Create new section */}
             <div className={styles.formCard}>
               <p className={styles.formTitle}>New Section</p>
               <p className={styles.hint} style={{ marginBottom: 10 }}>Creates a new column in the footer.</p>
@@ -353,26 +393,38 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
   );
 }
 
+/* ─── Tiny sort button ─── */
+function SortBtn({ disabled, onClick, children }: { disabled: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        width: 22, height: 18, border: "1px solid var(--color-border)", borderRadius: 3, fontSize: 9,
+        cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.3 : 1,
+        background: disabled ? "#f8f7f2" : "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 /* ─── Shared sort buttons ─── */
 function SortButtons({ idx, total, onMove }: { idx: number; total: number; onMove: (d: -1 | 1) => void }) {
-  const btnStyle = (disabled: boolean): React.CSSProperties => ({
-    width: 22, height: 18, border: "1px solid var(--color-border)", borderRadius: 3, fontSize: 9,
-    cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.35 : 1,
-    background: disabled ? "#f8f7f2" : "#fff", display: "flex", alignItems: "center", justifyContent: "center",
-  });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <button style={btnStyle(idx === 0)} onClick={() => onMove(-1)} disabled={idx === 0}>▲</button>
-      <button style={btnStyle(idx === total - 1)} onClick={() => onMove(1)} disabled={idx === total - 1}>▼</button>
+      <SortBtn disabled={idx === 0} onClick={() => onMove(-1)}>▲</SortBtn>
+      <SortBtn disabled={idx === total - 1} onClick={() => onMove(1)}>▼</SortBtn>
     </div>
   );
 }
 
 /* ─── Flat list for navbar and bottom bar ─── */
-function FlatList({ items, editId, editForm, setEF, pages, categories, saving, onEdit, onDelete, onMove, onSaveEdit, onCancelEdit, resolveUrl }: {
+function FlatList({ items, editId, editForm, setEF, pageOpts, catOpts, saving, onEdit, onDelete, onMove, onSaveEdit, onCancelEdit, resolveUrl }: {
   items: MenuItem[]; editId: string | null;
   editForm: typeof EMPTY_FORM; setEF: <K extends keyof typeof EMPTY_FORM>(k: K, v: typeof EMPTY_FORM[K]) => void;
-  pages: PageOpt[]; categories: CategoryOpt[]; saving: boolean;
+  pageOpts: ComboboxOption[]; catOpts: ComboboxOption[]; saving: boolean;
   onEdit: (it: MenuItem) => void; onDelete: (id: string) => void;
   onMove: (idx: number, dir: -1 | 1) => void;
   onSaveEdit: () => void; onCancelEdit: () => void;
@@ -391,8 +443,8 @@ function FlatList({ items, editId, editForm, setEF, pages, categories, saving, o
             <tr key={it.id}>
               {editId === it.id ? (
                 <td colSpan={4} style={{ padding: "12px 14px" }}>
-                  <LinkForm form={editForm} setF={setEF} pages={pages} categories={categories} saving={saving}
-                    onSave={onSaveEdit} onCancel={onCancelEdit} showSectionPicker={false} isEdit />
+                  <LinkForm form={editForm} setF={setEF} pageOpts={pageOpts} catOpts={catOpts}
+                    saving={saving} onSave={onSaveEdit} onCancel={onCancelEdit} showSectionPicker={false} isEdit />
                 </td>
               ) : (
                 <>
@@ -424,10 +476,10 @@ function FlatList({ items, editId, editForm, setEF, pages, categories, saving, o
 }
 
 /* ─── Shared link form ─── */
-function LinkForm({ form, setF, pages, categories, saving, onSave, onCancel, showSectionPicker, sectionOptions = [], isEdit = false }: {
+function LinkForm({ form, setF, pageOpts, catOpts, saving, onSave, onCancel, showSectionPicker, sectionOptions = [], isEdit = false }: {
   form: typeof EMPTY_FORM;
   setF: <K extends keyof typeof EMPTY_FORM>(k: K, v: typeof EMPTY_FORM[K]) => void;
-  pages: PageOpt[]; categories: CategoryOpt[]; saving: boolean;
+  pageOpts: ComboboxOption[]; catOpts: ComboboxOption[]; saving: boolean;
   onSave: () => void; onCancel?: () => void;
   showSectionPicker: boolean; sectionOptions?: string[]; isEdit?: boolean;
 }) {
@@ -436,10 +488,12 @@ function LinkForm({ form, setF, pages, categories, saving, onSave, onCancel, sho
       {showSectionPicker && sectionOptions.length > 0 && (
         <div className={styles.field}>
           <label className={styles.label}>Move to Section</label>
-          <select className={styles.select} value={form.section_label_en}
-            onChange={(e) => setF("section_label_en", e.target.value)}>
-            {sectionOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <Combobox
+            options={sectionOptions.map((s) => ({ value: s, label: s }))}
+            value={form.section_label_en}
+            placeholder="— choose section —"
+            onChange={(v) => setF("section_label_en", v)}
+          />
         </div>
       )}
       <div className={styles.formGrid}>
@@ -455,38 +509,41 @@ function LinkForm({ form, setF, pages, categories, saving, onSave, onCancel, sho
         </div>
         <div className={styles.field}>
           <label className={styles.label}>Link Type</label>
-          <select className={styles.select} value={form.link_type}
-            onChange={(e) => setF("link_type", e.target.value as "page" | "external" | "category")}>
-            <option value="category">Category</option>
-            <option value="page">CMS Page</option>
-            <option value="external">External URL</option>
-          </select>
+          <Combobox
+            options={LINK_TYPE_OPTS}
+            value={form.link_type}
+            placeholder="— select type —"
+            searchable={false}
+            onChange={(v) => setF("link_type", v as "page" | "external" | "category")}
+          />
         </div>
         <div className={styles.field}>
           {form.link_type === "category" ? (
             <>
               <label className={styles.label}>Select Category *</label>
-              <select className={styles.select} value={form.url}
-                onChange={(e) => {
-                  const cat = categories.find(c => c.slug === e.target.value);
-                  setF("url", e.target.value);
+              <Combobox
+                options={catOpts}
+                value={form.url}
+                placeholder="— choose category —"
+                onChange={(v) => {
+                  const cat = catOpts.find(c => c.value === v);
+                  setF("url", v);
                   if (cat && !form.label_en) setF("label_en", cat.label);
-                }}>
-                <option value="">— choose a category —</option>
-                {categories.map((c) => <option key={c.slug} value={c.slug}>{c.label} (/{c.slug})</option>)}
-              </select>
+                }}
+              />
             </>
           ) : form.link_type === "page" ? (
             <>
               <label className={styles.label}>Select Page *</label>
-              {pages.length === 0 ? (
+              {pageOpts.length === 0 ? (
                 <p className={styles.hint}>No published pages available.</p>
               ) : (
-                <select className={styles.select} value={form.page_id}
-                  onChange={(e) => setF("page_id", e.target.value)}>
-                  <option value="">— choose a page —</option>
-                  {pages.map((p) => <option key={p.id} value={p.id}>{p.title_en} (/{p.slug})</option>)}
-                </select>
+                <Combobox
+                  options={pageOpts}
+                  value={form.page_id}
+                  placeholder="— choose a page —"
+                  onChange={(v) => setF("page_id", v)}
+                />
               )}
             </>
           ) : (
