@@ -14,6 +14,16 @@ export interface SiteSettings {
   breaking_news_enabled: string;
   logo_url: string;
   favicon_url: string;
+  seo_meta_title_template: string;
+  seo_default_description_en: string;
+  seo_default_description_ne: string;
+  seo_og_image_url: string;
+  seo_canonical_base_url: string;
+  seo_ga4_id: string;
+  seo_gsc_verification: string;
+  seo_robots_noindex: string;
+  seo_structured_data_enabled: string;
+  seo_twitter_card: string;
   [key: string]: string;
 }
 

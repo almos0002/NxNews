@@ -30,6 +30,9 @@ export async function POST(req: NextRequest) {
       "site_description_en","site_description_ne",
       "contact_email","copyright_text","social_twitter","social_facebook",
       "social_instagram","social_youtube","breaking_news_enabled","logo_url","favicon_url",
+      "seo_meta_title_template","seo_default_description_en","seo_default_description_ne",
+      "seo_og_image_url","seo_canonical_base_url","seo_ga4_id","seo_gsc_verification",
+      "seo_robots_noindex","seo_structured_data_enabled","seo_twitter_card",
     ];
     for (const k of ALLOWED_KEYS) {
       if (typeof body[k] === "string") safe[k] = body[k];

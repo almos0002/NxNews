@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { pool } from "@/lib/db";
+import { countByStatus, listArticles } from "@/lib/articles";
 import styles from "./dashboard.module.css";
 
 export const metadata: Metadata = { title: "Dashboard — KumariHub" };
@@ -20,6 +22,26 @@ const ROLE_COLORS: Record<string, string> = {
   user: "#64748b",
 };
 
+const STATUS_COLORS: Record<string, string> = {
+  published: "#059669",
+  draft: "#64748b",
+  review: "#d97706",
+  archived: "#94a3b8",
+};
+
+async function getAdminStats() {
+  const [usersRes, articlesRes, pendingRes] = await Promise.all([
+    pool.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM \"user\""),
+    pool.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM article WHERE status = 'published'"),
+    pool.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM article WHERE status = 'review'"),
+  ]);
+  return {
+    totalUsers: parseInt(usersRes.rows[0]?.cnt ?? "0", 10),
+    publishedArticles: parseInt(articlesRes.rows[0]?.cnt ?? "0", 10),
+    pendingReview: parseInt(pendingRes.rows[0]?.cnt ?? "0", 10),
+  };
+}
+
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/en/login");
@@ -29,6 +51,13 @@ export default async function DashboardPage() {
   const isAdmin = role === "admin";
   const isModerator = role === "admin" || role === "moderator";
   const isAuthor = role === "admin" || role === "moderator" || role === "author";
+
+  const [articleCounts, adminStats, recentArticles, recentQueue] = await Promise.all([
+    isAuthor ? countByStatus(isAdmin ? undefined : user.id) : Promise.resolve({} as Record<string, number>),
+    isAdmin ? getAdminStats() : Promise.resolve(null),
+    isAuthor ? listArticles({ authorId: isAdmin ? undefined : user.id, limit: 5 }) : Promise.resolve([]),
+    isModerator ? listArticles({ status: "review", limit: 5 }) : Promise.resolve([]),
+  ]);
 
   return (
     <div className={styles.page}>
@@ -49,50 +78,55 @@ export default async function DashboardPage() {
 
       {/* Stats */}
       <div className={styles.statsGrid}>
-        {isAdmin && <>
+        {isAdmin && adminStats && <>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Total Users</p>
-            <p className={styles.statValue}>—</p>
+            <p className={styles.statValue}>{adminStats.totalUsers}</p>
             <p className={styles.statSub}>Registered accounts</p>
           </div>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Published Articles</p>
-            <p className={styles.statValue}>—</p>
+            <p className={styles.statValue}>{adminStats.publishedArticles}</p>
             <p className={styles.statSub}>Live on site</p>
           </div>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Pending Review</p>
-            <p className={styles.statValue}>—</p>
+            <p className={styles.statValue}>{adminStats.pendingReview}</p>
             <p className={styles.statSub}>Awaiting approval</p>
           </div>
           <div className={styles.statCard}>
-            <p className={styles.statLabel}>Page Views</p>
-            <p className={styles.statValue}>—</p>
-            <p className={styles.statSub}>Last 30 days</p>
+            <p className={styles.statLabel}>Total Articles</p>
+            <p className={styles.statValue}>{articleCounts.all ?? 0}</p>
+            <p className={styles.statSub}>All statuses</p>
           </div>
         </>}
         {!isAdmin && isAuthor && <>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>My Articles</p>
-            <p className={styles.statValue}>—</p>
+            <p className={styles.statValue}>{articleCounts.all ?? 0}</p>
             <p className={styles.statSub}>All time</p>
           </div>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Published</p>
-            <p className={styles.statValue}>—</p>
+            <p className={styles.statValue}>{articleCounts.published ?? 0}</p>
             <p className={styles.statSub}>Live on site</p>
           </div>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Drafts</p>
-            <p className={styles.statValue}>—</p>
+            <p className={styles.statValue}>{articleCounts.draft ?? 0}</p>
             <p className={styles.statSub}>In progress</p>
+          </div>
+          <div className={styles.statCard}>
+            <p className={styles.statLabel}>Under Review</p>
+            <p className={styles.statValue}>{articleCounts.review ?? 0}</p>
+            <p className={styles.statSub}>Awaiting approval</p>
           </div>
         </>}
         {!isAuthor && <>
           <div className={styles.statCard}>
-            <p className={styles.statLabel}>Saved Articles</p>
-            <p className={styles.statValue}>—</p>
-            <p className={styles.statSub}>In your reading list</p>
+            <p className={styles.statLabel}>Account</p>
+            <p className={styles.statValue}>Active</p>
+            <p className={styles.statSub}>Member since {user.createdAt ? new Date(user.createdAt).getFullYear() : "—"}</p>
           </div>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Newsletter</p>
@@ -140,11 +174,13 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      {/* Author: Articles quick link */}
+      {/* Author: Recent Articles */}
       {isAuthor && (
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Articles</h2>
+            <h2 className={styles.sectionTitle}>
+              {isAdmin ? "Recent Articles" : "My Recent Articles"}
+            </h2>
             <a href="/en/dashboard/articles/new" className={styles.actionBtn}>
               + New Article
             </a>
@@ -153,89 +189,177 @@ export default async function DashboardPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Title</th><th>Category</th><th>Status</th>
-                  <th>Date</th><th>Actions</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td colSpan={5} className={styles.emptyRow}>
-                    No articles yet.{" "}
-                    <a href="/en/dashboard/articles/new">Click here</a> to write your first article.
-                  </td>
-                </tr>
+                {recentArticles.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className={styles.emptyRow}>
+                      No articles yet.{" "}
+                      <a href="/en/dashboard/articles/new">Click here</a> to write your first article.
+                    </td>
+                  </tr>
+                ) : (
+                  recentArticles.map((a) => (
+                    <tr key={a.id}>
+                      <td>
+                        <span style={{ fontWeight: 600 }}>{a.title_en || a.title_ne || "Untitled"}</span>
+                        {a.author_name && isAdmin && (
+                          <span style={{ display: "block", fontSize: "0.75rem", color: "var(--color-ink-muted)", marginTop: 2 }}>
+                            by {a.author_name}
+                          </span>
+                        )}
+                      </td>
+                      <td>{a.category || "—"}</td>
+                      <td>
+                        <span
+                          className={styles.roleBadge}
+                          style={{
+                            background: STATUS_COLORS[a.status] ?? "#64748b",
+                            fontSize: "0.68rem",
+                            padding: "2px 8px",
+                          }}
+                        >
+                          {a.status}
+                        </span>
+                      </td>
+                      <td style={{ whiteSpace: "nowrap", fontSize: "0.82rem" }}>
+                        {new Date(a.created_at).toLocaleDateString("en-GB", {
+                          day: "numeric", month: "short", year: "numeric",
+                        })}
+                      </td>
+                      <td>
+                        <a
+                          href={`/en/dashboard/articles/${a.id}/edit`}
+                          style={{
+                            fontSize: "0.78rem",
+                            color: "var(--color-accent)",
+                            textDecoration: "none",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Edit
+                        </a>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
+          {recentArticles.length > 0 && (
+            <div style={{ padding: "12px 0 0", textAlign: "right" }}>
+              <a
+                href="/en/dashboard/articles"
+                style={{
+                  fontSize: "0.82rem",
+                  color: "var(--color-accent)",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                }}
+              >
+                View all articles →
+              </a>
+            </div>
+          )}
         </section>
       )}
 
       {/* Moderator: Queue */}
       {isModerator && (
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Moderation Queue</h2>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Moderation Queue</h2>
+            <a href="/en/dashboard/moderation" className={styles.actionBtn}>
+              View All
+            </a>
+          </div>
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Article</th><th>Author</th>
-                  <th>Submitted</th><th>Actions</th>
+                  <th>Article</th>
+                  <th>Author</th>
+                  <th>Submitted</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td colSpan={4} className={styles.emptyRow}>
-                    No items pending review.
-                  </td>
-                </tr>
+                {recentQueue.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className={styles.emptyRow}>
+                      No items pending review. Queue is clear.
+                    </td>
+                  </tr>
+                ) : (
+                  recentQueue.map((a) => (
+                    <tr key={a.id}>
+                      <td style={{ fontWeight: 600 }}>{a.title_en || a.title_ne || "Untitled"}</td>
+                      <td>{a.author_name ?? "—"}</td>
+                      <td style={{ whiteSpace: "nowrap", fontSize: "0.82rem" }}>
+                        {new Date(a.updated_at).toLocaleDateString("en-GB", {
+                          day: "numeric", month: "short", year: "numeric",
+                        })}
+                      </td>
+                      <td>
+                        <a
+                          href="/en/dashboard/moderation"
+                          style={{
+                            fontSize: "0.78rem",
+                            color: "var(--color-accent)",
+                            textDecoration: "none",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Review
+                        </a>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </section>
       )}
 
-      {/* Admin: User management */}
+      {/* Admin: Summary links */}
       {isAdmin && (
         <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>User Management</h2>
-          </div>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Name</th><th>Email</th><th>Role</th>
-                  <th>Joined</th><th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <span
-                      className={styles.roleBadge}
-                      style={{ background: ROLE_COLORS[role] ?? "#64748b" }}
-                    >
-                      {ROLE_LABELS[role] ?? role}
-                    </span>
-                  </td>
-                  <td>
-                    {user.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString("en-GB")
-                      : "—"}
-                  </td>
-                  <td>
-                    <span
-                      className={styles.roleBadge}
-                      style={{ background: ROLE_COLORS[role] ?? "#64748b" }}
-                    >
-                      {ROLE_LABELS[role] ?? role}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <h2 className={styles.sectionTitle}>Quick Links</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            {[
+              { href: "/en/dashboard/users", label: "User Management" },
+              { href: "/en/dashboard/taxonomy", label: "Categories & Tags" },
+              { href: "/en/dashboard/menu", label: "Menu Manager" },
+              { href: "/en/dashboard/ads", label: "Ad Management" },
+              { href: "/en/dashboard/settings", label: "Site Settings" },
+              { href: "/en/dashboard/seo", label: "SEO Settings" },
+            ].map(({ href, label }) => (
+              <a
+                key={href}
+                href={href}
+                style={{
+                  display: "inline-block",
+                  padding: "8px 16px",
+                  background: "var(--color-bg)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: 6,
+                  fontSize: "0.82rem",
+                  fontWeight: 600,
+                  color: "var(--color-ink)",
+                  textDecoration: "none",
+                  transition: "border-color 0.15s ease",
+                }}
+              >
+                {label}
+              </a>
+            ))}
           </div>
         </section>
       )}

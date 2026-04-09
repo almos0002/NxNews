@@ -121,6 +121,7 @@ Migration script: `scripts/migrate.mjs`
 | `/dashboard/menu` | Moderator+ | Navbar & footer menu manager with page/URL links and sort order |
 | `/dashboard/ads` | Admin | Ad slot enable/disable + ad code/script editor |
 | `/dashboard/settings` | Admin | Site-wide settings (title, description, social links, etc.) |
+| `/dashboard/seo` | Admin | SEO settings (meta titles, OG images, GA4, GSC, structured data, robots) |
 
 ### Key Client Components (app/_components/)
 | Component | Purpose |
@@ -135,6 +136,7 @@ Migration script: `scripts/migrate.mjs`
 | `UsersClient.tsx` | User table with role dropdown + ban toggle |
 | `ProfileClient.tsx` | Edit profile (name, bio) + change password via Better Auth |
 | `ModerationClient.tsx` | Review queue list with approve/reject article actions |
+| `SeoSettingsClient.tsx` | SEO settings form (meta titles, OG images, GA4, GSC, structured data, robots) |
 | `MenuClient.tsx` | Dual-menu manager (navbar/footer) with page selector, URL, and up/down sort |
 | `DashboardSidebar.tsx` | Role-aware navigation sidebar |
 | `cms.module.css` | Shared CSS module for all CMS/dashboard table pages |
