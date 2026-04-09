@@ -48,6 +48,17 @@
   text-overflow: ellipsis;
 }
 
+.strip {
+  height: 6px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #cc0000 0px,
+    #cc0000 10px,
+    #111111 10px,
+    #111111 20px
+  );
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
