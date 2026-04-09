@@ -1,0 +1,57 @@
+/* ── Page shell ──────────────────────────────────── */
+.page {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.pageHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.breadcrumb {
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  color: var(--color-ink-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.breadcrumb:hover { color: var(--color-accent); }
+
+.pageTitle {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+}
+
+.newBtn {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-accent);
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+.newBtn:hover { background: var(--color-accent-hover); }
+
+@media (max-width: 700px) {
+  .page { padding: 20px 14px 40px; }
+}

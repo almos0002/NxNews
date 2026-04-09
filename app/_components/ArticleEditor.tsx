@@ -1,0 +1,433 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import styles from "./ArticleEditor.module.css";
+
+const CATEGORIES = [
+  "World", "Politics", "Business", "Technology", "Science",
+  "Culture", "Opinion", "Sports", "Videos", "Weather", "Entertainment",
+];
+
+type Status = "draft" | "published" | "archived";
+type Lang = "en" | "ne";
+
+export interface ArticleFormValues {
+  id?: string;
+  title_en: string;
+  title_ne: string;
+  slug: string;
+  excerpt_en: string;
+  excerpt_ne: string;
+  content_en: string;
+  content_ne: string;
+  category: string;
+  tags: string[];
+  status: Status;
+  featured_image: string;
+}
+
+interface Props {
+  initial?: ArticleFormValues;
+  authorId: string;
+  backHref: string;
+}
+
+function toSlug(title: string) {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/--+/g, "-")
+    .slice(0, 80);
+}
+
+export default function ArticleEditor({ initial, backHref }: Props) {
+  const router = useRouter();
+  const isEdit = !!initial?.id;
+
+  const [lang, setLang] = useState<Lang>("en");
+  const [values, setValues] = useState<ArticleFormValues>(
+    initial ?? {
+      title_en: "", title_ne: "",
+      slug: "",
+      excerpt_en: "", excerpt_ne: "",
+      content_en: "", content_ne: "",
+      category: "",
+      tags: [],
+      status: "draft",
+      featured_image: "",
+    }
+  );
+  const [tagInput, setTagInput] = useState(initial?.tags.join(", ") ?? "");
+  const [slugManual, setSlugManual] = useState(!!initial?.id);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const set = useCallback(<K extends keyof ArticleFormValues>(k: K, v: ArticleFormValues[K]) => {
+    setValues((prev) => ({ ...prev, [k]: v }));
+    setError("");
+    setSuccess("");
+  }, []);
+
+  function onTitleEnChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    set("title_en", val);
+    if (!slugManual) set("slug", toSlug(val));
+  }
+
+  function onSlugChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setSlugManual(true);
+    set("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
+  }
+
+  function onTagInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setTagInput(e.target.value);
+    const tags = e.target.value
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    set("tags", tags);
+  }
+
+  function removeTag(tag: string) {
+    const tags = values.tags.filter((t) => t !== tag);
+    set("tags", tags);
+    setTagInput(tags.join(", "));
+  }
+
+  async function submit(targetStatus: Status) {
+    setError("");
+    setSuccess("");
+
+    if (!values.title_en.trim()) {
+      setError("English title is required.");
+      return;
+    }
+    if (!values.slug.trim()) {
+      setError("Slug is required.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload = { ...values, status: targetStatus };
+      const url = isEdit ? `/api/articles/${initial!.id}` : "/api/articles";
+      const method = isEdit ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "Something went wrong.");
+        return;
+      }
+
+      setSuccess(targetStatus === "published" ? "Article published!" : "Saved as draft.");
+
+      if (!isEdit && data.article?.id) {
+        router.push(`/en/dashboard/articles/${data.article.id}/edit`);
+      } else {
+        router.refresh();
+      }
+    } catch {
+      setError("Network error — please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const wordCountEn = values.content_en.trim().split(/\s+/).filter(Boolean).length;
+  const wordCountNe = values.content_ne.trim().split(/\s+/).filter(Boolean).length;
+
+  return (
+    <div className={styles.layout}>
+      {/* ── Top bar ── */}
+      <div className={styles.topBar}>
+        <div className={styles.topLeft}>
+          <a href={backHref} className={styles.backLink}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            All Articles
+          </a>
+          <span className={styles.topTitle}>
+            {isEdit ? "Edit Article" : "New Article"}
+          </span>
+        </div>
+        <div className={styles.topActions}>
+          {error && <span className={styles.topError}>{error}</span>}
+          {success && <span className={styles.topSuccess}>{success}</span>}
+          {isEdit && values.status === "published" && (
+            <button
+              className={styles.btnSecondary}
+              onClick={() => submit("archived")}
+              disabled={saving}
+            >
+              Archive
+            </button>
+          )}
+          <button
+            className={styles.btnGhost}
+            onClick={() => submit("draft")}
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save Draft"}
+          </button>
+          <button
+            className={styles.btnPrimary}
+            onClick={() => submit("published")}
+            disabled={saving}
+          >
+            {saving ? "Publishing…" : values.status === "published" ? "Update" : "Publish"}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Body ── */}
+      <div className={styles.body}>
+        {/* Left: content editor */}
+        <div className={styles.editor}>
+          {/* Language tabs */}
+          <div className={styles.langTabs}>
+            <button
+              className={`${styles.langTab} ${lang === "en" ? styles.langTabActive : ""}`}
+              onClick={() => setLang("en")}
+              type="button"
+            >
+              🇬🇧 English
+            </button>
+            <button
+              className={`${styles.langTab} ${lang === "ne" ? styles.langTabActive : ""}`}
+              onClick={() => setLang("ne")}
+              type="button"
+            >
+              🇳🇵 नेपाली
+            </button>
+            <span className={styles.langHint}>
+              {lang === "en"
+                ? "Writing in English"
+                : "नेपालीमा लेख्दै"}
+            </span>
+          </div>
+
+          {/* Title */}
+          <div className={styles.field}>
+            <label className={styles.label}>
+              {lang === "en" ? "Title (English)" : "शीर्षक (नेपाली)"}
+              {lang === "en" && <span className={styles.required}>*</span>}
+            </label>
+            {lang === "en" ? (
+              <input
+                type="text"
+                className={styles.titleInput}
+                placeholder="Enter article headline…"
+                value={values.title_en}
+                onChange={onTitleEnChange}
+              />
+            ) : (
+              <input
+                type="text"
+                className={`${styles.titleInput} ${styles.devanagari}`}
+                placeholder="लेखको शीर्षक लेख्नुहोस्…"
+                value={values.title_ne}
+                onChange={(e) => set("title_ne", e.target.value)}
+                lang="ne"
+              />
+            )}
+          </div>
+
+          {/* Excerpt */}
+          <div className={styles.field}>
+            <label className={styles.label}>
+              {lang === "en" ? "Excerpt / Summary" : "सारांश"}
+            </label>
+            {lang === "en" ? (
+              <textarea
+                className={styles.excerptInput}
+                placeholder="Brief summary shown in article cards…"
+                rows={3}
+                value={values.excerpt_en}
+                onChange={(e) => set("excerpt_en", e.target.value)}
+              />
+            ) : (
+              <textarea
+                className={`${styles.excerptInput} ${styles.devanagari}`}
+                placeholder="लेख कार्डहरूमा देखिने संक्षिप्त सारांश…"
+                rows={3}
+                value={values.excerpt_ne}
+                onChange={(e) => set("excerpt_ne", e.target.value)}
+                lang="ne"
+              />
+            )}
+          </div>
+
+          {/* Content */}
+          <div className={styles.field}>
+            <div className={styles.labelRow}>
+              <label className={styles.label}>
+                {lang === "en" ? "Content" : "सामग्री"}
+              </label>
+              <span className={styles.wordCount}>
+                {lang === "en"
+                  ? `${wordCountEn} words`
+                  : `${wordCountNe} शब्द`}
+              </span>
+            </div>
+            {lang === "en" ? (
+              <textarea
+                className={styles.contentInput}
+                placeholder="Write your article here…"
+                rows={24}
+                value={values.content_en}
+                onChange={(e) => set("content_en", e.target.value)}
+              />
+            ) : (
+              <textarea
+                className={`${styles.contentInput} ${styles.devanagari}`}
+                placeholder="यहाँ आफ्नो लेख लेख्नुहोस्…"
+                rows={24}
+                value={values.content_ne}
+                onChange={(e) => set("content_ne", e.target.value)}
+                lang="ne"
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Right: metadata sidebar */}
+        <aside className={styles.sidebar}>
+
+          {/* Status */}
+          <div className={styles.sideCard}>
+            <h3 className={styles.sideTitle}>Status</h3>
+            <div className={styles.statusBadge} data-status={values.status}>
+              {values.status === "draft" && "📝 Draft"}
+              {values.status === "published" && "✅ Published"}
+              {values.status === "archived" && "📦 Archived"}
+            </div>
+          </div>
+
+          {/* Slug */}
+          <div className={styles.sideCard}>
+            <h3 className={styles.sideTitle}>
+              URL Slug <span className={styles.required}>*</span>
+            </h3>
+            <div className={styles.slugWrap}>
+              <span className={styles.slugPrefix}>/article/</span>
+              <input
+                type="text"
+                className={styles.slugInput}
+                placeholder="my-article-slug"
+                value={values.slug}
+                onChange={onSlugChange}
+              />
+            </div>
+            <p className={styles.hint}>Lowercase letters, numbers, hyphens only</p>
+          </div>
+
+          {/* Category */}
+          <div className={styles.sideCard}>
+            <h3 className={styles.sideTitle}>Category</h3>
+            <select
+              className={styles.select}
+              value={values.category}
+              onChange={(e) => set("category", e.target.value)}
+            >
+              <option value="">— Select category —</option>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Tags */}
+          <div className={styles.sideCard}>
+            <h3 className={styles.sideTitle}>Tags</h3>
+            <input
+              type="text"
+              className={styles.input}
+              placeholder="climate, politics, nepal…"
+              value={tagInput}
+              onChange={onTagInputChange}
+            />
+            <p className={styles.hint}>Separate with commas</p>
+            {values.tags.length > 0 && (
+              <div className={styles.tagChips}>
+                {values.tags.map((tag) => (
+                  <span key={tag} className={styles.tagChip}>
+                    {tag}
+                    <button
+                      type="button"
+                      className={styles.tagRemove}
+                      onClick={() => removeTag(tag)}
+                      aria-label={`Remove ${tag}`}
+                    >×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Featured image */}
+          <div className={styles.sideCard}>
+            <h3 className={styles.sideTitle}>Featured Image URL</h3>
+            <input
+              type="url"
+              className={styles.input}
+              placeholder="https://images.unsplash.com/…"
+              value={values.featured_image}
+              onChange={(e) => set("featured_image", e.target.value)}
+            />
+            {values.featured_image && (
+              <div className={styles.imgPreview}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={values.featured_image}
+                  alt="Preview"
+                  className={styles.imgPreviewImg}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Bilingual progress */}
+          <div className={styles.sideCard}>
+            <h3 className={styles.sideTitle}>Translation Progress</h3>
+            <div className={styles.progressItem}>
+              <span>🇬🇧 English title</span>
+              <span className={values.title_en ? styles.done : styles.missing}>
+                {values.title_en ? "✓" : "—"}
+              </span>
+            </div>
+            <div className={styles.progressItem}>
+              <span>🇳🇵 Nepali title</span>
+              <span className={values.title_ne ? styles.done : styles.missing}>
+                {values.title_ne ? "✓" : "—"}
+              </span>
+            </div>
+            <div className={styles.progressItem}>
+              <span>🇬🇧 EN content</span>
+              <span className={values.content_en ? styles.done : styles.missing}>
+                {values.content_en ? `${wordCountEn}w` : "—"}
+              </span>
+            </div>
+            <div className={styles.progressItem}>
+              <span>🇳🇵 NE content</span>
+              <span className={values.content_ne ? styles.done : styles.missing}>
+                {values.content_ne ? `${wordCountNe}w` : "—"}
+              </span>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  );
+}
