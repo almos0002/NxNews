@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { getAllSettings } from "@/lib/settings";
 import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import ArticleCard from "@/app/_components/ArticleCard";
@@ -22,10 +23,16 @@ type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "site" });
+  let s: Record<string, string> = {};
+  try { s = await getAllSettings() as Record<string, string>; } catch { /* use defaults */ }
+
+  const isNe = locale === "ne";
+  const title       = isNe ? (s.site_title_ne       || s.site_title_en       || "KumariHub") : (s.site_title_en       || "KumariHub");
+  const description = isNe ? (s.site_description_ne || s.site_description_en || "")          : (s.site_description_en || "");
+
   return {
-    title: `${t("name")} — ${t("tagline")}`,
-    description: t("description"),
+    title,
+    description,
     alternates: { languages: { en: "/en", ne: "/ne" } },
   };
 }
