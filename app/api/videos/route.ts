@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { title_en, title_ne, youtube_url, description_en, description_ne, status } = body;
+    const { title_en, title_ne, youtube_url, description_en, description_ne, status, category, duration } = body;
 
     if (!title_en?.trim()) return NextResponse.json({ error: "English title is required" }, { status: 400 });
     if (!youtube_url?.trim()) return NextResponse.json({ error: "YouTube URL is required" }, { status: 400 });
@@ -31,6 +31,8 @@ export async function POST(req: NextRequest) {
       youtube_url: youtube_url.trim(),
       description_en: (description_en ?? "").trim(), description_ne: (description_ne ?? "").trim(),
       thumbnail,
+      category: (category ?? "").trim(),
+      duration: (duration ?? "").trim(),
       status: status === "draft" ? "draft" : "published",
       author_id: session.user.id,
     });

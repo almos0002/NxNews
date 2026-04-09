@@ -21,7 +21,7 @@ const CATEGORIES = [
 
 const CATEGORY_OPTS: ComboboxOption[] = CATEGORIES.map((c) => ({ value: c, label: c }));
 
-type Status = "draft" | "published" | "archived";
+type Status = "draft" | "review" | "published" | "archived";
 type Lang = "en" | "ne";
 type ImgMode = "url" | "upload";
 

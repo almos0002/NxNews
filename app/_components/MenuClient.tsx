@@ -424,6 +424,8 @@ function SortButtons({ idx, total, onMove }: { idx: number; total: number; onMov
 function FlatList({ items, editId, editForm, setEF, pageOpts, catOpts, saving, onEdit, onDelete, onMove, onSaveEdit, onCancelEdit, resolveUrl }: {
   items: MenuItem[]; editId: string | null;
   editForm: typeof EMPTY_FORM; setEF: <K extends keyof typeof EMPTY_FORM>(k: K, v: typeof EMPTY_FORM[K]) => void;
+  pages?: { id: string; slug: string; title_en: string }[];
+  categories?: { slug: string; label: string }[];
   pageOpts: ComboboxOption[]; catOpts: ComboboxOption[]; saving: boolean;
   onEdit: (it: MenuItem) => void; onDelete: (id: string) => void;
   onMove: (idx: number, dir: -1 | 1) => void;

@@ -17,7 +17,8 @@ interface Props {
 }
 
 const EMPTY: Omit<Video, "id" | "created_at" | "updated_at" | "author_id" | "thumbnail"> = {
-  title_en: "", title_ne: "", youtube_url: "", description_en: "", description_ne: "", status: "published",
+  title_en: "", title_ne: "", youtube_url: "", description_en: "", description_ne: "",
+  status: "published", category: "", duration: "",
 };
 
 export default function VideosClient({ initialVideos, authorId }: Props) {
@@ -30,7 +31,7 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
 
   function openAdd() { setForm({ ...EMPTY }); setEditId(null); setShowForm(true); setErr(""); }
   function openEdit(v: Video) {
-    setForm({ title_en: v.title_en, title_ne: v.title_ne, youtube_url: v.youtube_url, description_en: v.description_en, description_ne: v.description_ne, status: v.status });
+    setForm({ title_en: v.title_en, title_ne: v.title_ne, youtube_url: v.youtube_url, description_en: v.description_en, description_ne: v.description_ne, status: v.status, category: v.category ?? "", duration: v.duration ?? "" });
     setEditId(v.id); setShowForm(true); setErr("");
   }
   function closeForm() { setShowForm(false); setEditId(null); setErr(""); }

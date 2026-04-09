@@ -1,6 +1,6 @@
 import styles from "./BreakingTicker.module.css";
 
-export default function BreakingTicker({ headline }: { headline: string }) {
+export default function BreakingTicker({ headline = "" }: { headline?: string }) {
   return (
     <div className={styles.ticker} role="marquee" aria-label="Breaking news">
       <div className={styles.inner}>
