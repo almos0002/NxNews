@@ -109,13 +109,13 @@
 .strip {
   height: 42px;
   background-color: #111111;
-  /* Flat top, irregular wavy bottom — long/tall and short/small waves mixed */
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 42' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L200%2C0 L200%2C12 C192%2C42 178%2C42 170%2C12 C163%2C0 157%2C0 150%2C12 C144%2C24 138%2C24 132%2C12 C127%2C0 122%2C0 116%2C12 C107%2C42 93%2C42 84%2C12 C76%2C0 68%2C0 60%2C12 C52%2C33 44%2C33 36%2C12 C30%2C0 24%2C0 18%2C12 C11%2C42 5%2C42 0%2C12 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 42' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L200%2C0 L200%2C12 C192%2C42 178%2C42 170%2C12 C163%2C0 157%2C0 150%2C12 C144%2C24 138%2C24 132%2C12 C127%2C0 122%2C0 116%2C12 C107%2C42 93%2C42 84%2C12 C76%2C0 68%2C0 60%2C12 C52%2C33 44%2C33 36%2C12 C30%2C0 24%2C0 18%2C12 C11%2C42 5%2C42 0%2C12 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
+  /* Wider, fewer, thicker waves — 3 irregular waves per 300px tile */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 42' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L300%2C0 L300%2C20 C290%2C42 262%2C42 245%2C20 C228%2C0 218%2C0 200%2C20 C180%2C42 140%2C42 120%2C20 C103%2C0 90%2C0 72%2C20 C52%2C42 18%2C42 0%2C20 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 42' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L300%2C0 L300%2C20 C290%2C42 262%2C42 245%2C20 C228%2C0 218%2C0 200%2C20 C180%2C42 140%2C42 120%2C20 C103%2C0 90%2C0 72%2C20 C52%2C42 18%2C42 0%2C20 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
   -webkit-mask-repeat: repeat-x;
   mask-repeat: repeat-x;
-  -webkit-mask-size: 200px 42px;
-  mask-size: 200px 42px;
+  -webkit-mask-size: 300px 42px;
+  mask-size: 300px 42px;
 }
 
 @keyframes marquee {
