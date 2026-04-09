@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import styles from "./ArticleEditor.module.css";
 
-const NovelEditor = dynamic(() => import("./NovelEditor"), {
+const QuillEditor = dynamic(() => import("./QuillEditor"), {
   ssr: false,
   loading: () => (
     <div className={styles.editorPlaceholder}>Loading editor…</div>
@@ -279,7 +279,7 @@ export default function ArticleEditor({ initial, backHref }: Props) {
             )}
           </div>
 
-          {/* Content — Novel rich text editor */}
+          {/* Content — Quill rich text editor */}
           <div className={styles.field}>
             <div className={styles.labelRow}>
               <label className={styles.label}>
@@ -293,14 +293,14 @@ export default function ArticleEditor({ initial, backHref }: Props) {
             </div>
 
             {lang === "en" ? (
-              <NovelEditor
+              <QuillEditor
                 key="editor-en"
                 initialContent={values.content_en}
-                placeholder="Write your article here… (type / for commands)"
+                placeholder="Write your article here…"
                 onUpdate={(html) => set("content_en", html)}
               />
             ) : (
-              <NovelEditor
+              <QuillEditor
                 key="editor-ne"
                 initialContent={values.content_ne}
                 placeholder="यहाँ आफ्नो लेख लेख्नुहोस्…"
