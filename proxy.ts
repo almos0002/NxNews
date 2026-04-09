@@ -9,6 +9,19 @@ const PROTECTED = ["/dashboard"];
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ── Nepal geo-redirect: visitors without a locale prefix from NP → /ne ──
+  const hasLocalePrefix = /^\/(en|ne)(\/|$)/.test(pathname);
+  if (!hasLocalePrefix) {
+    const country =
+      request.headers.get("x-vercel-ip-country") ||
+      request.headers.get("cf-ipcountry");
+    if (country === "NP") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/ne" + (pathname === "/" ? "" : pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Strip locale prefix to check the real path
   const pathWithoutLocale = pathname.replace(/^\/(en|ne)/, "") || "/";
   const isProtected = PROTECTED.some(

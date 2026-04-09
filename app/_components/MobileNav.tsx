@@ -2,23 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { categories } from "@/app/_data/articles";
 import { Link } from "@/i18n/navigation";
+import type { MenuItem } from "@/lib/menu";
 import LanguageSwitcher from "./LanguageSwitcher";
 import styles from "./MobileNav.module.css";
 
-const catKeys: Record<string, string> = {
-  World: "world",
-  Politics: "politics",
-  Business: "business",
-  Technology: "technology",
-  Science: "science",
-  Culture: "culture",
-  Opinion: "opinion",
-  Sports: "sports",
-};
+interface Props {
+  navItems: MenuItem[];
+  locale: string;
+}
 
-export default function MobileNav() {
+export default function MobileNav({ navItems, locale }: Props) {
   const [open, setOpen] = useState(false);
   const t = useTranslations("nav");
 
@@ -26,6 +20,16 @@ export default function MobileNav() {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
+
+  function label(item: MenuItem): string {
+    return (locale === "ne" && item.label_ne) ? item.label_ne : item.label_en;
+  }
+
+  function resolveHref(item: MenuItem): string {
+    if (item.link_type === "page") return item.page_slug ? `/${item.page_slug}` : "#";
+    if (item.link_type === "category") return `/${item.url}`;
+    return item.url || "#";
+  }
 
   return (
     <>
@@ -50,9 +54,8 @@ export default function MobileNav() {
 
       <div className={`${styles.drawer} ${open ? styles.drawerOpen : ""}`} aria-hidden={!open}>
         <div className={styles.drawerHeader}>
-          <Link href="/" className={styles.drawerLogo} onClick={() => setOpen(false)}>
-            <span className={styles.drawerLogoMark}>DR</span>
-            <span className={styles.drawerLogoText}>The Daily Report</span>
+          <Link href="/" className={styles.drawerLogoLink} onClick={() => setOpen(false)}>
+            <img src="/logo.png" alt="KumariHub" className={styles.drawerLogoImg} />
           </Link>
           <button
             className={styles.closeBtn}
@@ -66,30 +69,51 @@ export default function MobileNav() {
           </button>
         </div>
 
+        <div className={styles.drawerSearch}>
+          <Link href="/search" className={styles.drawerSearchLink} onClick={() => setOpen(false)}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"
+              strokeLinejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            {t("search")}
+          </Link>
+        </div>
+
         <nav className={styles.drawerNav} aria-label="Mobile navigation">
           <ul className={styles.drawerList}>
-            {categories.map((cat) => (
-              <li key={cat}>
-                <Link
-                  href={`/${cat.toLowerCase()}`}
-                  className={styles.drawerLink}
-                  onClick={() => setOpen(false)}
-                >
-                  {t(catKeys[cat] ?? cat.toLowerCase())}
-                </Link>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              const href = resolveHref(item);
+              const isExternal = item.link_type === "external" && (href.startsWith("http") || href.startsWith("//"));
+              return (
+                <li key={item.id}>
+                  {isExternal || item.open_new_tab ? (
+                    <a
+                      href={href}
+                      className={styles.drawerLink}
+                      target={item.open_new_tab ? "_blank" : undefined}
+                      rel="noopener noreferrer"
+                      onClick={() => setOpen(false)}
+                    >
+                      {label(item)}
+                    </a>
+                  ) : (
+                    <Link
+                      href={href as Parameters<typeof Link>[0]["href"]}
+                      className={styles.drawerLink}
+                      onClick={() => setOpen(false)}
+                    >
+                      {label(item)}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
         <div className={styles.drawerFooter}>
-          <Link
-            href="/subscribe"
-            className={styles.drawerSubscribe}
-            onClick={() => setOpen(false)}
-          >
-            {t("subscribe")}
-          </Link>
           <div className={styles.drawerLangRow}>
             <span className={styles.drawerLangLabel}>Language</span>
             <LanguageSwitcher variant="drawer" />

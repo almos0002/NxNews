@@ -73,35 +73,16 @@
   flex-shrink: 0;
 }
 
-.drawerLogo {
+.drawerLogoLink {
   display: flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
 }
 
-.drawerLogoMark {
-  font-family: var(--font-serif);
-  font-size: 0.85rem;
-  font-weight: 700;
-  background-color: var(--color-accent);
-  color: #ffffff;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  letter-spacing: 0.02em;
-  flex-shrink: 0;
-}
-
-.drawerLogoText {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-ink);
-  letter-spacing: -0.02em;
+.drawerLogoImg {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
 }
 
 .closeBtn {
@@ -122,6 +103,33 @@
 .closeBtn:hover {
   background-color: var(--color-tag-bg);
   color: var(--color-ink);
+}
+
+/* ── Search row ──────────────────────────────────── */
+.drawerSearch {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.drawerSearchLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-ink-secondary);
+  background-color: var(--color-tag-bg);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  text-decoration: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.drawerSearchLink:hover {
+  color: var(--color-ink);
+  background-color: var(--color-border);
 }
 
 /* ── Drawer nav ──────────────────────────────────── */
@@ -159,27 +167,6 @@
   padding: 16px 20px;
   border-top: 1px solid var(--color-border);
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.drawerSubscribe {
-  display: block;
-  text-align: center;
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: var(--color-accent);
-  padding: 12px 20px;
-  border-radius: var(--radius);
-  text-decoration: none;
-  transition: background-color 0.15s ease;
-}
-
-.drawerSubscribe:hover {
-  background-color: var(--color-accent-hover);
 }
 
 .drawerLangRow {

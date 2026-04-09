@@ -19,7 +19,8 @@
     "subscribe": "Subscribe",
     "search": "Search",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "signIn": "Sign in"
   },
   "footer": {
     "description": "Independent, in-depth journalism for a complex world. Delivering clarity through rigorous reporting since 2024.",

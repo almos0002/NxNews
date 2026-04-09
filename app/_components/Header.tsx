@@ -7,6 +7,7 @@ import { getNavbarItems } from "@/lib/menu";
 import type { MenuItem } from "@/lib/menu";
 import LanguageSwitcher from "./LanguageSwitcher";
 import MobileNav from "./MobileNav";
+import DateTimeClock from "./DateTimeClock";
 import styles from "./Header.module.css";
 
 export default async function Header() {
@@ -38,18 +39,21 @@ export default async function Header() {
     <header className={styles.header}>
       {/* ── Row 1: logo centred, actions right ── */}
       <div className={styles.logoRow}>
-        <MobileNav />
+        <MobileNav navItems={navItems} locale={locale} />
 
-        <Link href="/" className={styles.logo}>
-          <Image
-            src="/logo.png"
-            alt="KumariHub"
-            width={260}
-            height={75}
-            style={{ objectFit: "contain", height: "58px", width: "auto" }}
-            priority
-          />
-        </Link>
+        <div className={styles.logoWrap}>
+          <Link href="/" className={styles.logo}>
+            <Image
+              src="/logo.png"
+              alt="KumariHub"
+              width={260}
+              height={75}
+              style={{ objectFit: "contain", height: "52px", width: "auto" }}
+              priority
+            />
+          </Link>
+          <DateTimeClock />
+        </div>
 
         <div className={styles.actions}>
           <LanguageSwitcher />
@@ -65,45 +69,51 @@ export default async function Header() {
             </Link>
           ) : (
             <Link href="/login" className={styles.signInLink}>
-              Sign in
+              {t("signIn")}
             </Link>
           )}
-
-          <Link href="/subscribe" className={styles.subscribeLink}>
-            {t("subscribe")}
-          </Link>
         </div>
       </div>
 
-      {/* ── Row 2: navigation ── */}
+      {/* ── Row 2: navigation + search ── */}
       {navItems.length > 0 && (
         <div className={styles.navRow}>
-          <nav className={styles.nav} aria-label="Main navigation">
-            <ul className={styles.navList}>
-              {navItems.map((item) => {
-                const href = resolveHref(item);
-                const isExternal = item.link_type === "external" && (href.startsWith("http") || href.startsWith("//"));
-                return (
-                  <li key={item.id}>
-                    {isExternal || item.open_new_tab ? (
-                      <a
-                        href={href}
-                        className={styles.navLink}
-                        target={item.open_new_tab ? "_blank" : undefined}
-                        rel="noopener noreferrer"
-                      >
-                        {label(item)}
-                      </a>
-                    ) : (
-                      <Link href={href as Parameters<typeof Link>[0]["href"]} className={styles.navLink}>
-                        {label(item)}
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+          <div className={styles.navInner}>
+            <nav className={styles.nav} aria-label="Main navigation">
+              <ul className={styles.navList}>
+                {navItems.map((item) => {
+                  const href = resolveHref(item);
+                  const isExternal = item.link_type === "external" && (href.startsWith("http") || href.startsWith("//"));
+                  return (
+                    <li key={item.id}>
+                      {isExternal || item.open_new_tab ? (
+                        <a
+                          href={href}
+                          className={styles.navLink}
+                          target={item.open_new_tab ? "_blank" : undefined}
+                          rel="noopener noreferrer"
+                        >
+                          {label(item)}
+                        </a>
+                      ) : (
+                        <Link href={href as Parameters<typeof Link>[0]["href"]} className={styles.navLink}>
+                          {label(item)}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+            <Link href="/search" className={styles.searchBtn} aria-label="Search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"
+                strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </Link>
+          </div>
         </div>
       )}
     </header>

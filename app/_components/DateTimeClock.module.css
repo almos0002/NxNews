@@ -1,0 +1,10 @@
+.clock {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--color-ink-secondary);
+  letter-spacing: 0.02em;
+  margin: 0;
+  white-space: nowrap;
+  text-align: center;
+}
