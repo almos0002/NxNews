@@ -16,7 +16,7 @@ import WeatherSection from "@/app/_components/WeatherSection";
 import EntertainmentSection from "@/app/_components/EntertainmentSection";
 import Footer from "@/app/_components/Footer";
 import AdUnit from "@/app/_components/AdUnit";
-import { getPublicArticles, getBreakingHeadline } from "@/lib/public";
+import { getPublicArticles, getBreakingHeadlines } from "@/lib/public";
 import styles from "@/app/page.module.css";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -45,9 +45,9 @@ export default async function LocaleHomePage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
-  const [allArticles, headline] = await Promise.all([
+  const [allArticles, headlines] = await Promise.all([
     getPublicArticles(locale, { limit: 50 }),
-    getBreakingHeadline(locale),
+    getBreakingHeadlines(locale, 10),
   ]);
 
   const featured = allArticles[0];
@@ -75,7 +75,7 @@ export default async function LocaleHomePage({ params }: Props) {
   if (!featured) {
     return (
       <>
-        <BreakingTicker headline={headline} />
+        <BreakingTicker headlines={headlines} locale={locale} />
         <Header />
         <main className={styles.main}>
           <div style={{ padding: "4rem 2rem", textAlign: "center" }}>
@@ -90,7 +90,7 @@ export default async function LocaleHomePage({ params }: Props) {
 
   return (
     <>
-      <BreakingTicker headline={headline} />
+      <BreakingTicker headlines={headlines} locale={locale} />
       <Header />
 
       <main className={styles.main}>

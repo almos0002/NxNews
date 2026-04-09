@@ -52,7 +52,7 @@ export default async function Header() {
               priority
             />
           </Link>
-          <DateTimeClock />
+          <DateTimeClock locale={locale} />
         </div>
 
         <div className={styles.actions}>

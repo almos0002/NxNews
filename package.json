@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/pg": "^8.20.0",
     "better-auth": "^1.6.1",
+    "nepali-date-converter": "^3.4.0",
     "next": "^16.2.2",
     "next-intl": "^4.9.0",
     "pg": "^8.20.0",

@@ -256,6 +256,29 @@ export async function getBreakingHeadline(locale: string): Promise<string> {
     : "Global Climate Summit Reaches Historic Agreement on Carbon Emissions";
 }
 
+export async function getBreakingHeadlines(
+  locale: string,
+  limit = 10
+): Promise<{ title: string; slug: string }[]> {
+  try {
+    const { rows } = await pool.query(
+      `SELECT title_en, title_ne, slug FROM article
+       WHERE status = 'published'
+       ORDER BY published_at DESC NULLS LAST, created_at DESC LIMIT $1`,
+      [limit]
+    );
+    return rows.map((r) => ({
+      title:
+        locale === "ne" && r.title_ne
+          ? String(r.title_ne)
+          : String(r.title_en),
+      slug: String(r.slug),
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export async function getPublicTags(): Promise<
   { slug: string; label: string; description: string }[]
 > {
