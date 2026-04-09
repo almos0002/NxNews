@@ -3,9 +3,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { noticiaText, dmSans } from "@/app/fonts";
 import { getAllSettings } from "@/lib/settings";
-import "@/app/globals.css";
+import HtmlLang from "@/app/_components/HtmlLang";
 
 type Props = {
   children: React.ReactNode;
@@ -51,12 +50,9 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${noticiaText.variable} ${dmSans.variable}`}>
-      <body>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <HtmlLang locale={locale} />
+      {children}
+    </NextIntlClientProvider>
   );
 }
