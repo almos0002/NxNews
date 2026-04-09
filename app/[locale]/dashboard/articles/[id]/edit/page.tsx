@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getArticleById } from "@/lib/articles";
+import { listCategories } from "@/lib/taxonomy";
 import ArticleEditor from "@/app/_components/ArticleEditor";
 
 export const metadata: Metadata = { title: "Edit Article — KumariHub Dashboard" };
@@ -14,13 +15,19 @@ export default async function EditArticlePage({ params }: Ctx) {
   if (!session) redirect("/en/login?from=/en/dashboard/articles");
 
   const { id } = await params;
-  const article = await getArticleById(id);
+  const [article, dbCategories] = await Promise.all([
+    getArticleById(id),
+    listCategories().catch(() => []),
+  ]);
   if (!article) notFound();
+
+  const categories = dbCategories.map((c) => ({ value: c.slug, label: c.name_en }));
 
   return (
     <ArticleEditor
       authorId={session.user.id}
       backHref="/en/dashboard/articles"
+      categories={categories}
       initial={{
         id: article.id,
         title_en: article.title_en,

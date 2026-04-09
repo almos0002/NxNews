@@ -210,3 +210,12 @@ Redirects to locale login with `?from=` param if missing.
 - `NEON_DATABASE_URL` is distinct from Replit's built-in `DATABASE_URL`
 - Auth cookie cache means session reads don't hit DB on every request (5-min TTL)
 - The test admin account `admin@kumari.test` was created during development
+- Category values stored in articles use the slug (e.g. "technology"); the public query filters via `LOWER(a.category) = slug` so older articles stored as "Technology" still match
+
+## Completed Features
+- **SEO Settings** (`/dashboard/seo`) — meta title templates, OG image, GA4/GSC integration, robots noindex toggle, JSON-LD toggle
+- **Dashboard overview** — real DB stats for admin/author, recent articles table, moderation queue preview
+- **Dynamic category pages** — `[category]/page.tsx` resolves from DB instead of a hardcoded allow-list; RESERVED slugs (login, signup, dashboard, etc.) short-circuit to 404
+- **Menu page** — `dashboard/menu/page.tsx` loads categories from DB via `listCategories()` instead of static data
+- **MenuClient Nepali autofill** — selecting a category in the link form auto-fills both `label_en` and `label_ne` from DB category names
+- **ArticleEditor dynamic categories** — hardcoded category array removed; editor receives categories prop from server pages (`new/page.tsx`, `[id]/edit/page.tsx`) which fetch from `listCategories()`

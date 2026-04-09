@@ -14,12 +14,10 @@ const QuillEditor = dynamic(() => import("./QuillEditor"), {
   ),
 });
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   "World", "Politics", "Business", "Technology", "Science",
-  "Culture", "Opinion", "Sports", "Videos", "Weather", "Entertainment",
+  "Culture", "Opinion", "Sports", "Entertainment",
 ];
-
-const CATEGORY_OPTS: ComboboxOption[] = CATEGORIES.map((c) => ({ value: c, label: c }));
 
 type Status = "draft" | "review" | "published" | "archived";
 type Lang = "en" | "ne";
@@ -40,10 +38,13 @@ export interface ArticleFormValues {
   featured_image: string;
 }
 
+interface CategoryOption { value: string; label: string; }
+
 interface Props {
   initial?: ArticleFormValues;
   authorId: string;
   backHref: string;
+  categories?: CategoryOption[];
 }
 
 function toSlug(title: string) {
@@ -62,7 +63,10 @@ function countWordsFromHtml(html: string): number {
   return text ? text.split(" ").filter(Boolean).length : 0;
 }
 
-export default function ArticleEditor({ initial, backHref }: Props) {
+export default function ArticleEditor({ initial, backHref, categories: categoriesProp }: Props) {
+  const categoryOpts: ComboboxOption[] = categoriesProp && categoriesProp.length > 0
+    ? categoriesProp.map((c) => ({ value: c.value, label: c.label }))
+    : DEFAULT_CATEGORIES.map((c) => ({ value: c, label: c }));
   const router = useRouter();
   const isEdit = !!initial?.id;
 
@@ -394,7 +398,7 @@ export default function ArticleEditor({ initial, backHref }: Props) {
           <div className={styles.sideCard}>
             <h3 className={styles.sideTitle}>Category</h3>
             <Combobox
-              options={CATEGORY_OPTS}
+              options={categoryOpts}
               value={values.category}
               placeholder="Select category…"
               onChange={(v) => set("category", v)}

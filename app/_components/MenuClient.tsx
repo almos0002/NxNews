@@ -8,7 +8,7 @@ import styles from "./cms.module.css";
 import type { MenuItem } from "@/lib/menu";
 
 interface PageOpt { id: string; slug: string; title_en: string; }
-interface CategoryOpt { slug: string; label: string; }
+interface CategoryOpt { slug: string; label: string; name_ne: string; }
 
 type MenuTab = "navbar" | "footer" | "bottom";
 
@@ -243,7 +243,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
             </p>
             <FlatList
               items={items} editId={editId} editForm={editForm} setEF={setEF}
-              pages={pages} categories={categories} pageOpts={pageOpts} catOpts={catOpts}
+              categories={categories} pageOpts={pageOpts} catOpts={catOpts}
               saving={saving} onEdit={openEdit} onDelete={deleteItem}
               onMove={(idx, dir) => moveItem(items, idx, dir)}
               onSaveEdit={submitEdit} onCancelEdit={cancelEdit} resolveUrl={resolveUrl}
@@ -259,7 +259,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                 These links appear in the thin bar at the very bottom of the footer (e.g. Privacy, Terms, Cookies).
               </p>
             )}
-            <LinkForm form={addForm} setF={setAF} pageOpts={pageOpts} catOpts={catOpts}
+            <LinkForm form={addForm} setF={setAF} pageOpts={pageOpts} catOpts={catOpts} categories={categories}
               saving={saving} onSave={() => submitAdd()} showSectionPicker={false} />
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                             <tr key={it.id}>
                               {editId === it.id ? (
                                 <td colSpan={4} style={{ padding: "12px 14px" }}>
-                                  <LinkForm form={editForm} setF={setEF} pageOpts={pageOpts} catOpts={catOpts}
+                                  <LinkForm form={editForm} setF={setEF} pageOpts={pageOpts} catOpts={catOpts} categories={categories}
                                     saving={saving} onSave={submitEdit} onCancel={cancelEdit}
                                     showSectionPicker sectionOptions={sectionKeys} isEdit />
                                 </td>
@@ -357,7 +357,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                 </div>
               )}
 
-              <LinkForm form={addForm} setF={setAF} pageOpts={pageOpts} catOpts={catOpts}
+              <LinkForm form={addForm} setF={setAF} pageOpts={pageOpts} catOpts={catOpts} categories={categories}
                 saving={saving} onSave={() => submitAdd(addForm.section_label_en, addForm.section_label_ne)}
                 showSectionPicker={false} />
             </div>
@@ -421,11 +421,11 @@ function SortButtons({ idx, total, onMove }: { idx: number; total: number; onMov
 }
 
 /* ─── Flat list for navbar and bottom bar ─── */
-function FlatList({ items, editId, editForm, setEF, pageOpts, catOpts, saving, onEdit, onDelete, onMove, onSaveEdit, onCancelEdit, resolveUrl }: {
+function FlatList({ items, editId, editForm, setEF, pageOpts, catOpts, categories, saving, onEdit, onDelete, onMove, onSaveEdit, onCancelEdit, resolveUrl }: {
   items: MenuItem[]; editId: string | null;
   editForm: typeof EMPTY_FORM; setEF: <K extends keyof typeof EMPTY_FORM>(k: K, v: typeof EMPTY_FORM[K]) => void;
   pages?: { id: string; slug: string; title_en: string }[];
-  categories?: { slug: string; label: string }[];
+  categories: CategoryOpt[];
   pageOpts: ComboboxOption[]; catOpts: ComboboxOption[]; saving: boolean;
   onEdit: (it: MenuItem) => void; onDelete: (id: string) => void;
   onMove: (idx: number, dir: -1 | 1) => void;
@@ -445,7 +445,7 @@ function FlatList({ items, editId, editForm, setEF, pageOpts, catOpts, saving, o
             <tr key={it.id}>
               {editId === it.id ? (
                 <td colSpan={4} style={{ padding: "12px 14px" }}>
-                  <LinkForm form={editForm} setF={setEF} pageOpts={pageOpts} catOpts={catOpts}
+                  <LinkForm form={editForm} setF={setEF} pageOpts={pageOpts} catOpts={catOpts} categories={categories}
                     saving={saving} onSave={onSaveEdit} onCancel={onCancelEdit} showSectionPicker={false} isEdit />
                 </td>
               ) : (
@@ -478,10 +478,10 @@ function FlatList({ items, editId, editForm, setEF, pageOpts, catOpts, saving, o
 }
 
 /* ─── Shared link form ─── */
-function LinkForm({ form, setF, pageOpts, catOpts, saving, onSave, onCancel, showSectionPicker, sectionOptions = [], isEdit = false }: {
+function LinkForm({ form, setF, pageOpts, catOpts, categories, saving, onSave, onCancel, showSectionPicker, sectionOptions = [], isEdit = false }: {
   form: typeof EMPTY_FORM;
   setF: <K extends keyof typeof EMPTY_FORM>(k: K, v: typeof EMPTY_FORM[K]) => void;
-  pageOpts: ComboboxOption[]; catOpts: ComboboxOption[]; saving: boolean;
+  pageOpts: ComboboxOption[]; catOpts: ComboboxOption[]; categories: CategoryOpt[]; saving: boolean;
   onSave: () => void; onCancel?: () => void;
   showSectionPicker: boolean; sectionOptions?: string[]; isEdit?: boolean;
 }) {
@@ -528,9 +528,12 @@ function LinkForm({ form, setF, pageOpts, catOpts, saving, onSave, onCancel, sho
                 value={form.url}
                 placeholder="— choose category —"
                 onChange={(v) => {
-                  const cat = catOpts.find(c => c.value === v);
+                  const cat = categories.find(c => c.slug === v);
                   setF("url", v);
-                  if (cat && !form.label_en) setF("label_en", cat.label);
+                  if (cat) {
+                    if (!form.label_en) setF("label_en", cat.label);
+                    if (!form.label_ne && cat.name_ne) setF("label_ne", cat.name_ne);
+                  }
                 }}
               />
             </>

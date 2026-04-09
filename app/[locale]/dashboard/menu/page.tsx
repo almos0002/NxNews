@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { listMenuItems } from "@/lib/menu";
 import { listPages } from "@/lib/pages";
-import { categories as hardcodedCategories } from "@/app/_data/articles";
+import { listCategories } from "@/lib/taxonomy";
 import MenuClient from "@/app/_components/MenuClient";
 
 export const metadata: Metadata = { title: "Menu Manager — KumariHub Dashboard" };
@@ -16,9 +16,10 @@ export default async function MenuPage() {
   const role = (session.user as { role?: string }).role ?? "user";
   if (!["admin", "moderator"].includes(role)) redirect("/en/dashboard");
 
-  const [allItems, pages] = await Promise.all([
+  const [allItems, pages, dbCategories] = await Promise.all([
     listMenuItems(),
     listPages(),
+    listCategories(),
   ]);
 
   const navbar = allItems.filter((it) => it.menu_type === "navbar");
@@ -26,9 +27,10 @@ export default async function MenuPage() {
   const bottom = allItems.filter((it) => it.menu_type === "bottom");
   const publishedPages = pages.filter((p) => p.status === "published");
 
-  const categories = hardcodedCategories.map((c) => ({
-    slug: c.toLowerCase(),
-    label: c,
+  const categories = dbCategories.map((c) => ({
+    slug: c.slug,
+    label: c.name_en,
+    name_ne: c.name_ne,
   }));
 
   return (

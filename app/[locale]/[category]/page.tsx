@@ -9,24 +9,9 @@ import {
   getPublicArticles,
   getBreakingHeadline,
 } from "@/lib/public";
+import { listCategories } from "@/lib/taxonomy";
 
-const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author", "videos", "weather"]);
-
-const VALID_CATEGORIES = new Set([
-  "world", "politics", "business", "technology",
-  "science", "culture", "opinion", "sports", "entertainment",
-]);
-
-type Props = { params: Promise<{ locale: string; category: string }> };
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, category } = await params;
-  const label = category.charAt(0).toUpperCase() + category.slice(1);
-  return {
-    title: `${label} — KumariHub`,
-    alternates: { languages: { en: `/en/${category}`, ne: `/ne/${category}` } },
-  };
-}
+const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author", "videos", "weather", "dashboard"]);
 
 const categoryDescriptionsEn: Record<string, string> = {
   world: "On-the-ground reporting from every corner of the globe — conflict, diplomacy, development, and the events that shape our interconnected world.",
@@ -52,14 +37,31 @@ const categoryDescriptionsNe: Record<string, string> = {
   entertainment: "फिल्म, टेलिभिजन, संगीत, सेलिब्रिटी — कथाहरूका पछाडिका कथाहरू।",
 };
 
+type Props = { params: Promise<{ locale: string; category: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, category } = await params;
+  const categories = await listCategories().catch(() => []);
+  const cat = categories.find((c) => c.slug === category);
+  const label = cat
+    ? (locale === "ne" ? cat.name_ne || cat.name_en : cat.name_en)
+    : category.charAt(0).toUpperCase() + category.slice(1);
+  return {
+    title: `${label} — KumariHub`,
+    alternates: { languages: { en: `/en/${category}`, ne: `/ne/${category}` } },
+  };
+}
+
 export default async function CategoryPage({ params }: Props) {
   const { category, locale } = await params;
 
   if (RESERVED.has(category)) notFound();
-  if (!VALID_CATEGORIES.has(category)) notFound();
+
+  const categories = await listCategories().catch(() => []);
+  const cat = categories.find((c) => c.slug === category);
+  if (!cat) notFound();
 
   const t = await getTranslations("archive");
-  const tNav = await getTranslations({ locale, namespace: "nav" });
 
   const [articles, headline] = await Promise.all([
     getPublicArticles(locale, { category }),
@@ -67,14 +69,14 @@ export default async function CategoryPage({ params }: Props) {
   ]);
 
   const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
+  const description = descriptions[category]
+    ?? (locale === "ne"
+      ? `${cat.name_ne || cat.name_en} सम्बन्धी नवीनतम समाचार र विश्लेषण।`
+      : `Latest news and analysis in ${cat.name_en}.`);
 
-  const navKeys: Record<string, string> = {
-    world: "world", politics: "politics", business: "business",
-    technology: "technology", science: "science", culture: "culture",
-    opinion: "opinion", sports: "sports", entertainment: "entertainment",
-  };
-  const navKey = navKeys[category] as "world" | "politics" | "business" | "technology" | "science" | "culture" | "opinion" | "sports" | undefined;
-  const translatedTitle = navKey ? tNav(navKey) : category.charAt(0).toUpperCase() + category.slice(1);
+  const title = locale === "ne"
+    ? (cat.name_ne || cat.name_en)
+    : cat.name_en;
 
   return (
     <>
@@ -82,8 +84,8 @@ export default async function CategoryPage({ params }: Props) {
       <Header />
       <ArchiveLayout
         badge={t("categoryBadge")}
-        title={translatedTitle}
-        description={descriptions[category]}
+        title={title}
+        description={description}
         count={articles.length}
         articles={articles}
       />
