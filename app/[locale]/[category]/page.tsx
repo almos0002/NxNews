@@ -5,27 +5,25 @@ import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
-import { categories } from "@/app/_data/articles";
-import { getArticlesByCategory } from "@/app/_data/getAllArticles";
-import { localizeArticles, getBreakingHeadline } from "@/app/_data/localize";
-import { categoryDescriptionsNe } from "@/app/_data/articlesNe";
-import { routing } from "@/i18n/routing";
+import {
+  getPublicArticles,
+  getBreakingHeadline,
+} from "@/lib/public";
 
-const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author"]);
+const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author", "videos", "weather"]);
+
+const VALID_CATEGORIES = new Set([
+  "world", "politics", "business", "technology",
+  "science", "culture", "opinion", "sports", "entertainment",
+]);
 
 type Props = { params: Promise<{ locale: string; category: string }> };
 
-export async function generateStaticParams() {
-  return routing.locales.flatMap((locale) =>
-    categories.map((cat) => ({ locale, category: cat.toLowerCase() }))
-  );
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, category } = await params;
-  const label = categories.find((c) => c.toLowerCase() === category) ?? category;
+  const label = category.charAt(0).toUpperCase() + category.slice(1);
   return {
-    title: `${label} — The Daily Report`,
+    title: `${label} — KumariHub`,
     alternates: { languages: { en: `/en/${category}`, ne: `/ne/${category}` } },
   };
 }
@@ -39,30 +37,44 @@ const categoryDescriptionsEn: Record<string, string> = {
   culture: "Arts, film, books, ideas, and the stories that define the age we live in.",
   opinion: "Perspectives and commentary from columnists, academics, and thought leaders.",
   sports: "Results, analysis, and long-form storytelling from the world of sport.",
+  entertainment: "Film, television, music, celebrity — the stories behind the stories.",
+};
+
+const categoryDescriptionsNe: Record<string, string> = {
+  world: "विश्वका हर कुनाबाट जमिनस्तरीय रिपोर्टिङ — संघर्ष, कूटनीति, विकास, र हाम्रो परस्पर जोडिएको विश्वलाई आकार दिने घटनाहरू।",
+  politics: "राष्ट्रिय र अन्तर्राष्ट्रिय राजनीति, नीति, र शासनको गहन विश्लेषण र तत्कालीन कवरेज।",
+  business: "बजार, कम्पनीहरू, अर्थशास्त्र, र वैश्विक अर्थतन्त्रलाई चलाउने शक्तिहरू।",
+  technology: "मानिस, विचार, र नवीनतम खोजहरू जसले हाम्रो जीवन, काम, र संचारलाई रूपान्तरण गर्दैछन्।",
+  science: "खोजहरू, अनुसन्धान, र हामीले जान्ने सीमाहरू पछाडि धकेल्ने वैज्ञानिकहरू।",
+  culture: "कला, फिल्म, पुस्तकहरू, विचारहरू, र हामी बाँचिरहेको युगलाई परिभाषित गर्ने कथाहरू।",
+  opinion: "स्तम्भकारहरू, शिक्षाविद्हरू, र विचार नेताहरूका दृष्टिकोण र टिप्पणीहरू।",
+  sports: "खेलकुदको संसारबाट नतिजाहरू, विश्लेषण, र दीर्घ-स्वरूप कथा।",
+  entertainment: "फिल्म, टेलिभिजन, संगीत, सेलिब्रिटी — कथाहरूका पछाडिका कथाहरू।",
 };
 
 export default async function CategoryPage({ params }: Props) {
   const { category, locale } = await params;
 
   if (RESERVED.has(category)) notFound();
-
-  const label = categories.find((c) => c.toLowerCase() === category);
-  if (!label) notFound();
+  if (!VALID_CATEGORIES.has(category)) notFound();
 
   const t = await getTranslations("archive");
   const tNav = await getTranslations({ locale, namespace: "nav" });
-  const rawArticles = getArticlesByCategory(label);
-  const articles = localizeArticles(rawArticles, locale);
-  const headline = getBreakingHeadline(locale);
+
+  const [articles, headline] = await Promise.all([
+    getPublicArticles(locale, { category }),
+    getBreakingHeadline(locale),
+  ]);
 
   const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
-  const navKeys: Record<string, "world" | "politics" | "business" | "technology" | "science" | "culture" | "opinion" | "sports"> = {
+
+  const navKeys: Record<string, string> = {
     world: "world", politics: "politics", business: "business",
     technology: "technology", science: "science", culture: "culture",
-    opinion: "opinion", sports: "sports",
+    opinion: "opinion", sports: "sports", entertainment: "entertainment",
   };
-  const navKey = navKeys[category];
-  const translatedTitle = navKey ? tNav(navKey) : label;
+  const navKey = navKeys[category] as "world" | "politics" | "business" | "technology" | "science" | "culture" | "opinion" | "sports" | undefined;
+  const translatedTitle = navKey ? tNav(navKey) : category.charAt(0).toUpperCase() + category.slice(1);
 
   return (
     <>

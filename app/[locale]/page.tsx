@@ -15,17 +15,7 @@ import WeatherSection from "@/app/_components/WeatherSection";
 import EntertainmentSection from "@/app/_components/EntertainmentSection";
 import Footer from "@/app/_components/Footer";
 import AdSlot from "@/app/_components/AdSlot";
-import {
-  featuredArticle,
-  secondaryFeatured,
-  latestNews,
-  editorsPicks,
-  gridArticles,
-  businessArticles,
-  techArticles,
-  entertainmentArticles,
-} from "@/app/_data/articles";
-import { localizeArticle, localizeArticles, getBreakingHeadline } from "@/app/_data/localize";
+import { getPublicArticles, getBreakingHeadline } from "@/lib/public";
 import styles from "@/app/page.module.css";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -45,14 +35,26 @@ export default async function LocaleHomePage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
-  const featured = localizeArticle(featuredArticle, locale);
-  const secondary = localizeArticles(secondaryFeatured, locale);
-  const latest = localizeArticles(latestNews, locale);
-  const picks = localizeArticles(editorsPicks, locale);
-  const grid = localizeArticles(gridArticles, locale);
-  const business = localizeArticles(businessArticles, locale);
-  const tech = localizeArticles(techArticles, locale);
-  const entertainment = localizeArticles(entertainmentArticles, locale);
+  const [allArticles, headline] = await Promise.all([
+    getPublicArticles(locale, { limit: 50 }),
+    getBreakingHeadline(locale),
+  ]);
+
+  const featured = allArticles[0];
+  const secondary = allArticles.slice(1, 4);
+  const latest = allArticles.slice(0, 8);
+  const picks = allArticles.slice(2, 6);
+  const grid = allArticles.slice(0, 12);
+
+  const business = allArticles.filter(
+    (a) => a.category.toLowerCase() === "business"
+  );
+  const tech = allArticles.filter(
+    (a) => a.category.toLowerCase() === "technology"
+  );
+  const entertainment = allArticles.filter(
+    (a) => a.category.toLowerCase() === "entertainment"
+  );
 
   const categoryColumns = [
     { label: tNav("business"), articles: business.slice(0, 5) },
@@ -60,7 +62,21 @@ export default async function LocaleHomePage({ params }: Props) {
     { label: t("aroundTheWorld"), articles: grid.slice(0, 5) },
   ];
 
-  const headline = getBreakingHeadline(locale);
+  if (!featured) {
+    return (
+      <>
+        <BreakingTicker headline={headline} />
+        <Header />
+        <main className={styles.main}>
+          <div style={{ padding: "4rem 2rem", textAlign: "center" }}>
+            <h2>No articles published yet</h2>
+            <p>Run the seed script to add content: <code>npx tsx scripts/seed.ts</code></p>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -68,32 +84,26 @@ export default async function LocaleHomePage({ params }: Props) {
       <Header />
 
       <main className={styles.main}>
-        {/* Featured panel */}
         <section className={styles.section}>
           <FeaturedPanel primary={featured} secondary={secondary} />
         </section>
 
-        {/* Ad 1 — after hero */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
 
-        {/* Latest feed */}
         <section className={styles.section}>
           <LatestFeed articles={latest} />
         </section>
 
-        {/* Ad 2 — after latest */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
 
-        {/* Editor's Pick */}
         <section className={styles.section}>
           <EditorsPick articles={picks} />
         </section>
 
-        {/* Top Stories + Trending sidebar */}
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
             <SectionHeading title={t("topStories")} />
@@ -108,55 +118,44 @@ export default async function LocaleHomePage({ params }: Props) {
           </div>
         </section>
 
-        {/* Ad 3 — after Top Stories */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
 
-        {/* Category columns */}
         <CategoryLists columns={categoryColumns} />
 
-        {/* Ad 4 — billboard after categories */}
         <div className={styles.adSection}>
           <AdSlot variant="billboard" />
         </div>
 
-        {/* Science & Technology */}
         <div className={styles.topicDivider}>
           <ThreeColSection title={t("scienceTech")} articles={tech} />
         </div>
 
-        {/* Ad 5 — after Science */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
 
-        {/* Videos */}
         <section className={styles.section}>
           <VideoSection />
         </section>
 
-        {/* Ad 6 — after Videos */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
 
-        {/* World Weather */}
         <section className={styles.section}>
           <WeatherSection />
         </section>
 
-        {/* Entertainment */}
         <section className={styles.section}>
           <EntertainmentSection articles={entertainment} />
         </section>
 
-        {/* Ad 7 — before newsletter */}
         <div className={styles.adSection}>
           <AdSlot variant="leaderboard" />
         </div>
 
-        {/* Newsletter */}
         <section className={styles.newsletterSection}>
           <div className={styles.newsletterInner}>
             <p className={styles.newsletterEyebrow}>{t("newsletterEyebrow")}</p>

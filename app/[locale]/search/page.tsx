@@ -5,14 +5,16 @@ import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
 import SearchInput from "@/app/_components/SearchInput";
-import { searchArticles } from "@/app/_data/getAllArticles";
-import { tags } from "@/app/_data/tags";
-import { localizeArticles, getBreakingHeadline } from "@/app/_data/localize";
+import {
+  searchPublicArticles,
+  getPublicTags,
+  getBreakingHeadline,
+} from "@/lib/public";
 import { Link } from "@/i18n/navigation";
 import styles from "@/app/search/page.module.css";
 
 export const metadata: Metadata = {
-  title: "Search — The Daily Report",
+  title: "Search — KumariHub",
 };
 
 type Props = {
@@ -24,10 +26,14 @@ export default async function LocaleSearchPage({ params, searchParams }: Props) 
   const { locale } = await params;
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
-  const rawResults = searchArticles(query);
-  const results = localizeArticles(rawResults, locale);
+
+  const [results, tags, headline] = await Promise.all([
+    query ? searchPublicArticles(query, locale) : Promise.resolve([]),
+    getPublicTags(),
+    getBreakingHeadline(locale),
+  ]);
+
   const t = await getTranslations("search");
-  const headline = getBreakingHeadline(locale);
 
   return (
     <>

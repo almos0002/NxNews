@@ -1,11 +1,16 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { videoItems } from "@/app/_data/videos";
+import { getLocale } from "next-intl/server";
+import { getPublicVideos } from "@/lib/public";
 import { Link } from "@/i18n/navigation";
 import styles from "./VideoSection.module.css";
 
 export default async function VideoSection() {
   const t = await getTranslations("home");
+  const locale = await getLocale();
+  const videos = await getPublicVideos(locale);
+
+  if (videos.length === 0) return null;
 
   return (
     <section className={styles.wrapper}>
@@ -16,9 +21,8 @@ export default async function VideoSection() {
       </div>
 
       <div className={styles.scrollTrack}>
-        {videoItems.map((video) => (
+        {videos.map((video) => (
           <Link key={video.id} href={`/videos/${video.id}`} className={styles.card}>
-            {/* Background image */}
             {video.thumbnailUrl && (
               <Image
                 src={video.thumbnailUrl}
@@ -29,16 +33,13 @@ export default async function VideoSection() {
               />
             )}
 
-            {/* Full gradient overlay */}
             <div className={styles.overlay} />
 
-            {/* Top row: category + duration */}
             <div className={styles.topRow}>
               <span className={styles.category}>{video.category}</span>
-              <span className={styles.duration}>{video.duration}</span>
+              {video.duration && <span className={styles.duration}>{video.duration}</span>}
             </div>
 
-            {/* Centred play button */}
             <div className={styles.playWrap}>
               <div className={styles.playBtn}>
                 <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26">
@@ -47,7 +48,6 @@ export default async function VideoSection() {
               </div>
             </div>
 
-            {/* Bottom text */}
             <div className={styles.bottom}>
               <h4 className={styles.cardTitle}>{video.title}</h4>
               <p className={styles.excerpt}>{video.excerpt}</p>

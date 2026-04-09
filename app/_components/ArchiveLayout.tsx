@@ -1,10 +1,8 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
-import type { Article } from "@/app/_data/articles";
-import { tags } from "@/app/_data/tags";
-import { trendingArticles } from "@/app/_data/articles";
-import { localizeArticles, localizeTrending } from "@/app/_data/localize";
+import type { PublicArticle as Article } from "@/lib/public";
+import { getTrendingArticles, getPublicTags } from "@/lib/public";
 import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
 import AdSlot from "./AdSlot";
@@ -23,39 +21,47 @@ async function ArchiveSidebar() {
   const tArchive = await getTranslations("archive");
   const tNewsletter = await getTranslations("newsletter");
   const locale = await getLocale();
-  const localizedTrending = localizeTrending(trendingArticles, locale);
+
+  const [trending, tags] = await Promise.all([
+    getTrendingArticles(locale, 8),
+    getPublicTags(),
+  ]);
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.sidebarCard}>
-        <h2 className={styles.sidebarHeading}>{tArchive("trendingNow")}</h2>
-        <ol className={styles.trendingList}>
-          {localizedTrending.map((article, i) => (
-            <li key={article.id} className={styles.trendingItem}>
-              <span className={styles.trendingRank}>
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <div className={styles.trendingContent}>
-                <span className={styles.trendingCategory}>{article.category}</span>
-                <Link href={`/article/${article.id}`} className={styles.trendingTitle}>
-                  {article.title}
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <div className={styles.sidebarCard}>
-        <h2 className={styles.sidebarHeading}>{tArchive("browseTopics")}</h2>
-        <div className={styles.topicList}>
-          {tags.map((t) => (
-            <Link key={t.slug} href={`/tags/${t.slug}`} className={styles.topicPill}>
-              {t.label}
-            </Link>
-          ))}
+      {trending.length > 0 && (
+        <div className={styles.sidebarCard}>
+          <h2 className={styles.sidebarHeading}>{tArchive("trendingNow")}</h2>
+          <ol className={styles.trendingList}>
+            {trending.map((article, i) => (
+              <li key={article.id} className={styles.trendingItem}>
+                <span className={styles.trendingRank}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className={styles.trendingContent}>
+                  <span className={styles.trendingCategory}>{article.category}</span>
+                  <Link href={`/article/${article.id}`} className={styles.trendingTitle}>
+                    {article.title}
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
-      </div>
+      )}
+
+      {tags.length > 0 && (
+        <div className={styles.sidebarCard}>
+          <h2 className={styles.sidebarHeading}>{tArchive("browseTopics")}</h2>
+          <div className={styles.topicList}>
+            {tags.map((t) => (
+              <Link key={t.slug} href={`/tags/${t.slug}`} className={styles.topicPill}>
+                {t.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className={`${styles.sidebarCard} ${styles.newsletter}`}>
         <p className={styles.newsletterEyebrow}>{tNewsletter("eyebrow")}</p>

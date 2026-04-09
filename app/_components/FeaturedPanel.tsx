@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import type { Article } from "@/app/_data/articles";
+import type { PublicArticle as Article } from "@/lib/public";
 import { Link } from "@/i18n/navigation";
 import CategoryBadge from "./CategoryBadge";
 import styles from "./FeaturedPanel.module.css";

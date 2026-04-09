@@ -111,6 +111,65 @@
   min-width: 0;
 }
 
+.richContent {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.78;
+  color: var(--color-ink-secondary);
+}
+
+.richContent p {
+  margin-bottom: 24px;
+}
+
+.richContent p:first-child {
+  font-size: 1.1rem;
+  color: var(--color-ink);
+}
+
+.richContent h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 2rem 0 1rem;
+}
+
+.richContent h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 1.5rem 0 0.75rem;
+}
+
+.richContent ul,
+.richContent ol {
+  margin: 1rem 0 1.5rem 1.5rem;
+}
+
+.richContent li {
+  margin-bottom: 0.5rem;
+}
+
+.richContent blockquote {
+  border-left: 3px solid var(--color-accent);
+  margin: 2rem 0;
+  padding: 4px 0 4px 24px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--color-ink);
+}
+
+.richContent a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.richContent strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
 .para {
   font-family: var(--font-serif);
   font-size: 1.05rem;

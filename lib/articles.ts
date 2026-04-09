@@ -80,6 +80,17 @@ export async function getArticleById(id: string): Promise<ArticleWithAuthor | nu
   return rows[0] ?? null;
 }
 
+export async function getArticleBySlug(slug: string): Promise<ArticleWithAuthor | null> {
+  const { rows } = await pool.query<ArticleWithAuthor>(
+    `SELECT a.*, u.name AS author_name
+     FROM article a
+     LEFT JOIN "user" u ON u.id = a.author_id
+     WHERE a.slug = $1`,
+    [slug]
+  );
+  return rows[0] ?? null;
+}
+
 export interface ArticleInput {
   title_en: string;
   title_ne: string;

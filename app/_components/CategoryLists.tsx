@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { Article } from "@/app/_data/articles";
+import type { PublicArticle as Article } from "@/lib/public";
 import { Link } from "@/i18n/navigation";
 import styles from "./CategoryLists.module.css";
 
