@@ -152,7 +152,7 @@ export default function NovelEditor({
                 t.toLowerCase().includes(query.toLowerCase())
               )
           ),
-        render: renderItems(commandRef),
+        render: () => renderItems(commandRef),
       },
     }),
   ];
@@ -162,6 +162,7 @@ export default function NovelEditor({
       <EditorContent
         initialContent={textToJson(initialContent)}
         extensions={extensions}
+        immediatelyRender={false}
         className={`${styles.editorContent} ${isNepali ? styles.devanagari : ""} ${className ?? ""}`}
         onUpdate={({ editor }) => {
           onUpdate(editor.getHTML());
