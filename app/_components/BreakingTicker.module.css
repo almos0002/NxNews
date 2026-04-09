@@ -93,13 +93,17 @@
   vertical-align: middle;
 }
 
-/* ── Alternating black/white wave teeth ── */
+/* ── Wavy black bottom strip (flipped, irregular wave pointing downward) ── */
 .strip {
-  height: 20px;
-  background-color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 20'%3E%3Cpath d='M0%2C0 C18%2C22 42%2C22 60%2C0 Z' fill='%23111111'/%3E%3Cpath d='M60%2C0 C72%2C14 88%2C14 100%2C0 Z' fill='%23ffffff'/%3E%3Cpath d='M100%2C0 C114%2C20 126%2C20 140%2C0 Z' fill='%23111111'/%3E%3Cpath d='M140%2C0 C150%2C10 170%2C10 180%2C0 Z' fill='%23ffffff'/%3E%3C%2Fsvg%3E");
-  background-repeat: repeat-x;
-  background-size: 180px 20px;
+  height: 18px;
+  background-color: #111111;
+  /* Flat top, irregular wavy bottom — long/tall and short/small waves mixed */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L200%2C0 L200%2C5 C192%2C18 178%2C18 170%2C5 C163%2C0 157%2C0 150%2C5 C144%2C10 138%2C10 132%2C5 C127%2C0 122%2C0 116%2C5 C107%2C18 93%2C18 84%2C5 C76%2C0 68%2C0 60%2C5 C52%2C14 44%2C14 36%2C5 C30%2C0 24%2C0 18%2C5 C11%2C18 5%2C18 0%2C5 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 18' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L200%2C0 L200%2C5 C192%2C18 178%2C18 170%2C5 C163%2C0 157%2C0 150%2C5 C144%2C10 138%2C10 132%2C5 C127%2C0 122%2C0 116%2C5 C107%2C18 93%2C18 84%2C5 C76%2C0 68%2C0 60%2C5 C52%2C14 44%2C14 36%2C5 C30%2C0 24%2C0 18%2C5 C11%2C18 5%2C18 0%2C5 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 200px 18px;
+  mask-size: 200px 18px;
 }
 
 @keyframes marquee {
