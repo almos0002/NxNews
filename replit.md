@@ -85,13 +85,65 @@ next.config.ts            # Next.js config (next-intl plugin, remote images)
 | `account`     | OAuth + email providers per user         |
 | `verification`| Email verification tokens                |
 | `rateLimit`   | Per-IP rate limit tracking               |
+| `article`     | Published articles (bilingual)           |
+| `pages`       | Static CMS pages (bilingual)             |
+| `categories`  | Article categories with color coding     |
+| `tags`        | Article tags (bilingual)                 |
+| `videos`      | YouTube video entries (bilingual)        |
+
+Migration script: `scripts/migrate.mjs`
 
 ### Role-Based Dashboard (`/dashboard`)
-- **Admin**: Full user table, moderation queue, article management, site analytics
-- **Moderator**: Moderation queue + article review
-- **Author**: My articles, drafts, publish stats
-- **User (Reader)**: Profile, saved articles, newsletter prefs
+- **Admin**: User management, moderation queue, articles, pages, categories/tags, videos
+- **Moderator**: Moderation queue, articles, pages, categories/tags, videos
+- **Author**: Articles, pages, videos
+- **User (Reader)**: Profile only
 - Unauthenticated visitors → redirect to `/[locale]/login?from=/[locale]/dashboard`
+
+### Dashboard Sections
+| Route | Access | Purpose |
+|-------|--------|---------|
+| `/dashboard` | All roles | Overview |
+| `/dashboard/articles` | Author+ | Article list + CRUD |
+| `/dashboard/articles/new` | Author+ | New article (Quill editor, bilingual) |
+| `/dashboard/articles/[id]/edit` | Author+ | Edit article |
+| `/dashboard/pages` | Author+ | Static pages list |
+| `/dashboard/pages/new` | Author+ | New page (Quill editor, bilingual) |
+| `/dashboard/pages/[id]/edit` | Author+ | Edit page |
+| `/dashboard/videos` | Author+ | YouTube video management |
+| `/dashboard/taxonomy` | Moderator+ | Categories & tags (tabbed inline CRUD) |
+| `/dashboard/users` | Admin | User role + ban management |
+| `/dashboard/moderation` | Moderator+ | Article review queue |
+| `/dashboard/profile` | All roles | Edit own profile |
+
+### Key Client Components (app/_components/)
+| Component | Purpose |
+|-----------|---------|
+| `ArticleEditor.tsx` | Full bilingual article editor with Quill, categories, tags, featured image |
+| `PageEditor.tsx` | Bilingual page editor (reuses ArticleEditor.module.css) |
+| `QuillEditor.tsx` | Dynamically imported Quill v2 rich text editor (SSR disabled) |
+| `TaxonomyClient.tsx` | Tabbed categories/tags CRUD client |
+| `VideosClient.tsx` | Videos list + inline add/edit form with YouTube embed preview |
+| `UsersClient.tsx` | User table with role dropdown + ban toggle |
+| `DashboardSidebar.tsx` | Role-aware navigation sidebar |
+| `cms.module.css` | Shared CSS module for all CMS/dashboard table pages |
+
+### API Routes
+| Route | Methods | Auth |
+|-------|---------|------|
+| `/api/articles` | GET, POST | Session |
+| `/api/articles/[id]` | GET, PUT, DELETE | Session |
+| `/api/pages` | GET, POST | Session |
+| `/api/pages/[id]` | GET, PUT, DELETE | Session |
+| `/api/categories` | GET, POST | Moderator+ |
+| `/api/categories/[id]` | PUT, DELETE | Moderator+ |
+| `/api/tags` | GET, POST | Moderator+ |
+| `/api/tags/[id]` | PUT, DELETE | Moderator+ |
+| `/api/videos` | GET, POST | Session |
+| `/api/videos/[id]` | GET, PUT, DELETE | Session |
+| `/api/users` | GET, PATCH | Admin |
+| `/api/upload` | POST | Session — saves to `public/uploads/`, 8MB max |
+| `/api/auth/[...all]` | GET, POST | Better Auth handler |
 
 ### Route Protection
 `proxy.ts` reads `better-auth.session_token` / `__Secure-better-auth.session_token` cookie.
