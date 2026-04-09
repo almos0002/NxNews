@@ -107,15 +107,15 @@
 
 /* ── Wavy black bottom strip (flipped, irregular wave pointing downward) ── */
 .strip {
-  height: 42px;
+  height: 28px;
   background-color: #111111;
-  /* Wider, fewer, thicker waves — 3 irregular waves per 300px tile */
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 42' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L300%2C0 L300%2C20 C290%2C42 262%2C42 245%2C20 C228%2C0 218%2C0 200%2C20 C180%2C42 140%2C42 120%2C20 C103%2C0 90%2C0 72%2C20 C52%2C42 18%2C42 0%2C20 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 42' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L300%2C0 L300%2C20 C290%2C42 262%2C42 245%2C20 C228%2C0 218%2C0 200%2C20 C180%2C42 140%2C42 120%2C20 C103%2C0 90%2C0 72%2C20 C52%2C42 18%2C42 0%2C20 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
+  /* 5 waves per 300px tile, moderate height */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 28' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L300%2C0 L300%2C13 C288%2C28 268%2C28 255%2C13 C242%2C0 232%2C0 220%2C13 C207%2C28 183%2C28 170%2C13 C157%2C0 147%2C0 135%2C13 C121%2C28 99%2C28 85%2C13 C71%2C0 61%2C0 50%2C13 C37%2C28 15%2C28 0%2C13 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 28' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L300%2C0 L300%2C13 C288%2C28 268%2C28 255%2C13 C242%2C0 232%2C0 220%2C13 C207%2C28 183%2C28 170%2C13 C157%2C0 147%2C0 135%2C13 C121%2C28 99%2C28 85%2C13 C71%2C0 61%2C0 50%2C13 C37%2C28 15%2C28 0%2C13 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
   -webkit-mask-repeat: repeat-x;
   mask-repeat: repeat-x;
-  -webkit-mask-size: 300px 42px;
-  mask-size: 300px 42px;
+  -webkit-mask-size: 300px 28px;
+  mask-size: 300px 28px;
 }
 
 @keyframes marquee {
