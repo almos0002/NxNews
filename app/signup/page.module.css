@@ -211,6 +211,34 @@
   opacity: 0.75;
 }
 
+.serverError {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-family: var(--font-serif);
+  font-size: 0.83rem;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 4px;
+}
+
+.inputError {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08) !important;
+}
+
+.fieldError {
+  font-family: var(--font-serif);
+  font-size: 0.76rem;
+  color: #ef4444;
+  margin-top: 2px;
+}
+
+.submitBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 @media (max-width: 520px) {
   .card {
     padding: 32px 20px;
