@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
@@ -20,9 +19,6 @@ export default function LoginPage() {
         <div className={styles.card}>
 
           <div className={styles.cardHeader}>
-            <a href="/" className={styles.logoLink}>
-              <Image src="/logo.png" alt="KumariHub" width={150} height={48} style={{ objectFit: "contain", height: "auto" }} />
-            </a>
             <h1 className={styles.heading}>Welcome back</h1>
             <p className={styles.subheading}>Sign in to your KumariHub account</p>
           </div>

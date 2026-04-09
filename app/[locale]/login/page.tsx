@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
@@ -23,9 +22,6 @@ export default async function LocaleLoginPage() {
         <div className={styles.card}>
 
           <div className={styles.cardHeader}>
-            <Link href="/" className={styles.logoLink}>
-              <Image src="/logo.png" alt="KumariHub" width={150} height={48} style={{ objectFit: "contain", height: "auto" }} />
-            </Link>
             <h1 className={styles.heading}>{t("title")}</h1>
             <p className={styles.subheading}>{t("subtitle")}</p>
           </div>
