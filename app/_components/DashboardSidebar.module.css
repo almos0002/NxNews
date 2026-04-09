@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════
    KumariHub Dashboard Sidebar
-   Dark shell — #0f1117 base
+   Warm light shell — matches editorial aesthetic
 ══════════════════════════════════════════════ */
 
 .sidebar {
@@ -8,8 +8,8 @@
   inset-block: 0;
   left: 0;
   width: 256px;
-  background: #0d1117;
-  border-right: 1px solid #1e2535;
+  background: #f8f7f2;
+  border-right: 1px solid #e2e0d8;
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -22,7 +22,7 @@
   align-items: center;
   gap: 10px;
   padding: 18px 18px 16px;
-  border-bottom: 1px solid #1e2535;
+  border-bottom: 1px solid #e2e0d8;
   flex-shrink: 0;
 }
 
@@ -52,7 +52,7 @@
   font-family: "Georgia", "Noticia Text", serif;
   font-size: 0.9rem;
   font-weight: 700;
-  color: #e8eaf0;
+  color: #141414;
   letter-spacing: -0.01em;
   line-height: 1;
 }
@@ -61,7 +61,7 @@
   font-family: "Georgia", "Noticia Text", serif;
   font-size: 0.6rem;
   font-weight: 700;
-  color: #3b4561;
+  color: #a89e8e;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -80,7 +80,7 @@
   font-family: "Georgia", "Noticia Text", serif;
   font-size: 0.62rem;
   font-weight: 700;
-  color: #2e3a52;
+  color: #c0b8a8;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   padding: 10px 10px 5px;
@@ -101,29 +101,29 @@
   font-family: "Georgia", "Noticia Text", serif;
   font-size: 0.83rem;
   font-weight: 500;
-  color: #5c6880;
+  color: #6b6459;
   text-decoration: none;
   transition: background 0.12s ease, color 0.12s ease;
   cursor: pointer;
 }
 
 .link:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: #9da8bc;
+  background: #eeece5;
+  color: #2c2823;
 }
 
 .link.active {
-  background: rgba(230, 57, 70, 0.1);
-  color: #e63946;
+  background: rgba(230, 57, 70, 0.08);
+  color: #c0313c;
   font-weight: 600;
 }
 
 .link.active .linkIcon {
-  color: #e63946;
+  color: #c0313c;
 }
 
 .linkIcon {
-  color: #3b4561;
+  color: #b8b0a0;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -131,17 +131,18 @@
 }
 
 .link:hover .linkIcon {
-  color: #6b7a96;
+  color: #8c8070;
 }
 
 /* ── User area ──────────────────────────────── */
 .userArea {
-  border-top: 1px solid #1e2535;
+  border-top: 1px solid #e2e0d8;
   padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   flex-shrink: 0;
+  background: #f3f1eb;
 }
 
 .userRow {
@@ -174,7 +175,7 @@
   font-family: "Georgia", "Noticia Text", serif;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #c5cad6;
+  color: #2c2823;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -184,7 +185,7 @@
 .userEmail {
   font-family: "Georgia", "Noticia Text", serif;
   font-size: 0.68rem;
-  color: #3b4561;
+  color: #a89e8e;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -209,11 +210,11 @@
 }
 
 .signOutRow:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: #eeece5;
 }
 
 .signOutIcon {
-  color: #3b4561;
+  color: #b8b0a0;
   display: flex;
   align-items: center;
   flex-shrink: 0;

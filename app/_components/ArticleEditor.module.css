@@ -258,7 +258,20 @@
   line-height: 1.75;
   min-height: 420px;
 }
-.contentInput:focus { border-color: var(--color-accent); }
+/* Novel editor loading placeholder */
+.editorPlaceholder {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  color: var(--color-ink-muted);
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-start;
+  font-style: italic;
+}
 
 /* Devanagari font override for Nepali fields */
 .devanagari {

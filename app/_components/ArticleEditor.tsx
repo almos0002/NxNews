@@ -2,7 +2,15 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import styles from "./ArticleEditor.module.css";
+
+const NovelEditor = dynamic(() => import("./NovelEditor"), {
+  ssr: false,
+  loading: () => (
+    <div className={styles.editorPlaceholder}>Loading editor…</div>
+  ),
+});
 
 const CATEGORIES = [
   "World", "Politics", "Business", "Technology", "Science",
@@ -40,6 +48,12 @@ function toSlug(title: string) {
     .replace(/\s+/g, "-")
     .replace(/--+/g, "-")
     .slice(0, 80);
+}
+
+function countWordsFromHtml(html: string): number {
+  if (!html) return 0;
+  const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return text ? text.split(" ").filter(Boolean).length : 0;
 }
 
 export default function ArticleEditor({ initial, backHref }: Props) {
@@ -142,8 +156,8 @@ export default function ArticleEditor({ initial, backHref }: Props) {
     }
   }
 
-  const wordCountEn = values.content_en.trim().split(/\s+/).filter(Boolean).length;
-  const wordCountNe = values.content_ne.trim().split(/\s+/).filter(Boolean).length;
+  const wordCountEn = countWordsFromHtml(values.content_en);
+  const wordCountNe = countWordsFromHtml(values.content_ne);
 
   return (
     <div className={styles.layout}>
@@ -210,9 +224,7 @@ export default function ArticleEditor({ initial, backHref }: Props) {
               🇳🇵 नेपाली
             </button>
             <span className={styles.langHint}>
-              {lang === "en"
-                ? "Writing in English"
-                : "नेपालीमा लेख्दै"}
+              {lang === "en" ? "Writing in English" : "नेपालीमा लेख्दै"}
             </span>
           </div>
 
@@ -267,7 +279,7 @@ export default function ArticleEditor({ initial, backHref }: Props) {
             )}
           </div>
 
-          {/* Content */}
+          {/* Content — Novel rich text editor */}
           <div className={styles.field}>
             <div className={styles.labelRow}>
               <label className={styles.label}>
@@ -279,22 +291,21 @@ export default function ArticleEditor({ initial, backHref }: Props) {
                   : `${wordCountNe} शब्द`}
               </span>
             </div>
+
             {lang === "en" ? (
-              <textarea
-                className={styles.contentInput}
-                placeholder="Write your article here…"
-                rows={24}
-                value={values.content_en}
-                onChange={(e) => set("content_en", e.target.value)}
+              <NovelEditor
+                key="editor-en"
+                initialContent={values.content_en}
+                placeholder="Write your article here… (type / for commands)"
+                onUpdate={(html) => set("content_en", html)}
               />
             ) : (
-              <textarea
-                className={`${styles.contentInput} ${styles.devanagari}`}
+              <NovelEditor
+                key="editor-ne"
+                initialContent={values.content_ne}
                 placeholder="यहाँ आफ्नो लेख लेख्नुहोस्…"
-                rows={24}
-                value={values.content_ne}
-                onChange={(e) => set("content_ne", e.target.value)}
-                lang="ne"
+                onUpdate={(html) => set("content_ne", html)}
+                isNepali
               />
             )}
           </div>
