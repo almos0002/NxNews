@@ -48,11 +48,14 @@ export default async function Header() {
               alt="KumariHub"
               width={300}
               height={90}
-              style={{ objectFit: "contain", height: "66px", width: "auto" }}
+              className={styles.logoImg}
+              style={{ objectFit: "contain", width: "auto" }}
               priority
             />
           </Link>
-          <DateTimeClock locale={locale} />
+          <span className={styles.clockWrap}>
+            <DateTimeClock locale={locale} />
+          </span>
         </div>
 
         <div className={styles.actions}>

@@ -35,6 +35,14 @@
   text-decoration: none;
 }
 
+.logoImg {
+  height: 66px;
+}
+
+.clockWrap {
+  display: block;
+}
+
 .actions {
   display: flex;
   align-items: center;
@@ -171,8 +179,21 @@
 /* ── Mobile ── */
 @media (max-width: 600px) {
   .logoRow {
-    min-height: 60px;
+    min-height: 56px;
+    height: 56px;
     padding: 0 12px;
+  }
+
+  .logoWrap {
+    gap: 0;
+  }
+
+  .logoImg {
+    height: 38px;
+  }
+
+  .clockWrap {
+    display: none;
   }
 
   .navRow {
@@ -185,21 +206,14 @@
 
   .signInLink {
     font-size: 0.75rem;
-    padding: 6px 12px;
+    padding: 6px 10px;
   }
 
   .userBtn {
-    padding: 4px 10px 4px 4px;
+    padding: 4px 8px 4px 4px;
   }
 
   .userName {
     display: none;
-  }
-}
-
-/* Hide datetime on very small screens */
-@media (max-width: 400px) {
-  .logoWrap {
-    gap: 0;
   }
 }
