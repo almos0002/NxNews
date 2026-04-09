@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { videoItems } from "@/app/_data/videos";
+import { Link } from "@/i18n/navigation";
 import styles from "./VideoSection.module.css";
 
 export default async function VideoSection() {
@@ -11,12 +12,12 @@ export default async function VideoSection() {
       <div className={styles.heading}>
         <h2 className={styles.title}>{t("videos")}</h2>
         <div className={styles.rule} />
-        <span className={styles.seeAll}>{t("seeAll")}</span>
+        <Link href="/videos" className={styles.seeAll}>{t("seeAll")}</Link>
       </div>
 
       <div className={styles.scrollTrack}>
         {videoItems.map((video) => (
-          <div key={video.id} className={styles.card}>
+          <Link key={video.id} href={`/videos/${video.id}`} className={styles.card}>
             {/* Background image */}
             {video.thumbnailUrl && (
               <Image
@@ -56,7 +57,7 @@ export default async function VideoSection() {
                 <span>{video.date}</span>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

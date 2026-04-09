@@ -72,6 +72,7 @@
   flex-direction: column;
   justify-content: space-between;
   transition: transform 0.2s ease;
+  text-decoration: none;
 }
 
 .card:hover {
