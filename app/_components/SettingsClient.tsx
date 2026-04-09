@@ -83,6 +83,14 @@ export default function SettingsClient({ initialSettings }: Props) {
                 <label className={styles.label}>Site Title (Nepali)</label>
                 <input className={styles.input} value={s.site_title_ne ?? ""} onChange={(e) => set("site_title_ne", e.target.value)} placeholder="कुमारीहब" />
               </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Site Tagline (English)</label>
+                <input className={styles.input} value={s.site_tagline_en ?? ""} onChange={(e) => set("site_tagline_en", e.target.value)} placeholder="Independent, in-depth journalism for a complex world." />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Site Tagline (Nepali)</label>
+                <input className={styles.input} value={s.site_tagline_ne ?? ""} onChange={(e) => set("site_tagline_ne", e.target.value)} placeholder="जटिल संसारका लागि स्वतन्त्र, गहन पत्रकारिता।" />
+              </div>
               <div className={`${styles.field} ${styles.formGridFull}`}>
                 <label className={styles.label}>Site Description (English)</label>
                 <textarea className={styles.textarea} rows={2} value={s.site_description_en ?? ""} onChange={(e) => set("site_description_en", e.target.value)} placeholder="Nepal's leading multilingual news portal…" />

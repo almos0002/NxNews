@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
     if (typeof body !== "object" || !body) return NextResponse.json({ error: "Invalid body" }, { status: 400 });
     const safe: Record<string, string> = {};
     const ALLOWED_KEYS = [
-      "site_title_en","site_title_ne","site_description_en","site_description_ne",
+      "site_title_en","site_title_ne","site_tagline_en","site_tagline_ne",
+      "site_description_en","site_description_ne",
       "contact_email","copyright_text","social_twitter","social_facebook",
       "social_instagram","social_youtube","breaking_news_enabled","logo_url","favicon_url",
     ];

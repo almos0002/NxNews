@@ -27,8 +27,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try { s = await getAllSettings() as Record<string, string>; } catch { /* use defaults */ }
 
   const isNe = locale === "ne";
-  const title       = isNe ? (s.site_title_ne       || s.site_title_en       || "KumariHub") : (s.site_title_en       || "KumariHub");
-  const description = isNe ? (s.site_description_ne || s.site_description_en || "")          : (s.site_description_en || "");
+  const siteName  = isNe ? (s.site_title_ne   || s.site_title_en   || "KumariHub") : (s.site_title_en   || "KumariHub");
+  const tagline   = isNe ? (s.site_tagline_ne  || s.site_tagline_en  || "")          : (s.site_tagline_en  || "");
+  const description = isNe ? (s.site_description_ne || s.site_description_en || "") : (s.site_description_en || "");
+
+  const title = tagline ? `${siteName} — ${tagline}` : siteName;
 
   return {
     title,
