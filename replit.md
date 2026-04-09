@@ -113,8 +113,9 @@ Migration script: `scripts/migrate.mjs`
 | `/dashboard/videos` | Author+ | YouTube video management |
 | `/dashboard/taxonomy` | Moderator+ | Categories & tags (tabbed inline CRUD) |
 | `/dashboard/users` | Admin | User role + ban management |
-| `/dashboard/moderation` | Moderator+ | Article review queue |
-| `/dashboard/profile` | All roles | Edit own profile |
+| `/dashboard/moderation` | Moderator+ | Article review queue (approve/reject) |
+| `/dashboard/profile` | All roles | Edit own name, bio, change password |
+| `/dashboard/menu` | Moderator+ | Navbar & footer menu manager with page/URL links and sort order |
 
 ### Key Client Components (app/_components/)
 | Component | Purpose |
@@ -125,6 +126,9 @@ Migration script: `scripts/migrate.mjs`
 | `TaxonomyClient.tsx` | Tabbed categories/tags CRUD client |
 | `VideosClient.tsx` | Videos list + inline add/edit form with YouTube embed preview |
 | `UsersClient.tsx` | User table with role dropdown + ban toggle |
+| `ProfileClient.tsx` | Edit profile (name, bio) + change password via Better Auth |
+| `ModerationClient.tsx` | Review queue list with approve/reject article actions |
+| `MenuClient.tsx` | Dual-menu manager (navbar/footer) with page selector, URL, and up/down sort |
 | `DashboardSidebar.tsx` | Role-aware navigation sidebar |
 | `cms.module.css` | Shared CSS module for all CMS/dashboard table pages |
 
@@ -142,6 +146,10 @@ Migration script: `scripts/migrate.mjs`
 | `/api/videos` | GET, POST | Session |
 | `/api/videos/[id]` | GET, PUT, DELETE | Session |
 | `/api/users` | GET, PATCH | Admin |
+| `/api/menu` | GET, POST | Moderator+ |
+| `/api/menu/[id]` | PUT, DELETE | Moderator+ |
+| `/api/menu/reorder` | POST | Moderator+ — bulk sort_order update |
+| `/api/profile` | GET, PATCH | Session — update own name/bio |
 | `/api/upload` | POST | Session — saves to `public/uploads/`, 8MB max |
 | `/api/auth/[...all]` | GET, POST | Better Auth handler |
 

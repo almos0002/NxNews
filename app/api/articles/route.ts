@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       content_ne: (content_ne ?? "").trim(),
       category: category ?? "",
       tags: Array.isArray(tags) ? tags : [],
-      status: ["draft", "published", "archived"].includes(status) ? status : "draft",
+      status: ["draft", "review", "published", "archived"].includes(status) ? status : "draft",
       featured_image: (featured_image ?? "").trim(),
       author_id: session.user.id,
     });

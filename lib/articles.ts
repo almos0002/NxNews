@@ -11,7 +11,7 @@ export interface Article {
   content_ne: string;
   category: string;
   tags: string[];
-  status: "draft" | "published" | "archived";
+  status: "draft" | "review" | "published" | "archived";
   featured_image: string;
   author_id: string | null;
   published_at: Date | null;
@@ -90,7 +90,7 @@ export interface ArticleInput {
   content_ne: string;
   category: string;
   tags: string[];
-  status: "draft" | "published" | "archived";
+  status: "draft" | "review" | "published" | "archived";
   featured_image: string;
   author_id: string;
 }
@@ -159,7 +159,7 @@ export async function countByStatus(authorId?: string): Promise<Record<string, n
      GROUP BY status`,
     authorId ? [authorId] : []
   );
-  const counts: Record<string, number> = { all: 0, draft: 0, published: 0, archived: 0 };
+  const counts: Record<string, number> = { all: 0, draft: 0, review: 0, published: 0, archived: 0 };
   for (const r of rows) {
     counts[r.status] = parseInt(r.cnt, 10);
     counts.all += parseInt(r.cnt, 10);
