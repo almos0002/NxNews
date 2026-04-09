@@ -107,15 +107,15 @@
 
 /* ── Wavy black bottom strip (flipped, irregular wave pointing downward) ── */
 .strip {
-  height: 28px;
+  height: 42px;
   background-color: #111111;
   /* Flat top, irregular wavy bottom — long/tall and short/small waves mixed */
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 28' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L200%2C0 L200%2C8 C192%2C28 178%2C28 170%2C8 C163%2C0 157%2C0 150%2C8 C144%2C16 138%2C16 132%2C8 C127%2C0 122%2C0 116%2C8 C107%2C28 93%2C28 84%2C8 C76%2C0 68%2C0 60%2C8 C52%2C22 44%2C22 36%2C8 C30%2C0 24%2C0 18%2C8 C11%2C28 5%2C28 0%2C8 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 28' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L200%2C0 L200%2C8 C192%2C28 178%2C28 170%2C8 C163%2C0 157%2C0 150%2C8 C144%2C16 138%2C16 132%2C8 C127%2C0 122%2C0 116%2C8 C107%2C28 93%2C28 84%2C8 C76%2C0 68%2C0 60%2C8 C52%2C22 44%2C22 36%2C8 C30%2C0 24%2C0 18%2C8 C11%2C28 5%2C28 0%2C8 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 42' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L200%2C0 L200%2C12 C192%2C42 178%2C42 170%2C12 C163%2C0 157%2C0 150%2C12 C144%2C24 138%2C24 132%2C12 C127%2C0 122%2C0 116%2C12 C107%2C42 93%2C42 84%2C12 C76%2C0 68%2C0 60%2C12 C52%2C33 44%2C33 36%2C12 C30%2C0 24%2C0 18%2C12 C11%2C42 5%2C42 0%2C12 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 42' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L200%2C0 L200%2C12 C192%2C42 178%2C42 170%2C12 C163%2C0 157%2C0 150%2C12 C144%2C24 138%2C24 132%2C12 C127%2C0 122%2C0 116%2C12 C107%2C42 93%2C42 84%2C12 C76%2C0 68%2C0 60%2C12 C52%2C33 44%2C33 36%2C12 C30%2C0 24%2C0 18%2C12 C11%2C42 5%2C42 0%2C12 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
   -webkit-mask-repeat: repeat-x;
   mask-repeat: repeat-x;
-  -webkit-mask-size: 200px 28px;
-  mask-size: 200px 28px;
+  -webkit-mask-size: 200px 42px;
+  mask-size: 200px 42px;
 }
 
 @keyframes marquee {
