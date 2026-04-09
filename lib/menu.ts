@@ -2,7 +2,7 @@ import { pool } from "./db";
 
 export interface MenuItem {
   id: string;
-  menu_type: "navbar" | "footer";
+  menu_type: "navbar" | "footer" | "bottom";
   label_en: string;
   label_ne: string;
   link_type: "page" | "external";
@@ -52,6 +52,10 @@ export async function getFooterSections(): Promise<FooterSection[]> {
 
 export async function getNavbarItems(): Promise<MenuItem[]> {
   return listMenuItems("navbar");
+}
+
+export async function getBottomItems(): Promise<MenuItem[]> {
+  return listMenuItems("bottom");
 }
 
 export async function createMenuItem(data: Omit<MenuItem, "id" | "created_at" | "page_slug" | "page_title_en">): Promise<MenuItem> {

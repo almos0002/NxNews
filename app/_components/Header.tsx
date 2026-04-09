@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { categories } from "@/app/_data/articles";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
+import { getNavbarItems } from "@/lib/menu";
 import LanguageSwitcher from "./LanguageSwitcher";
 import MobileNav from "./MobileNav";
 import styles from "./Header.module.css";
@@ -18,19 +19,20 @@ export default async function Header() {
     // DB unavailable — render unauthenticated state
   }
 
+  const navItems = await getNavbarItems().catch(() => []);
+  const hasManagedNav = navItems.length > 0;
+
   const catKeys: Record<string, string> = {
-    World: "world",
-    Politics: "politics",
-    Business: "business",
-    Technology: "technology",
-    Science: "science",
-    Culture: "culture",
-    Opinion: "opinion",
-    Sports: "sports",
-    Videos: "videos",
-    Weather: "weather",
-    Entertainment: "entertainment",
+    World: "world", Politics: "politics", Business: "business",
+    Technology: "technology", Science: "science", Culture: "culture",
+    Opinion: "opinion", Sports: "sports", Videos: "videos",
+    Weather: "weather", Entertainment: "entertainment",
   };
+
+  function resolveHref(item: { link_type: string; url: string; page_slug?: string }): string {
+    if (item.link_type === "page") return item.page_slug ? `/${item.page_slug}` : "#";
+    return item.url || "#";
+  }
 
   return (
     <header className={styles.header}>
@@ -77,16 +79,39 @@ export default async function Header() {
       <div className={styles.navRow}>
         <nav className={styles.nav} aria-label="Main navigation">
           <ul className={styles.navList}>
-            {categories.map((cat) => (
-              <li key={cat}>
-                <Link
-                  href={`/${cat.toLowerCase()}`}
-                  className={styles.navLink}
-                >
-                  {t(catKeys[cat] ?? cat.toLowerCase())}
-                </Link>
-              </li>
-            ))}
+            {hasManagedNav ? (
+              navItems.map((item) => {
+                const href = resolveHref(item);
+                const isExternal = item.link_type === "external" && (href.startsWith("http") || href.startsWith("//"));
+                return (
+                  <li key={item.id}>
+                    {isExternal || item.open_new_tab ? (
+                      <a
+                        href={href}
+                        className={styles.navLink}
+                        target={item.open_new_tab ? "_blank" : undefined}
+                        rel="noopener noreferrer"
+                      >
+                        {item.label_en}
+                      </a>
+                    ) : (
+                      <Link href={href as Parameters<typeof Link>[0]["href"]} className={styles.navLink}>
+                        {item.label_en}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })
+            ) : (
+              /* Fallback to hardcoded categories when no navbar links configured */
+              categories.map((cat) => (
+                <li key={cat}>
+                  <Link href={`/${cat.toLowerCase()}`} className={styles.navLink}>
+                    {t(catKeys[cat] ?? cat.toLowerCase())}
+                  </Link>
+                </li>
+              ))
+            )}
           </ul>
         </nav>
       </div>

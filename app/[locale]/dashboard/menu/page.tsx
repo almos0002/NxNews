@@ -22,12 +22,14 @@ export default async function MenuPage() {
 
   const navbar = allItems.filter((it) => it.menu_type === "navbar");
   const footer = allItems.filter((it) => it.menu_type === "footer");
+  const bottom = allItems.filter((it) => it.menu_type === "bottom");
   const publishedPages = pages.filter((p) => p.status === "published");
 
   return (
     <MenuClient
       initialNavbar={navbar}
       initialFooter={footer}
+      initialBottom={bottom}
       pages={publishedPages.map((p) => ({ id: p.id, slug: p.slug, title_en: p.title_en }))}
     />
   );
