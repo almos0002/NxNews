@@ -36,6 +36,64 @@
   flex-shrink: 0;
 }
 
+.signInLink {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+  padding: 7px 16px;
+  border-radius: var(--radius);
+  transition: border-color 0.15s ease, color 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.signInLink:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.userBtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: none;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 5px 12px 5px 5px;
+  transition: border-color 0.15s ease;
+}
+
+.userBtn:hover {
+  border-color: var(--color-accent);
+}
+
+.userAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userName {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .subscribeLink {
   font-family: var(--font-sans);
   font-size: 0.8rem;
