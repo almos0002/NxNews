@@ -8,6 +8,21 @@ interface Props {
   initialAds: AdSlotConfig[];
 }
 
+function ToggleSwitch({ enabled, busy, onToggle }: { enabled: boolean; busy: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      className={`${styles.toggleSwitch} ${enabled ? styles.toggleSwitchOn : styles.toggleSwitchOff}`}
+      onClick={onToggle}
+      disabled={busy}
+      aria-pressed={enabled}
+      aria-label={enabled ? "Disable ad slot" : "Enable ad slot"}
+    >
+      <span className={styles.toggleThumb} />
+    </button>
+  );
+}
+
 export default function AdsClient({ initialAds }: Props) {
   const [ads, setAds] = useState(initialAds);
   const [editSlot, setEditSlot] = useState<string | null>(null);
@@ -25,9 +40,14 @@ export default function AdsClient({ initialAds }: Props) {
         body: JSON.stringify({ enabled: !current }),
       });
       const data = await res.json();
-      if (!res.ok) { setMsg(data.error ?? "Failed"); return; }
-      setAds((p) => p.map((a) => a.slot === slot ? { ...a, enabled: !current } : a));
-    } finally { setSaving(null); }
+      if (!res.ok) {
+        setMsg(data.error ?? "Failed");
+        return;
+      }
+      setAds((p) => p.map((a) => (a.slot === slot ? { ...a, enabled: !current } : a)));
+    } finally {
+      setSaving(null);
+    }
   }
 
   function openEdit(ad: AdSlotConfig) {
@@ -47,11 +67,16 @@ export default function AdsClient({ initialAds }: Props) {
         body: JSON.stringify({ code: editCode }),
       });
       const data = await res.json();
-      if (!res.ok) { setMsg(data.error ?? "Failed"); return; }
-      setAds((p) => p.map((a) => a.slot === editSlot ? { ...a, code: editCode } : a));
+      if (!res.ok) {
+        setMsg(data.error ?? "Failed");
+        return;
+      }
+      setAds((p) => p.map((a) => (a.slot === editSlot ? { ...a, code: editCode } : a)));
       setEditSlot(null);
       setMsg("Saved successfully.");
-    } finally { setSaving(null); }
+    } finally {
+      setSaving(null);
+    }
   }
 
   return (
@@ -64,23 +89,18 @@ export default function AdsClient({ initialAds }: Props) {
         </p>
       </div>
 
-      {msg && (
-        <div className={styles.successBanner} style={{ marginBottom: 16 }}>{msg}</div>
-      )}
+      {msg && <div className={styles.successBanner} style={{ marginBottom: 16 }}>{msg}</div>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {ads.map((ad) => (
           <div key={ad.slot} className={styles.tableCard} style={{ padding: 20 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <button
-                  className={ad.enabled ? styles.publishBtn : styles.draftBtn}
-                  onClick={() => toggleEnabled(ad.slot, ad.enabled)}
-                  disabled={saving === ad.slot}
-                  style={{ minWidth: 90 }}
-                >
-                  {saving === ad.slot ? "…" : ad.enabled ? "Enabled" : "Disabled"}
-                </button>
+                <ToggleSwitch
+                  enabled={ad.enabled}
+                  busy={saving === ad.slot}
+                  onToggle={() => toggleEnabled(ad.slot, ad.enabled)}
+                />
                 <div>
                   <strong style={{ fontSize: "0.95rem" }}>{ad.label}</strong>
                   <div style={{ fontSize: "0.78rem", color: "var(--color-ink-muted)", fontFamily: "monospace", marginTop: 2 }}>
