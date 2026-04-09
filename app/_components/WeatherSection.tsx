@@ -1,9 +1,18 @@
 import { getTranslations } from "next-intl/server";
+import { fetchWeatherAll } from "@/app/_data/fetchWeather";
 import { weatherData } from "@/app/_data/weather";
 import styles from "./WeatherSection.module.css";
 
 export default async function WeatherSection() {
   const t = await getTranslations("home");
+
+  let cities = weatherData;
+  try {
+    const live = await fetchWeatherAll();
+    if (live.length > 0) cities = live;
+  } catch {
+    // fallback to static data silently
+  }
 
   return (
     <section className={styles.wrapper}>
@@ -14,7 +23,7 @@ export default async function WeatherSection() {
       </div>
 
       <div className={styles.strip}>
-        {weatherData.map((city) => (
+        {cities.map((city) => (
           <div key={city.city} className={styles.card}>
             <div className={styles.cardTop}>
               <div>
