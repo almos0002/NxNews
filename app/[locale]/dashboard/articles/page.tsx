@@ -4,10 +4,6 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { listArticles, countByStatus } from "@/lib/articles";
 import Link from "next/link";
-import Header from "@/app/_components/Header";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Footer from "@/app/_components/Footer";
-import { breakingHeadline } from "@/app/_data/articles";
 import ArticleListClient from "@/app/_components/ArticleListClient";
 import styles from "./articles.module.css";
 
@@ -33,31 +29,25 @@ export default async function ArticlesPage({
   ]);
 
   return (
-    <>
-      <BreakingTicker headline={breakingHeadline} />
-      <Header />
-      <div className={styles.page}>
-        {/* Page header */}
-        <div className={styles.pageHeader}>
-          <div className={styles.pageHeaderLeft}>
-            <Link href="/en/dashboard" className={styles.breadcrumb}>
-              ← Dashboard
-            </Link>
-            <h1 className={styles.pageTitle}>Articles</h1>
-          </div>
-          <Link href="/en/dashboard/articles/new" className={styles.newBtn}>
-            + New Article
+    <div className={styles.page}>
+      <div className={styles.pageHeader}>
+        <div className={styles.pageHeaderLeft}>
+          <Link href="/en/dashboard" className={styles.breadcrumb}>
+            ← Dashboard
           </Link>
+          <h1 className={styles.pageTitle}>Articles</h1>
         </div>
-
-        <ArticleListClient
-          initialArticles={articles}
-          counts={counts}
-          currentStatus={status}
-          currentSearch={search ?? ""}
-        />
+        <Link href="/en/dashboard/articles/new" className={styles.newBtn}>
+          + New Article
+        </Link>
       </div>
-      <Footer />
-    </>
+
+      <ArticleListClient
+        initialArticles={articles}
+        counts={counts}
+        currentStatus={status}
+        currentSearch={search ?? ""}
+      />
+    </div>
   );
 }

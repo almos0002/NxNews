@@ -3,13 +3,44 @@
 import { useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth-client";
 
-export default function SignOutButton() {
+interface Props {
+  variant?: "light" | "dark";
+}
+
+export default function SignOutButton({ variant = "light" }: Props) {
   const router = useRouter();
 
   async function handleSignOut() {
     await signOut();
     router.push("/en/login");
     router.refresh();
+  }
+
+  if (variant === "dark") {
+    return (
+      <button
+        onClick={handleSignOut}
+        style={{
+          background: "transparent",
+          border: "none",
+          fontFamily: "Georgia, serif",
+          fontSize: "0.83rem",
+          color: "#5c6880",
+          cursor: "pointer",
+          padding: 0,
+          transition: "color 0.12s ease",
+          textAlign: "left",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.color = "#e05c6a";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.color = "#5c6880";
+        }}
+      >
+        Sign out
+      </button>
+    );
   }
 
   return (

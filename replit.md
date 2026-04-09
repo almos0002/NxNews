@@ -32,6 +32,8 @@ app/
     login/                # Login page (Server Component + LoginForm client)
     signup/               # Sign-up page (Server Component + SignupForm client)
     dashboard/            # Protected dashboard (RBAC: admin/moderator/author/user)
+      layout.tsx          # Isolated dashboard shell (dark sidebar, no public Header/Footer)
+      layout.module.css
   _components/            # Shared components
     Header.tsx            # Sticky nav — auth-aware Sign In / user avatar
     Footer.tsx

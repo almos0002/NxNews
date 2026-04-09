@@ -1,75 +1,41 @@
-/* ── Layout ─────────────────────────────────────── */
-.layout {
+/* ── Dashboard overview page ─────────────────── */
+.page {
+  padding: 36px 40px 56px;
   display: flex;
-  min-height: calc(100vh - 160px);
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 32px 20px;
+  flex-direction: column;
   gap: 28px;
+  max-width: 1080px;
+}
+
+/* ── Page header ─────────────────────────────── */
+.pageHeader {
+  display: flex;
   align-items: flex-start;
-}
-
-/* ── Sidebar ─────────────────────────────────────── */
-.sidebar {
-  flex: 0 0 240px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 24px 0;
-  position: sticky;
-  top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 0 20px 20px;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--color-border);
 }
 
-.avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  color: #fff;
+.pageGreeting {
   font-family: var(--font-serif);
-  font-size: 1.4rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--color-ink-muted);
+  margin-bottom: 4px;
 }
 
-.profileInfo {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.profileName {
+.pageTitle {
   font-family: var(--font-serif);
-  font-size: 0.9rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: var(--color-ink);
+  letter-spacing: -0.02em;
 }
 
-.profileEmail {
-  font-family: var(--font-serif);
-  font-size: 0.75rem;
-  color: var(--color-ink-muted);
-  word-break: break-all;
-}
-
+/* ── Role badge ──────────────────────────────── */
 .roleBadge {
   display: inline-block;
-  padding: 2px 10px;
+  padding: 3px 12px;
   border-radius: 20px;
   font-family: var(--font-serif);
   font-size: 0.72rem;
@@ -77,68 +43,63 @@
   color: #fff;
   letter-spacing: 0.03em;
   text-transform: uppercase;
+  margin-top: 4px;
 }
 
-/* ── Nav ─────────────────────────────────────────── */
-.nav {
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
+/* ── Stats grid ──────────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
 }
 
-.navLabel {
+.statCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.statCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--color-accent);
+  opacity: 0.5;
+}
+
+.statLabel {
   font-family: var(--font-serif);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--color-ink-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0 8px;
-  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
 }
 
-.navLink {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: 6px;
+.statValue {
   font-family: var(--font-serif);
-  font-size: 0.85rem;
-  color: var(--color-ink-secondary);
-  text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.navLink:hover,
-.navLink.active {
-  background: var(--color-tag-bg);
+  font-size: 2rem;
+  font-weight: 700;
   color: var(--color-ink);
+  line-height: 1;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
 }
 
-.navLink.active {
-  font-weight: 600;
-  color: var(--color-accent);
+.statSub {
+  font-family: var(--font-serif);
+  font-size: 0.74rem;
+  color: var(--color-ink-muted);
 }
 
-.sidebarFooter {
-  padding: 16px 20px 0;
-  border-top: 1px solid var(--color-border);
-  margin-top: auto;
-}
-
-/* ── Main ────────────────────────────────────────── */
-.main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-/* ── Section ─────────────────────────────────────── */
+/* ── Section ─────────────────────────────────── */
 .section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -155,7 +116,7 @@
 
 .sectionTitle {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-ink);
   letter-spacing: -0.01em;
@@ -166,46 +127,7 @@
   margin-bottom: 0;
 }
 
-/* ── Stats grid ──────────────────────────────────── */
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-}
-
-.statCard {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 16px 18px;
-}
-
-.statLabel {
-  font-family: var(--font-serif);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-ink-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 6px;
-}
-
-.statValue {
-  font-family: var(--font-serif);
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--color-ink);
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.statSub {
-  font-family: var(--font-serif);
-  font-size: 0.75rem;
-  color: var(--color-ink-muted);
-}
-
-/* ── Profile card ────────────────────────────────── */
+/* ── Profile card ────────────────────────────── */
 .profileCard {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -219,15 +141,13 @@
   gap: 20px;
 }
 
-.profileCardField {}
-
 .fieldLabel {
   font-family: var(--font-serif);
-  font-size: 0.73rem;
+  font-size: 0.71rem;
   font-weight: 700;
   color: var(--color-ink-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   display: block;
   margin-bottom: 4px;
 }
@@ -238,7 +158,7 @@
   color: var(--color-ink);
 }
 
-/* ── Action button ───────────────────────────────── */
+/* ── Action button ───────────────────────────── */
 .actionBtn {
   font-family: var(--font-serif);
   font-size: 0.82rem;
@@ -249,6 +169,8 @@
   border-radius: var(--radius);
   padding: 8px 16px;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
   transition: background 0.15s ease;
 }
 
@@ -256,7 +178,7 @@
   background: var(--color-accent-hover);
 }
 
-/* ── Table ───────────────────────────────────────── */
+/* ── Table ───────────────────────────────────── */
 .tableWrap {
   overflow-x: auto;
   border-radius: 8px;
@@ -294,8 +216,8 @@
   border-bottom: none;
 }
 
-.table tr:hover td {
-  background: var(--color-tag-bg);
+.table tbody tr:hover td {
+  background: var(--color-bg);
 }
 
 .emptyRow {
@@ -305,7 +227,7 @@
   font-style: italic;
 }
 
-/* ── Role select ─────────────────────────────────── */
+/* ── Role select ─────────────────────────────── */
 .roleSelect {
   font-family: var(--font-serif);
   font-size: 0.82rem;
@@ -322,50 +244,18 @@
   border-color: var(--color-accent);
 }
 
-/* ── Responsive ──────────────────────────────────── */
+/* ── Responsive ──────────────────────────────── */
 @media (max-width: 900px) {
-  .layout {
-    flex-direction: column;
+  .page {
+    padding: 24px 20px 48px;
   }
+}
 
-  .sidebar {
-    flex: none;
-    width: 100%;
-    position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 16px;
-    gap: 12px;
+@media (max-width: 600px) {
+  .page {
+    padding: 20px 16px 40px;
   }
-
-  .profile {
-    flex-direction: row;
-    align-items: center;
-    border-bottom: none;
-    padding: 0;
-    text-align: left;
-  }
-
-  .profileInfo {
-    text-align: left;
-  }
-
-  .nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 0;
-    border-top: 1px solid var(--color-border);
-    padding-top: 12px;
-    width: 100%;
-    gap: 4px;
-  }
-
-  .navLabel {
-    display: none;
-  }
-
-  .sidebarFooter {
-    border-top: none;
-    padding: 0;
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
   }
 }

@@ -3,10 +3,6 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getArticleById } from "@/lib/articles";
-import Header from "@/app/_components/Header";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Footer from "@/app/_components/Footer";
-import { breakingHeadline } from "@/app/_data/articles";
 import ArticleEditor from "@/app/_components/ArticleEditor";
 
 export const metadata: Metadata = { title: "Edit Article — KumariHub Dashboard" };
@@ -22,28 +18,23 @@ export default async function EditArticlePage({ params }: Ctx) {
   if (!article) notFound();
 
   return (
-    <>
-      <BreakingTicker headline={breakingHeadline} />
-      <Header />
-      <ArticleEditor
-        authorId={session.user.id}
-        backHref="/en/dashboard/articles"
-        initial={{
-          id: article.id,
-          title_en: article.title_en,
-          title_ne: article.title_ne,
-          slug: article.slug,
-          excerpt_en: article.excerpt_en,
-          excerpt_ne: article.excerpt_ne,
-          content_en: article.content_en,
-          content_ne: article.content_ne,
-          category: article.category,
-          tags: article.tags,
-          status: article.status,
-          featured_image: article.featured_image,
-        }}
-      />
-      <Footer />
-    </>
+    <ArticleEditor
+      authorId={session.user.id}
+      backHref="/en/dashboard/articles"
+      initial={{
+        id: article.id,
+        title_en: article.title_en,
+        title_ne: article.title_ne,
+        slug: article.slug,
+        excerpt_en: article.excerpt_en,
+        excerpt_ne: article.excerpt_ne,
+        content_en: article.content_en,
+        content_ne: article.content_ne,
+        category: article.category,
+        tags: article.tags,
+        status: article.status,
+        featured_image: article.featured_image,
+      }}
+    />
   );
 }
