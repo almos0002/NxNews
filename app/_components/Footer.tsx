@@ -11,11 +11,9 @@ export default async function Footer() {
     getBottomItems().catch(() => []),
   ]);
 
-  const hasManagedFooter = sections.length > 0;
-  const hasManagedBottom = bottomItems.length > 0;
-
   function resolveHref(item: { link_type: string; url: string; page_slug?: string }): string {
     if (item.link_type === "page") return item.page_slug ? `/${item.page_slug}` : "#";
+    if (item.link_type === "category") return `/${item.url}`;
     return item.url || "#";
   }
 
@@ -49,10 +47,9 @@ export default async function Footer() {
             <p className={styles.description}>{t("description")}</p>
           </div>
 
-          <div className={styles.links}>
-            {hasManagedFooter ? (
-              /* Dynamic footer sections from database */
-              sections.map((section) => (
+          {sections.length > 0 && (
+            <div className={styles.links}>
+              {sections.map((section) => (
                 <div key={section.label_en || "unsectioned"} className={styles.column}>
                   {section.label_en && (
                     <h3 className={styles.columnTitle}>{section.label_en}</h3>
@@ -63,49 +60,21 @@ export default async function Footer() {
                     ))}
                   </ul>
                 </div>
-              ))
-            ) : (
-              /* Fallback static columns */
-              <>
-                <div className={styles.column}>
-                  <h3 className={styles.columnTitle}>{t("sections")}</h3>
-                  <ul className={styles.linkList}>
-                    <li><Link href="/world">World</Link></li>
-                    <li><Link href="/politics">Politics</Link></li>
-                    <li><Link href="/business">Business</Link></li>
-                    <li><Link href="/technology">Technology</Link></li>
-                    <li><Link href="/science">Science</Link></li>
-                  </ul>
-                </div>
-                <div className={styles.column}>
-                  <h3 className={styles.columnTitle}>{t("company")}</h3>
-                  <ul className={styles.linkList}>
-                    <li><Link href="/about">{t("about")}</Link></li>
-                    <li><Link href="/careers">{t("careers")}</Link></li>
-                    <li><Link href="/contact">{t("contact")}</Link></li>
-                  </ul>
-                </div>
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Bottom bar */}
         <div className={styles.bottom}>
           <span>{t("copyright")}</span>
-          <div className={styles.bottomLinks}>
-            {hasManagedBottom ? (
-              bottomItems.map((item) => (
+          {bottomItems.length > 0 && (
+            <div className={styles.bottomLinks}>
+              {bottomItems.map((item) => (
                 <span key={item.id}>{renderLink(item)}</span>
-              ))
-            ) : (
-              <>
-                <Link href="/privacy">{t("privacy")}</Link>
-                <Link href="/terms">{t("terms")}</Link>
-                <Link href="/cookies">{t("cookies")}</Link>
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </footer>

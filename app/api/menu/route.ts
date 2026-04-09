@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     if (!["navbar", "footer", "bottom"].includes(menu_type)) return NextResponse.json({ error: "Invalid menu_type" }, { status: 400 });
     if (!label_en?.trim()) return NextResponse.json({ error: "English label required" }, { status: 400 });
     if (link_type === "external" && !url?.trim()) return NextResponse.json({ error: "URL required for external links" }, { status: 400 });
+    if (link_type === "category" && !url?.trim()) return NextResponse.json({ error: "Category slug required" }, { status: 400 });
 
     const item = await createMenuItem({
       menu_type, label_en: label_en.trim(), label_ne: (label_ne ?? "").trim(),

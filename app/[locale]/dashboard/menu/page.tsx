@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { listMenuItems } from "@/lib/menu";
 import { listPages } from "@/lib/pages";
+import { categories as hardcodedCategories } from "@/app/_data/articles";
 import MenuClient from "@/app/_components/MenuClient";
 
 export const metadata: Metadata = { title: "Menu Manager — KumariHub Dashboard" };
@@ -25,12 +26,18 @@ export default async function MenuPage() {
   const bottom = allItems.filter((it) => it.menu_type === "bottom");
   const publishedPages = pages.filter((p) => p.status === "published");
 
+  const categories = hardcodedCategories.map((c) => ({
+    slug: c.toLowerCase(),
+    label: c,
+  }));
+
   return (
     <MenuClient
       initialNavbar={navbar}
       initialFooter={footer}
       initialBottom={bottom}
       pages={publishedPages.map((p) => ({ id: p.id, slug: p.slug, title_en: p.title_en }))}
+      categories={categories}
     />
   );
 }

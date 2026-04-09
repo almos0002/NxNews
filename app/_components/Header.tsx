@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
-import { categories } from "@/app/_data/articles";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { getNavbarItems } from "@/lib/menu";
@@ -20,17 +19,10 @@ export default async function Header() {
   }
 
   const navItems = await getNavbarItems().catch(() => []);
-  const hasManagedNav = navItems.length > 0;
-
-  const catKeys: Record<string, string> = {
-    World: "world", Politics: "politics", Business: "business",
-    Technology: "technology", Science: "science", Culture: "culture",
-    Opinion: "opinion", Sports: "sports", Videos: "videos",
-    Weather: "weather", Entertainment: "entertainment",
-  };
 
   function resolveHref(item: { link_type: string; url: string; page_slug?: string }): string {
     if (item.link_type === "page") return item.page_slug ? `/${item.page_slug}` : "#";
+    if (item.link_type === "category") return `/${item.url}`;
     return item.url || "#";
   }
 
@@ -76,11 +68,11 @@ export default async function Header() {
       </div>
 
       {/* ── Row 2: navigation ── */}
-      <div className={styles.navRow}>
-        <nav className={styles.nav} aria-label="Main navigation">
-          <ul className={styles.navList}>
-            {hasManagedNav ? (
-              navItems.map((item) => {
+      {navItems.length > 0 && (
+        <div className={styles.navRow}>
+          <nav className={styles.nav} aria-label="Main navigation">
+            <ul className={styles.navList}>
+              {navItems.map((item) => {
                 const href = resolveHref(item);
                 const isExternal = item.link_type === "external" && (href.startsWith("http") || href.startsWith("//"));
                 return (
@@ -101,20 +93,11 @@ export default async function Header() {
                     )}
                   </li>
                 );
-              })
-            ) : (
-              /* Fallback to hardcoded categories when no navbar links configured */
-              categories.map((cat) => (
-                <li key={cat}>
-                  <Link href={`/${cat.toLowerCase()}`} className={styles.navLink}>
-                    {t(catKeys[cat] ?? cat.toLowerCase())}
-                  </Link>
-                </li>
-              ))
-            )}
-          </ul>
-        </nav>
-      </div>
+              })}
+            </ul>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

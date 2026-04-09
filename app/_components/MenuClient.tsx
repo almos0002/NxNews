@@ -6,6 +6,7 @@ import styles from "./cms.module.css";
 import type { MenuItem } from "@/lib/menu";
 
 interface PageOpt { id: string; slug: string; title_en: string; }
+interface CategoryOpt { slug: string; label: string; }
 
 type MenuTab = "navbar" | "footer" | "bottom";
 
@@ -14,16 +15,17 @@ interface Props {
   initialFooter: MenuItem[];
   initialBottom: MenuItem[];
   pages: PageOpt[];
+  categories: CategoryOpt[];
 }
 
 const EMPTY_FORM = {
   label_en: "", label_ne: "",
-  link_type: "external" as "page" | "external",
+  link_type: "category" as "page" | "external" | "category",
   page_id: "", url: "", open_new_tab: false,
   section_label_en: "", section_label_ne: "",
 };
 
-export default function MenuClient({ initialNavbar, initialFooter, initialBottom, pages }: Props) {
+export default function MenuClient({ initialNavbar, initialFooter, initialBottom, pages, categories }: Props) {
   const [tab, setTab] = useState<MenuTab>("navbar");
 
   const [navbar, setNavbar] = useState(initialNavbar);
@@ -91,6 +93,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
     if (!form.label_en.trim()) { setErr("English label is required"); return; }
     if (form.link_type === "external" && !form.url.trim()) { setErr("URL is required for external links"); return; }
     if (form.link_type === "page" && !form.page_id) { setErr("Please select a page"); return; }
+    if (form.link_type === "category" && !form.url.trim()) { setErr("Please select a category"); return; }
     setSaving(true); setErr("");
     try {
       const payload = {
@@ -98,7 +101,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
         label_en: form.label_en.trim(), label_ne: form.label_ne.trim(),
         link_type: form.link_type,
         page_id: form.link_type === "page" ? form.page_id : null,
-        url: form.link_type === "external" ? form.url.trim() : "",
+        url: form.link_type === "external" ? form.url.trim() : form.link_type === "category" ? form.url.trim() : "",
         open_new_tab: form.open_new_tab,
         sort_order: items.length,
         section_label_en: form.section_label_en.trim(),
@@ -124,7 +127,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
         label_en: editForm.label_en.trim(), label_ne: editForm.label_ne.trim(),
         link_type: editForm.link_type,
         page_id: editForm.link_type === "page" ? editForm.page_id : null,
-        url: editForm.link_type === "external" ? editForm.url.trim() : "",
+        url: editForm.link_type === "external" ? editForm.url.trim() : editForm.link_type === "category" ? editForm.url.trim() : "",
         open_new_tab: editForm.open_new_tab,
         section_label_en: editForm.section_label_en.trim(),
         section_label_ne: editForm.section_label_ne.trim(),
@@ -202,6 +205,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
               editForm={editForm}
               setEF={setEF}
               pages={pages}
+              categories={categories}
               saving={saving}
               onEdit={openEdit}
               onDelete={deleteItem}
@@ -222,7 +226,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                 These links appear in the thin bar at the very bottom of the footer (e.g. Privacy, Terms, Cookies).
               </p>
             )}
-            <LinkForm form={addForm} setF={setAF} pages={pages} saving={saving} onSave={() => submitAdd()} showSectionPicker={false} />
+            <LinkForm form={addForm} setF={setAF} pages={pages} categories={categories} saving={saving} onSave={() => submitAdd()} showSectionPicker={false} />
           </div>
         </div>
       )}
@@ -255,7 +259,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                             <tr key={it.id}>
                               {editId === it.id ? (
                                 <td colSpan={4} style={{ padding: "12px 14px" }}>
-                                  <LinkForm form={editForm} setF={setEF} pages={pages} saving={saving}
+                                  <LinkForm form={editForm} setF={setEF} pages={pages} categories={categories} saving={saving}
                                     onSave={submitEdit} onCancel={cancelEdit}
                                     showSectionPicker sectionOptions={sectionKeys} isEdit />
                                 </td>
@@ -312,7 +316,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                 </div>
               )}
 
-              <LinkForm form={addForm} setF={setAF} pages={pages} saving={saving}
+              <LinkForm form={addForm} setF={setAF} pages={pages} categories={categories} saving={saving}
                 onSave={() => submitAdd(addForm.section_label_en, addForm.section_label_ne)}
                 showSectionPicker={false} />
             </div>
@@ -365,10 +369,10 @@ function SortButtons({ idx, total, onMove }: { idx: number; total: number; onMov
 }
 
 /* ─── Flat list for navbar and bottom bar ─── */
-function FlatList({ items, editId, editForm, setEF, pages, saving, onEdit, onDelete, onMove, onSaveEdit, onCancelEdit, resolveUrl }: {
+function FlatList({ items, editId, editForm, setEF, pages, categories, saving, onEdit, onDelete, onMove, onSaveEdit, onCancelEdit, resolveUrl }: {
   items: MenuItem[]; editId: string | null;
   editForm: typeof EMPTY_FORM; setEF: <K extends keyof typeof EMPTY_FORM>(k: K, v: typeof EMPTY_FORM[K]) => void;
-  pages: PageOpt[]; saving: boolean;
+  pages: PageOpt[]; categories: CategoryOpt[]; saving: boolean;
   onEdit: (it: MenuItem) => void; onDelete: (id: string) => void;
   onMove: (idx: number, dir: -1 | 1) => void;
   onSaveEdit: () => void; onCancelEdit: () => void;
@@ -387,7 +391,7 @@ function FlatList({ items, editId, editForm, setEF, pages, saving, onEdit, onDel
             <tr key={it.id}>
               {editId === it.id ? (
                 <td colSpan={4} style={{ padding: "12px 14px" }}>
-                  <LinkForm form={editForm} setF={setEF} pages={pages} saving={saving}
+                  <LinkForm form={editForm} setF={setEF} pages={pages} categories={categories} saving={saving}
                     onSave={onSaveEdit} onCancel={onCancelEdit} showSectionPicker={false} isEdit />
                 </td>
               ) : (
@@ -420,10 +424,10 @@ function FlatList({ items, editId, editForm, setEF, pages, saving, onEdit, onDel
 }
 
 /* ─── Shared link form ─── */
-function LinkForm({ form, setF, pages, saving, onSave, onCancel, showSectionPicker, sectionOptions = [], isEdit = false }: {
+function LinkForm({ form, setF, pages, categories, saving, onSave, onCancel, showSectionPicker, sectionOptions = [], isEdit = false }: {
   form: typeof EMPTY_FORM;
   setF: <K extends keyof typeof EMPTY_FORM>(k: K, v: typeof EMPTY_FORM[K]) => void;
-  pages: PageOpt[]; saving: boolean;
+  pages: PageOpt[]; categories: CategoryOpt[]; saving: boolean;
   onSave: () => void; onCancel?: () => void;
   showSectionPicker: boolean; sectionOptions?: string[]; isEdit?: boolean;
 }) {
@@ -452,13 +456,27 @@ function LinkForm({ form, setF, pages, saving, onSave, onCancel, showSectionPick
         <div className={styles.field}>
           <label className={styles.label}>Link Type</label>
           <select className={styles.select} value={form.link_type}
-            onChange={(e) => setF("link_type", e.target.value as "page" | "external")}>
+            onChange={(e) => setF("link_type", e.target.value as "page" | "external" | "category")}>
+            <option value="category">Category</option>
             <option value="page">CMS Page</option>
             <option value="external">External URL</option>
           </select>
         </div>
         <div className={styles.field}>
-          {form.link_type === "page" ? (
+          {form.link_type === "category" ? (
+            <>
+              <label className={styles.label}>Select Category *</label>
+              <select className={styles.select} value={form.url}
+                onChange={(e) => {
+                  const cat = categories.find(c => c.slug === e.target.value);
+                  setF("url", e.target.value);
+                  if (cat && !form.label_en) setF("label_en", cat.label);
+                }}>
+                <option value="">— choose a category —</option>
+                {categories.map((c) => <option key={c.slug} value={c.slug}>{c.label} (/{c.slug})</option>)}
+              </select>
+            </>
+          ) : form.link_type === "page" ? (
             <>
               <label className={styles.label}>Select Page *</label>
               {pages.length === 0 ? (

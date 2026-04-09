@@ -5,7 +5,7 @@ export interface MenuItem {
   menu_type: "navbar" | "footer" | "bottom";
   label_en: string;
   label_ne: string;
-  link_type: "page" | "external";
+  link_type: "page" | "external" | "category";
   page_id: string | null;
   url: string;
   sort_order: number;
