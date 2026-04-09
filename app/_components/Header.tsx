@@ -1,15 +1,19 @@
 import Image from "next/image";
 import { headers } from "next/headers";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { getNavbarItems } from "@/lib/menu";
+import type { MenuItem } from "@/lib/menu";
 import LanguageSwitcher from "./LanguageSwitcher";
 import MobileNav from "./MobileNav";
 import styles from "./Header.module.css";
 
 export default async function Header() {
-  const t = await getTranslations("nav");
+  const [t, locale] = await Promise.all([
+    getTranslations("nav"),
+    getLocale(),
+  ]);
 
   let session = null;
   try {
@@ -20,7 +24,11 @@ export default async function Header() {
 
   const navItems = await getNavbarItems().catch(() => []);
 
-  function resolveHref(item: { link_type: string; url: string; page_slug?: string }): string {
+  function label(item: MenuItem): string {
+    return (locale === "ne" && item.label_ne) ? item.label_ne : item.label_en;
+  }
+
+  function resolveHref(item: MenuItem): string {
     if (item.link_type === "page") return item.page_slug ? `/${item.page_slug}` : "#";
     if (item.link_type === "category") return `/${item.url}`;
     return item.url || "#";
@@ -84,11 +92,11 @@ export default async function Header() {
                         target={item.open_new_tab ? "_blank" : undefined}
                         rel="noopener noreferrer"
                       >
-                        {item.label_en}
+                        {label(item)}
                       </a>
                     ) : (
                       <Link href={href as Parameters<typeof Link>[0]["href"]} className={styles.navLink}>
-                        {item.label_en}
+                        {label(item)}
                       </Link>
                     )}
                   </li>
