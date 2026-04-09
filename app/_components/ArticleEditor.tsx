@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import styles from "./ArticleEditor.module.css";
@@ -19,6 +19,7 @@ const CATEGORIES = [
 
 type Status = "draft" | "published" | "archived";
 type Lang = "en" | "ne";
+type ImgMode = "url" | "upload";
 
 export interface ArticleFormValues {
   id?: string;
@@ -47,6 +48,7 @@ function toSlug(title: string) {
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/--+/g, "-")
+    .trim()
     .slice(0, 80);
 }
 
@@ -79,6 +81,27 @@ export default function ArticleEditor({ initial, backHref }: Props) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [imgMode, setImgMode] = useState<ImgMode>("url");
+  const [uploading, setUploading] = useState(false);
+
+  const [catQuery, setCatQuery] = useState(initial?.category ?? "");
+  const [catOpen, setCatOpen] = useState(false);
+  const comboRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (comboRef.current && !comboRef.current.contains(e.target as Node)) {
+        setCatOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
+
+  const filteredCats = CATEGORIES.filter((c) =>
+    c.toLowerCase().includes(catQuery.toLowerCase())
+  );
+
   const set = useCallback(<K extends keyof ArticleFormValues>(k: K, v: ArticleFormValues[K]) => {
     setValues((prev) => ({ ...prev, [k]: v }));
     setError("");
@@ -96,12 +119,14 @@ export default function ArticleEditor({ initial, backHref }: Props) {
     set("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
   }
 
+  function resetSlugToAuto() {
+    setSlugManual(false);
+    set("slug", toSlug(values.title_en));
+  }
+
   function onTagInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTagInput(e.target.value);
-    const tags = e.target.value
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
+    const tags = e.target.value.split(",").map((t) => t.trim()).filter(Boolean);
     set("tags", tags);
   }
 
@@ -109,6 +134,27 @@ export default function ArticleEditor({ initial, backHref }: Props) {
     const tags = values.tags.filter((t) => t !== tag);
     set("tags", tags);
     setTagInput(tags.join(", "));
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (res.ok) {
+        set("featured_image", data.url);
+      } else {
+        setError(data.error ?? "Upload failed.");
+      }
+    } catch {
+      setError("Upload error — please try again.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function submit(targetStatus: Status) {
@@ -214,14 +260,14 @@ export default function ArticleEditor({ initial, backHref }: Props) {
               onClick={() => setLang("en")}
               type="button"
             >
-              🇬🇧 English
+              English
             </button>
             <button
               className={`${styles.langTab} ${lang === "ne" ? styles.langTabActive : ""}`}
               onClick={() => setLang("ne")}
               type="button"
             >
-              🇳🇵 नेपाली
+              नेपाली
             </button>
             <span className={styles.langHint}>
               {lang === "en" ? "Writing in English" : "नेपालीमा लेख्दै"}
@@ -279,7 +325,7 @@ export default function ArticleEditor({ initial, backHref }: Props) {
             )}
           </div>
 
-          {/* Content — Quill rich text editor */}
+          {/* Content */}
           <div className={styles.field}>
             <div className={styles.labelRow}>
               <label className={styles.label}>
@@ -318,17 +364,32 @@ export default function ArticleEditor({ initial, backHref }: Props) {
           <div className={styles.sideCard}>
             <h3 className={styles.sideTitle}>Status</h3>
             <div className={styles.statusBadge} data-status={values.status}>
-              {values.status === "draft" && "📝 Draft"}
-              {values.status === "published" && "✅ Published"}
-              {values.status === "archived" && "📦 Archived"}
+              {values.status === "draft" && "Draft"}
+              {values.status === "published" && "Published"}
+              {values.status === "archived" && "Archived"}
             </div>
           </div>
 
           {/* Slug */}
           <div className={styles.sideCard}>
-            <h3 className={styles.sideTitle}>
-              URL Slug <span className={styles.required}>*</span>
-            </h3>
+            <div className={styles.sideTitleRow}>
+              <h3 className={styles.sideTitle}>
+                URL Slug <span className={styles.required}>*</span>
+              </h3>
+              {!slugManual ? (
+                <span className={styles.slugAutoBadge}>Auto</span>
+              ) : (
+                values.title_en && (
+                  <button
+                    type="button"
+                    className={styles.slugResetBtn}
+                    onClick={resetSlugToAuto}
+                  >
+                    Reset to auto
+                  </button>
+                )
+              )}
+            </div>
             <div className={styles.slugWrap}>
               <span className={styles.slugPrefix}>/article/</span>
               <input
@@ -342,19 +403,68 @@ export default function ArticleEditor({ initial, backHref }: Props) {
             <p className={styles.hint}>Lowercase letters, numbers, hyphens only</p>
           </div>
 
-          {/* Category */}
+          {/* Category combobox */}
           <div className={styles.sideCard}>
             <h3 className={styles.sideTitle}>Category</h3>
-            <select
-              className={styles.select}
-              value={values.category}
-              onChange={(e) => set("category", e.target.value)}
-            >
-              <option value="">— Select category —</option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+            <div className={styles.comboWrap} ref={comboRef}>
+              <div className={styles.comboField}>
+                <input
+                  type="text"
+                  className={styles.comboSearch}
+                  placeholder="Search category…"
+                  value={catQuery}
+                  autoComplete="off"
+                  onChange={(e) => {
+                    setCatQuery(e.target.value);
+                    setCatOpen(true);
+                    if (!e.target.value) set("category", "");
+                  }}
+                  onFocus={() => setCatOpen(true)}
+                />
+                {catQuery && (
+                  <button
+                    type="button"
+                    className={styles.comboClear}
+                    onClick={() => {
+                      setCatQuery("");
+                      set("category", "");
+                      setCatOpen(false);
+                    }}
+                    aria-label="Clear category"
+                  >
+                    ×
+                  </button>
+                )}
+                <svg className={styles.comboChevron} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </div>
+              {catOpen && (
+                <ul className={styles.comboList}>
+                  {filteredCats.map((c) => (
+                    <li
+                      key={c}
+                      className={`${styles.comboItem} ${values.category === c ? styles.comboItemActive : ""}`}
+                      onMouseDown={() => {
+                        set("category", c);
+                        setCatQuery(c);
+                        setCatOpen(false);
+                      }}
+                    >
+                      {c}
+                      {values.category === c && (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </li>
+                  ))}
+                  {filteredCats.length === 0 && (
+                    <li className={styles.comboEmpty}>No matching categories</li>
+                  )}
+                </ul>
+              )}
+            </div>
           </div>
 
           {/* Tags */}
@@ -387,14 +497,53 @@ export default function ArticleEditor({ initial, backHref }: Props) {
 
           {/* Featured image */}
           <div className={styles.sideCard}>
-            <h3 className={styles.sideTitle}>Featured Image URL</h3>
-            <input
-              type="url"
-              className={styles.input}
-              placeholder="https://images.unsplash.com/…"
-              value={values.featured_image}
-              onChange={(e) => set("featured_image", e.target.value)}
-            />
+            <h3 className={styles.sideTitle}>Featured Image</h3>
+            <div className={styles.imgModeToggle}>
+              <button
+                type="button"
+                className={`${styles.imgModeBtn} ${imgMode === "url" ? styles.imgModeBtnActive : ""}`}
+                onClick={() => setImgMode("url")}
+              >
+                URL
+              </button>
+              <button
+                type="button"
+                className={`${styles.imgModeBtn} ${imgMode === "upload" ? styles.imgModeBtnActive : ""}`}
+                onClick={() => setImgMode("upload")}
+              >
+                Upload
+              </button>
+            </div>
+
+            {imgMode === "url" ? (
+              <input
+                type="url"
+                className={styles.input}
+                placeholder="https://images.unsplash.com/…"
+                value={values.featured_image}
+                onChange={(e) => set("featured_image", e.target.value)}
+              />
+            ) : (
+              <div className={styles.uploadArea}>
+                <label className={styles.uploadLabel}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <polyline points="16 16 12 12 8 16" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                  </svg>
+                  {uploading ? "Uploading…" : "Choose image"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className={styles.uploadInput}
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                  />
+                </label>
+                <p className={styles.hint}>JPEG, PNG, WebP, GIF — max 8 MB</p>
+              </div>
+            )}
+
             {values.featured_image && (
               <div className={styles.imgPreview}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -412,25 +561,25 @@ export default function ArticleEditor({ initial, backHref }: Props) {
           <div className={styles.sideCard}>
             <h3 className={styles.sideTitle}>Translation Progress</h3>
             <div className={styles.progressItem}>
-              <span>🇬🇧 English title</span>
+              <span>English title</span>
               <span className={values.title_en ? styles.done : styles.missing}>
-                {values.title_en ? "✓" : "—"}
+                {values.title_en ? "Done" : "—"}
               </span>
             </div>
             <div className={styles.progressItem}>
-              <span>🇳🇵 Nepali title</span>
+              <span>Nepali title</span>
               <span className={values.title_ne ? styles.done : styles.missing}>
-                {values.title_ne ? "✓" : "—"}
+                {values.title_ne ? "Done" : "—"}
               </span>
             </div>
             <div className={styles.progressItem}>
-              <span>🇬🇧 EN content</span>
+              <span>EN content</span>
               <span className={values.content_en ? styles.done : styles.missing}>
                 {values.content_en ? `${wordCountEn}w` : "—"}
               </span>
             </div>
             <div className={styles.progressItem}>
-              <span>🇳🇵 NE content</span>
+              <span>NE content</span>
               <span className={values.content_ne ? styles.done : styles.missing}>
                 {values.content_ne ? `${wordCountNe}w` : "—"}
               </span>
