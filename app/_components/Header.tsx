@@ -46,9 +46,9 @@ export default async function Header() {
             <Image
               src="/logo.png"
               alt="KumariHub"
-              width={260}
-              height={75}
-              style={{ objectFit: "contain", height: "52px", width: "auto" }}
+              width={300}
+              height={90}
+              style={{ objectFit: "contain", height: "66px", width: "auto" }}
               priority
             />
           </Link>
@@ -56,7 +56,9 @@ export default async function Header() {
         </div>
 
         <div className={styles.actions}>
-          <LanguageSwitcher />
+          <span className={styles.langSwitch}>
+            <LanguageSwitcher />
+          </span>
 
           {session ? (
             <Link href="/dashboard" className={styles.userBtn}>

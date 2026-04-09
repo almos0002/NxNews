@@ -11,7 +11,7 @@
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 24px;
-  min-height: 80px;
+  min-height: 90px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -171,11 +171,35 @@
 /* ── Mobile ── */
 @media (max-width: 600px) {
   .logoRow {
-    min-height: 64px;
-    padding: 0 16px;
+    min-height: 60px;
+    padding: 0 12px;
   }
 
   .navRow {
     display: none;
+  }
+
+  .langSwitch {
+    display: none;
+  }
+
+  .signInLink {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+
+  .userBtn {
+    padding: 4px 10px 4px 4px;
+  }
+
+  .userName {
+    display: none;
+  }
+}
+
+/* Hide datetime on very small screens */
+@media (max-width: 400px) {
+  .logoWrap {
+    gap: 0;
   }
 }
