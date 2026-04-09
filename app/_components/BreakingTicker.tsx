@@ -43,7 +43,10 @@ export default function BreakingTicker({ headlines = [], locale = "en" }: Props)
           </div>
         </div>
       </div>
-      <div className={styles.strip} aria-hidden="true" />
+      <div className={styles.goldStrip} aria-hidden="true" />
+      <div className={styles.stripWrap} aria-hidden="true">
+        <div className={styles.strip} />
+      </div>
     </div>
   );
 }

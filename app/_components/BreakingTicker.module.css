@@ -93,6 +93,18 @@
   vertical-align: middle;
 }
 
+/* ── Thin golden strip between ticker and wavy border ── */
+.goldStrip {
+  height: 5px;
+  background-color: #d4af37;
+}
+
+/* ── White backing so masked wave blends with white navbar ── */
+.stripWrap {
+  background-color: #ffffff;
+  line-height: 0;
+}
+
 /* ── Wavy black bottom strip (flipped, irregular wave pointing downward) ── */
 .strip {
   height: 18px;
