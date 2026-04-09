@@ -31,7 +31,7 @@ export async function listMenuItems(menu_type?: string): Promise<MenuItem[]> {
      FROM menu_items m
      LEFT JOIN pages p ON m.page_id = p.id
      ${where}
-     ORDER BY m.menu_type, m.section_label_en, m.sort_order, m.created_at`,
+     ORDER BY m.sort_order, m.created_at`,
     params
   );
   return rows;
