@@ -11,7 +11,7 @@ import {
 } from "@/lib/public";
 import { listCategories } from "@/lib/taxonomy";
 
-const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author", "videos", "weather", "dashboard"]);
+const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author", "videos", "dashboard"]);
 
 const categoryDescriptionsEn: Record<string, string> = {
   world: "On-the-ground reporting from every corner of the globe — conflict, diplomacy, development, and the events that shape our interconnected world.",
