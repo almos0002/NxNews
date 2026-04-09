@@ -1,5 +1,17 @@
 import { pool } from "./db";
 
+function sanitizeImageUrl(raw: string): string {
+  if (!raw) return "";
+  try {
+    const u = new URL(raw);
+    if (u.pathname.startsWith("/_next/image")) {
+      const original = u.searchParams.get("url");
+      if (original) return decodeURIComponent(original);
+    }
+  } catch { /* not a URL */ }
+  return raw;
+}
+
 export interface PublicArticle {
   id: string;
   title: string;
@@ -60,7 +72,7 @@ function mapArticle(row: Record<string, unknown>, locale: string): PublicArticle
     date: formatDate(row.created_at as string),
     time: formatTime(row.created_at as string),
     readTime: estimateReadTime(content),
-    imageUrl: String(row.featured_image ?? ""),
+    imageUrl: sanitizeImageUrl(String(row.featured_image ?? "")),
   };
 }
 
