@@ -179,21 +179,17 @@
 /* ── Mobile ── */
 @media (max-width: 600px) {
   .logoRow {
-    min-height: 56px;
-    height: 56px;
+    min-height: 72px;
+    height: 72px;
     padding: 0 12px;
   }
 
   .logoWrap {
-    gap: 0;
+    gap: 2px;
   }
 
   .logoImg {
-    height: 38px;
-  }
-
-  .clockWrap {
-    display: none;
+    height: 40px;
   }
 
   .navRow {
