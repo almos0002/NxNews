@@ -226,12 +226,12 @@ export default async function DashboardPage() {
                       : "—"}
                   </td>
                   <td>
-                    <select className={styles.roleSelect} defaultValue={role}>
-                      <option value="user">Reader</option>
-                      <option value="author">Author</option>
-                      <option value="moderator">Moderator</option>
-                      <option value="admin">Admin</option>
-                    </select>
+                    <span
+                      className={styles.roleBadge}
+                      style={{ background: ROLE_COLORS[role] ?? "#64748b" }}
+                    >
+                      {ROLE_LABELS[role] ?? role}
+                    </span>
                   </td>
                 </tr>
               </tbody>

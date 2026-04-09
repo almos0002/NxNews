@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "./cms.module.css";
 import type { Video } from "@/lib/videos";
+import Combobox from "./Combobox";
 
 function extractYoutubeId(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
@@ -115,10 +116,15 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Status</label>
-              <select className={styles.select} value={form.status} onChange={(e) => setF("status", e.target.value as "published" | "draft")}>
-                <option value="published">Published</option>
-                <option value="draft">Draft</option>
-              </select>
+              <Combobox
+                options={[
+                  { value: "published", label: "Published" },
+                  { value: "draft",     label: "Draft" },
+                ]}
+                value={form.status}
+                searchable={false}
+                onChange={(v) => setF("status", v as "published" | "draft")}
+              />
             </div>
           </div>
           <div className={styles.formActions}>

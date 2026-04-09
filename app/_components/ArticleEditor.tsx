@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import styles from "./ArticleEditor.module.css";
+import Combobox from "./Combobox";
+import type { ComboboxOption } from "./Combobox";
 
 const QuillEditor = dynamic(() => import("./QuillEditor"), {
   ssr: false,
@@ -16,6 +18,8 @@ const CATEGORIES = [
   "World", "Politics", "Business", "Technology", "Science",
   "Culture", "Opinion", "Sports", "Videos", "Weather", "Entertainment",
 ];
+
+const CATEGORY_OPTS: ComboboxOption[] = CATEGORIES.map((c) => ({ value: c, label: c }));
 
 type Status = "draft" | "published" | "archived";
 type Lang = "en" | "ne";
@@ -84,23 +88,6 @@ export default function ArticleEditor({ initial, backHref }: Props) {
   const [imgMode, setImgMode] = useState<ImgMode>("url");
   const [uploading, setUploading] = useState(false);
 
-  const [catQuery, setCatQuery] = useState(initial?.category ?? "");
-  const [catOpen, setCatOpen] = useState(false);
-  const comboRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleOutside(e: MouseEvent) {
-      if (comboRef.current && !comboRef.current.contains(e.target as Node)) {
-        setCatOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, []);
-
-  const filteredCats = CATEGORIES.filter((c) =>
-    c.toLowerCase().includes(catQuery.toLowerCase())
-  );
 
   const set = useCallback(<K extends keyof ArticleFormValues>(k: K, v: ArticleFormValues[K]) => {
     setValues((prev) => ({ ...prev, [k]: v }));
@@ -406,65 +393,12 @@ export default function ArticleEditor({ initial, backHref }: Props) {
           {/* Category combobox */}
           <div className={styles.sideCard}>
             <h3 className={styles.sideTitle}>Category</h3>
-            <div className={styles.comboWrap} ref={comboRef}>
-              <div className={styles.comboField}>
-                <input
-                  type="text"
-                  className={styles.comboSearch}
-                  placeholder="Search category…"
-                  value={catQuery}
-                  autoComplete="off"
-                  onChange={(e) => {
-                    setCatQuery(e.target.value);
-                    setCatOpen(true);
-                    if (!e.target.value) set("category", "");
-                  }}
-                  onFocus={() => setCatOpen(true)}
-                />
-                {catQuery && (
-                  <button
-                    type="button"
-                    className={styles.comboClear}
-                    onClick={() => {
-                      setCatQuery("");
-                      set("category", "");
-                      setCatOpen(false);
-                    }}
-                    aria-label="Clear category"
-                  >
-                    ×
-                  </button>
-                )}
-                <svg className={styles.comboChevron} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </div>
-              {catOpen && (
-                <ul className={styles.comboList}>
-                  {filteredCats.map((c) => (
-                    <li
-                      key={c}
-                      className={`${styles.comboItem} ${values.category === c ? styles.comboItemActive : ""}`}
-                      onMouseDown={() => {
-                        set("category", c);
-                        setCatQuery(c);
-                        setCatOpen(false);
-                      }}
-                    >
-                      {c}
-                      {values.category === c && (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </li>
-                  ))}
-                  {filteredCats.length === 0 && (
-                    <li className={styles.comboEmpty}>No matching categories</li>
-                  )}
-                </ul>
-              )}
-            </div>
+            <Combobox
+              options={CATEGORY_OPTS}
+              value={values.category}
+              placeholder="Select category…"
+              onChange={(v) => set("category", v)}
+            />
           </div>
 
           {/* Tags */}

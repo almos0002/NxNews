@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import styles from "./cms.module.css";
+import Combobox from "./Combobox";
 
 interface User {
   id: string;
@@ -105,17 +106,18 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
                     {isMe ? (
                       <span className={`${styles.badge} ${ROLE_BADGE[u.role] ?? ""}`}>{ROLE_LABELS[u.role] ?? u.role}</span>
                     ) : (
-                      <select
-                        className={styles.roleSelect}
+                      <Combobox
+                        options={[
+                          { value: "user",      label: "Reader" },
+                          { value: "author",    label: "Author" },
+                          { value: "moderator", label: "Moderator" },
+                          { value: "admin",     label: "Admin" },
+                        ]}
                         value={u.role}
+                        searchable={false}
                         disabled={isDisabled}
-                        onChange={(e) => patchUser(u.id, { role: e.target.value })}
-                      >
-                        <option value="user">Reader</option>
-                        <option value="author">Author</option>
-                        <option value="moderator">Moderator</option>
-                        <option value="admin">Admin</option>
-                      </select>
+                        onChange={(v) => patchUser(u.id, { role: v })}
+                      />
                     )}
                   </td>
                   <td style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem" }}>
