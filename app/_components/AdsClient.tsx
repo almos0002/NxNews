@@ -8,21 +8,6 @@ interface Props {
   initialAds: AdSlotConfig[];
 }
 
-function ToggleSwitch({ enabled, busy, onToggle }: { enabled: boolean; busy: boolean; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      className={`${styles.toggleSwitch} ${enabled ? styles.toggleSwitchOn : styles.toggleSwitchOff}`}
-      onClick={onToggle}
-      disabled={busy}
-      aria-pressed={enabled}
-      aria-label={enabled ? "Disable ad slot" : "Enable ad slot"}
-    >
-      <span className={styles.toggleThumb} />
-    </button>
-  );
-}
-
 export default function AdsClient({ initialAds }: Props) {
   const [ads, setAds] = useState(initialAds);
   const [editSlot, setEditSlot] = useState<string | null>(null);
@@ -95,21 +80,28 @@ export default function AdsClient({ initialAds }: Props) {
         {ads.map((ad) => (
           <div key={ad.slot} className={styles.tableCard} style={{ padding: 20 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <ToggleSwitch
-                  enabled={ad.enabled}
-                  busy={saving === ad.slot}
-                  onToggle={() => toggleEnabled(ad.slot, ad.enabled)}
+              {/* Toggle + label */}
+              <label className={styles.toggle} style={{ opacity: saving === ad.slot ? 0.6 : 1 }}>
+                <span className={styles.toggleTrack} data-on={String(ad.enabled)}>
+                  <span className={styles.toggleThumb} />
+                </span>
+                <input
+                  type="checkbox"
+                  style={{ display: "none" }}
+                  checked={ad.enabled}
+                  disabled={saving === ad.slot}
+                  onChange={() => toggleEnabled(ad.slot, ad.enabled)}
                 />
                 <div>
-                  <strong style={{ fontSize: "0.95rem" }}>{ad.label}</strong>
+                  <span className={styles.toggleLabel}>{ad.label}</span>
                   <div style={{ fontSize: "0.78rem", color: "var(--color-ink-muted)", fontFamily: "monospace", marginTop: 2 }}>
                     slot: {ad.slot}
                     {ad.width > 0 && ` · ${ad.width}×${ad.height}px`}
                   </div>
                 </div>
-              </div>
+              </label>
 
+              {/* Code status + edit button */}
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{
                   fontSize: "0.78rem",

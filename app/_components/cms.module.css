@@ -273,6 +273,52 @@
   display: block;
 }
 
+/* ── Toggle switch (matches SettingsClient pattern) ── */
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggleTrack {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: #d6d0c6;
+  transition: background 0.18s ease;
+  flex-shrink: 0;
+}
+
+.toggleTrack[data-on="true"] {
+  background: var(--color-accent, #e63946);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: transform 0.18s ease;
+}
+
+.toggleTrack[data-on="true"] .toggleThumb {
+  transform: translateX(18px);
+}
+
+.toggleLabel {
+  font-family: var(--font-serif, serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ink, #141414);
+}
+
 /* Success / status banners */
 .successBanner {
   padding: 10px 16px;
