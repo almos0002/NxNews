@@ -21,7 +21,7 @@ export default function BreakingTicker({ headlines = [], locale = "en" }: Props)
     : [...headlines, ...headlines];
 
   return (
-    <div>
+    <div className={styles.wrapper}>
       <div className={styles.ticker} role="marquee" aria-label="Breaking news">
         <div className={styles.inner}>
           <span className={styles.label}>Live</span>
