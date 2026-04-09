@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     if (!["admin", "moderator"].includes(role)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
-    const { menu_type, label_en, label_ne, link_type, page_id, url, sort_order, open_new_tab } = body;
+    const { menu_type, label_en, label_ne, link_type, page_id, url, sort_order, open_new_tab, section_label_en, section_label_ne } = body;
 
     if (!["navbar", "footer"].includes(menu_type)) return NextResponse.json({ error: "Invalid menu_type" }, { status: 400 });
     if (!label_en?.trim()) return NextResponse.json({ error: "English label required" }, { status: 400 });
@@ -36,6 +36,8 @@ export async function POST(req: NextRequest) {
       menu_type, label_en: label_en.trim(), label_ne: (label_ne ?? "").trim(),
       link_type, page_id: page_id ?? null, url: url ?? "",
       sort_order: sort_order ?? 999, open_new_tab: open_new_tab ?? false,
+      section_label_en: (section_label_en ?? "").trim(),
+      section_label_ne: (section_label_ne ?? "").trim(),
     });
     return NextResponse.json({ item }, { status: 201 });
   } catch (err) {
