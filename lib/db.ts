@@ -2,20 +2,32 @@ import pg from "pg";
 
 const { Pool } = pg;
 
-function buildConnectionUrl(rawUrl: string): string {
-  if (!rawUrl) return rawUrl;
+const isNeonDatabase = (url: string): boolean => {
   try {
-    const url = new URL(rawUrl);
-    url.searchParams.set("sslmode", "verify-full");
-    return url.toString();
+    const parsed = new URL(url);
+    return parsed.hostname.includes("neon.tech");
   } catch {
-    return rawUrl;
+    return false;
+  }
+};
+
+const rawUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || "";
+const useSSL = isNeonDatabase(rawUrl);
+
+function buildConnectionUrl(url: string): string {
+  if (!url || !useSSL) return url;
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set("sslmode", "verify-full");
+    return parsed.toString();
+  } catch {
+    return url;
   }
 }
 
 export const pool = new Pool({
-  connectionString: buildConnectionUrl(process.env.NEON_DATABASE_URL ?? ""),
-  ssl: { rejectUnauthorized: true },
+  connectionString: buildConnectionUrl(rawUrl),
+  ...(useSSL ? { ssl: { rejectUnauthorized: true } } : {}),
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,

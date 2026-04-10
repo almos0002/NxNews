@@ -1,9 +1,19 @@
 import pg from "pg";
 const { Pool } = pg;
+
+const rawUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL || "";
+const isNeon = rawUrl.includes("neon.tech");
+
 function buildUrl(raw) {
+  if (!raw || !isNeon) return raw;
   try { const u = new URL(raw); u.searchParams.set("sslmode","verify-full"); return u.toString(); } catch { return raw; }
 }
-const pool = new Pool({ connectionString: buildUrl(process.env.NEON_DATABASE_URL ?? ""), ssl: { rejectUnauthorized: true } });
+
+const pool = new Pool({
+  connectionString: buildUrl(rawUrl),
+  ...(isNeon ? { ssl: { rejectUnauthorized: true } } : {})
+});
+
 await pool.query(`
   CREATE TABLE IF NOT EXISTS pages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -10,6 +10,7 @@ const baseURL = process.env.BETTER_AUTH_URL ||
 export const auth = betterAuth({
   appName: "KumariHub",
   baseURL,
+  secret: process.env.BETTER_AUTH_SECRET || process.env.SESSION_SECRET,
   database: pool,
 
   emailAndPassword: {

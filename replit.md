@@ -77,7 +77,7 @@ next.config.ts            # Next.js config (next-intl plugin, remote images)
 - Session: 7-day expiry, daily refresh, 5-min JWE cookie cache
 - Base URL: reads `BETTER_AUTH_URL` → falls back to `REPLIT_DEV_DOMAIN`
 
-### Database Tables (Neon PostgreSQL — `NEON_DATABASE_URL`)
+### Database Tables (Replit PostgreSQL — `DATABASE_URL`)
 | Table          | Purpose                                  |
 |---------------|------------------------------------------|
 | `user`        | Users with `role`, `banned`, `bio` fields |
@@ -169,9 +169,10 @@ Redirects to locale login with `?from=` param if missing.
 ## Environment Variables
 | Key                  | Type   | Purpose                                |
 |---------------------|--------|----------------------------------------|
-| `NEON_DATABASE_URL` | Secret | Neon PostgreSQL connection string      |
-| `BETTER_AUTH_SECRET`| Secret | Session signing key (32+ char random) |
-| `BETTER_AUTH_URL`   | Env    | App base URL (optional, auto-detected) |
+| `DATABASE_URL`      | Secret | Replit PostgreSQL connection string (auto-provided) |
+| `SESSION_SECRET`    | Secret | Session signing key — used as `BETTER_AUTH_SECRET` fallback |
+| `BETTER_AUTH_SECRET`| Secret | Session signing key (32+ char random, optional if SESSION_SECRET set) |
+| `BETTER_AUTH_URL`   | Env    | App base URL (optional, auto-detected via REPLIT_DEV_DOMAIN) |
 
 ## i18n Architecture
 - All URLs locale-prefixed: `/en/...` and `/ne/...`
@@ -206,8 +207,10 @@ Redirects to locale login with `?from=` param if missing.
 - `npx @better-auth/cli@latest migrate` — Run DB migrations (run once after setup)
 
 ## Notes
-- `proxy.ts` is this project's Next.js middleware file (not `middleware.ts`)
-- `NEON_DATABASE_URL` is distinct from Replit's built-in `DATABASE_URL`
+- `proxy.ts` is this project's Next.js 16 middleware file (Next.js 16 renamed middleware to proxy)
+- `lib/db.ts` uses `NEON_DATABASE_URL` with fallback to `DATABASE_URL` (Replit's built-in Postgres)
+- SSL is only enabled for Neon databases; Replit's Helium Postgres does not use SSL
+- `lib/auth.ts` uses `BETTER_AUTH_SECRET` with fallback to `SESSION_SECRET`
 - Auth cookie cache means session reads don't hit DB on every request (5-min TTL)
 - The test admin account `admin@kumari.test` was created during development
 - Category values stored in articles use the slug (e.g. "technology"); the public query filters via `LOWER(a.category) = slug` so older articles stored as "Technology" still match
