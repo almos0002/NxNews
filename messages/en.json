@@ -1,9 +1,4 @@
 {
-  "site": {
-    "name": "The Daily Report",
-    "tagline": "Independent, in-depth journalism for a complex world.",
-    "description": "The Daily Report delivers independent, in-depth journalism covering world affairs, politics, business, technology, science, and culture."
-  },
   "nav": {
     "world": "World",
     "politics": "Politics",
@@ -14,30 +9,10 @@
     "opinion": "Opinion",
     "sports": "Sports",
     "videos": "Videos",
-    "weather": "Weather",
-    "entertainment": "Entertainment",
-    "subscribe": "Subscribe",
     "search": "Search",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "signIn": "Sign in"
-  },
-  "footer": {
-    "description": "Independent, in-depth journalism for a complex world. Delivering clarity through rigorous reporting since 2024.",
-    "sections": "Sections",
-    "company": "Company",
-    "about": "About",
-    "careers": "Careers",
-    "contact": "Contact",
-    "advertise": "Advertise",
-    "ethics": "Ethics Policy",
-    "privacy": "Privacy",
-    "terms": "Terms",
-    "cookies": "Cookies",
-    "copyright": "© 2026 The Daily Report"
-  },
-  "ticker": {
-    "live": "LIVE"
   },
   "home": {
     "latest": "Latest",
@@ -76,7 +51,7 @@
     "aboutAuthor": "About the author",
     "correspondent": "Correspondent",
     "newsletter": "Newsletter",
-    "sidebarText": "Get the best of The Daily Report in your inbox every morning.",
+    "sidebarText": "Get the best of KumariHub in your inbox every morning.",
     "subscribeFree": "Subscribe free"
   },
   "archive": {
