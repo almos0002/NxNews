@@ -77,7 +77,7 @@ next.config.ts            # Next.js config (next-intl plugin, remote images)
 - Session: 7-day expiry, daily refresh, 5-min JWE cookie cache
 - Base URL: reads `BETTER_AUTH_URL` → falls back to `REPLIT_DEV_DOMAIN`
 
-### Database Tables (Replit PostgreSQL — `DATABASE_URL`)
+### Database Tables (Neon PostgreSQL — `NEON_DATABASE_URL`)
 | Table          | Purpose                                  |
 |---------------|------------------------------------------|
 | `user`        | Users with `role`, `banned`, `bio` fields |
@@ -169,9 +169,10 @@ Redirects to locale login with `?from=` param if missing.
 ## Environment Variables
 | Key                  | Type   | Purpose                                |
 |---------------------|--------|----------------------------------------|
-| `DATABASE_URL`      | Secret | Replit PostgreSQL connection string (auto-provided) |
-| `SESSION_SECRET`    | Secret | Session signing key — used as `BETTER_AUTH_SECRET` fallback |
-| `BETTER_AUTH_SECRET`| Secret | Session signing key (32+ char random, optional if SESSION_SECRET set) |
+| `NEON_DATABASE_URL` | Secret | Neon PostgreSQL connection (primary — auto-provided via Neon integration) |
+| `DATABASE_URL`      | Secret | Replit Helium PostgreSQL fallback (used if NEON_DATABASE_URL not set) |
+| `BETTER_AUTH_SECRET`| Secret | Session signing key (32+ char random string) |
+| `SESSION_SECRET`    | Secret | Fallback session key if BETTER_AUTH_SECRET not set |
 | `BETTER_AUTH_URL`   | Env    | App base URL (optional, auto-detected via REPLIT_DEV_DOMAIN) |
 
 ## i18n Architecture
@@ -212,7 +213,8 @@ Redirects to locale login with `?from=` param if missing.
 - SSL is only enabled for Neon databases; Replit's Helium Postgres does not use SSL
 - `lib/auth.ts` uses `BETTER_AUTH_SECRET` with fallback to `SESSION_SECRET`
 - Auth cookie cache means session reads don't hit DB on every request (5-min TTL)
-- The test admin account `admin@kumari.test` was created during development
+- Admin account: `admin@kumarihub.com` / `Admin@1234` (role: admin, not banned)
+- **Critical**: The app uses `NEON_DATABASE_URL` (Neon cloud PostgreSQL), NOT the Replit helium `DATABASE_URL`. Using the wrong connection shows an empty user table — always use `NEON_DATABASE_URL` for database operations.
 - Category values stored in articles use the slug (e.g. "technology"); the public query filters via `LOWER(a.category) = slug` so older articles stored as "Technology" still match
 
 ## Completed Features

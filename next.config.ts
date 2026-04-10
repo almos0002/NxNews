@@ -3,13 +3,20 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
+const allowedDevOrigins = [
+  "*.replit.dev",
+  "*.picard.replit.dev",
+  "*.pike.replit.dev",
+  "*.janeway.replit.dev",
+  "*.repl.co",
+];
+
+if (process.env.REPLIT_DEV_DOMAIN) {
+  allowedDevOrigins.push(process.env.REPLIT_DEV_DOMAIN);
+}
+
 const nextConfig: NextConfig = {
-  allowedDevOrigins: [
-    "*.replit.dev",
-    "*.pike.replit.dev",
-    "*.janeway.replit.dev",
-    "*.repl.co",
-  ],
+  allowedDevOrigins,
   images: {
     remotePatterns: [
       {
@@ -19,6 +26,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.replit.dev",
+      },
+      {
+        protocol: "https",
+        hostname: "*.picard.replit.dev",
       },
       {
         protocol: "https",
