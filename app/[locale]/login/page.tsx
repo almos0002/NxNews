@@ -11,8 +11,13 @@ export const metadata: Metadata = {
   title: "Sign In — KumariHub",
 };
 
-export default async function LocaleLoginPage() {
+export default async function LocaleLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
   const t = await getTranslations("login");
+  const { from } = await searchParams;
 
   return (
     <>
@@ -24,7 +29,7 @@ export default async function LocaleLoginPage() {
             <h1 className={styles.heading}>{t("title")}</h1>
             <p className={styles.subheading}>{t("subtitle")}</p>
           </div>
-          <LoginForm />
+          <LoginForm from={from ?? "/dashboard"} />
         </div>
       </main>
       <Footer />

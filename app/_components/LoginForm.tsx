@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { signIn } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/validation";
 import styles from "@/app/login/page.module.css";
 
-export default function LoginForm() {
+export default function LoginForm({ from = "/dashboard" }: { from?: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const from = searchParams.get("from") ?? "/dashboard";
 
   const [values, setValues] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});

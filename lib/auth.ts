@@ -7,11 +7,27 @@ const baseURL = process.env.BETTER_AUTH_URL ||
     ? `https://${process.env.REPLIT_DEV_DOMAIN}`
     : "http://localhost:5000");
 
+const trustedOrigins: string[] = [
+  "http://localhost:5000",
+  "http://localhost:3000",
+];
+
+if (process.env.REPLIT_DEV_DOMAIN) {
+  trustedOrigins.push(`https://${process.env.REPLIT_DEV_DOMAIN}`);
+}
+
+if (process.env.REPLIT_DOMAINS) {
+  process.env.REPLIT_DOMAINS.split(",").forEach((d) => {
+    trustedOrigins.push(`https://${d.trim()}`);
+  });
+}
+
 export const auth = betterAuth({
   appName: "KumariHub",
   baseURL,
   secret: process.env.BETTER_AUTH_SECRET || process.env.SESSION_SECRET,
   database: pool,
+  trustedOrigins,
 
   emailAndPassword: {
     enabled: true,
@@ -20,12 +36,12 @@ export const auth = betterAuth({
   },
 
   session: {
-    expiresIn: 60 * 60 * 24 * 7,      // 7 days
-    updateAge: 60 * 60 * 24,           // refresh daily
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
     storeSessionInDatabase: true,
     cookieCache: {
       enabled: true,
-      maxAge: 60 * 5,                  // 5-min client-side cache
+      maxAge: 60 * 5,
     },
   },
 
@@ -38,8 +54,8 @@ export const auth = betterAuth({
 
   rateLimit: {
     enabled: true,
-    window: 60,       // 60-second window
-    max: 10,          // 10 auth attempts per window per IP
+    window: 60,
+    max: 10,
     storage: "database",
   },
 
