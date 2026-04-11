@@ -18,12 +18,20 @@ export async function GET(req: NextRequest) {
     const { rows } = await pool.query(
       `SELECT
         pv.id, pv.content_type, pv.content_id, pv.ip, pv.country, pv.city, pv.viewed_at,
-        COALESCE(a.title_en, p.title_en, v.title_en) AS content_title,
-        COALESCE(a.slug, p.id::text, v.id::text) AS content_slug
+        CASE
+          WHEN pv.content_type = 'live' THEN 'Live Page'
+          ELSE COALESCE(a.title_en, p.title_en, v.title_en, ep.title_en)
+        END AS content_title,
+        CASE
+          WHEN pv.content_type = 'live'  THEN '/live'
+          WHEN pv.content_type = 'event' THEN ep.slug
+          ELSE COALESCE(a.slug, p.id::text, v.id::text)
+        END AS content_slug
        FROM page_views pv
-       LEFT JOIN article a ON pv.content_type = 'article' AND a.id::text = pv.content_id
-       LEFT JOIN pages p ON pv.content_type = 'page' AND p.id::text = pv.content_id
-       LEFT JOIN videos v ON pv.content_type = 'video' AND v.id::text = pv.content_id
+       LEFT JOIN article       a  ON pv.content_type = 'article' AND a.id::text  = pv.content_id
+       LEFT JOIN pages         p  ON pv.content_type = 'page'    AND p.id::text  = pv.content_id
+       LEFT JOIN videos        v  ON pv.content_type = 'video'   AND v.id::text  = pv.content_id
+       LEFT JOIN event_photos  ep ON pv.content_type = 'event'   AND ep.id::text = pv.content_id
        ORDER BY pv.viewed_at DESC
        LIMIT $1`,
       [limit]

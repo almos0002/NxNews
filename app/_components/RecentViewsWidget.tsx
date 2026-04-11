@@ -39,6 +39,14 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
+const TYPE_LABELS: Record<string, string> = {
+  article: "Article",
+  video:   "Video",
+  page:    "Page",
+  event:   "Event Gallery",
+  live:    "Live Page",
+};
+
 function typeIcon(type: string) {
   if (type === "article") return (
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -52,6 +60,22 @@ function typeIcon(type: string) {
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polygon points="23 7 16 12 23 17 23 7" />
       <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+    </svg>
+  );
+  if (type === "event") return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <polyline points="21 15 16 10 5 21" />
+    </svg>
+  );
+  if (type === "live") return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="2" />
+      <path d="M16.24 7.76a6 6 0 0 1 0 8.49" />
+      <path d="M7.76 16.24a6 6 0 0 1 0-8.49" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+      <path d="M4.93 19.07a10 10 0 0 1 0-14.14" />
     </svg>
   );
   return (
@@ -156,10 +180,17 @@ export default function RecentViewsWidget() {
                 <tr key={row.id}>
                   <td className={styles.contentCell}>
                     <div className={styles.contentInner}>
-                      <span className={styles.typeIcon}>{typeIcon(row.content_type)}</span>
-                      <span className={styles.contentTitle} title={row.content_title ?? row.content_id}>
-                        {row.content_title ?? row.content_id}
+                      <span className={styles.typeIcon} title={TYPE_LABELS[row.content_type] ?? row.content_type}>
+                        {typeIcon(row.content_type)}
                       </span>
+                      <div>
+                        <span className={styles.contentTitle} title={row.content_title ?? row.content_id}>
+                          {row.content_title ?? row.content_id}
+                        </span>
+                        <span className={styles.typeLabel}>
+                          {TYPE_LABELS[row.content_type] ?? row.content_type}
+                        </span>
+                      </div>
                     </div>
                   </td>
                   <td className={styles.ipCell}>{maskIp(row.ip ?? "")}</td>
