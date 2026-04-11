@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import { toast } from "@/lib/toast";
 import Combobox from "./Combobox";
 import type { ComboboxOption } from "./Combobox";
 import styles from "./cms.module.css";
@@ -47,8 +48,6 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
   const [newSectionNe, setNewSectionNe] = useState("");
 
   const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
-  const [ok, setOk] = useState("");
 
   const items = tab === "navbar" ? navbar : tab === "bottom" ? bottom : footer;
   const setItems = useCallback((fn: (p: MenuItem[]) => MenuItem[]) => {
@@ -85,7 +84,7 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
   }
 
   function switchTab(t: MenuTab) {
-    setTab(t); setEditId(null); setErr(""); setOk("");
+    setTab(t); setEditId(null);
     setAddForm({ ...EMPTY_FORM }); setNewSectionEn(""); setNewSectionNe("");
   }
 
@@ -96,18 +95,18 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
       open_new_tab: it.open_new_tab,
       section_label_en: it.section_label_en, section_label_ne: it.section_label_ne,
     });
-    setEditId(it.id); setErr(""); setOk("");
+    setEditId(it.id);
   }
 
-  function cancelEdit() { setEditId(null); setErr(""); }
+  function cancelEdit() { setEditId(null); }
 
   async function submitAdd(sectionLabelEn = "", sectionLabelNe = "") {
     const form = { ...addForm, section_label_en: sectionLabelEn || addForm.section_label_en, section_label_ne: sectionLabelNe || addForm.section_label_ne };
-    if (!form.label_en.trim()) { setErr("English label is required"); return; }
-    if (form.link_type === "external" && !form.url.trim()) { setErr("URL is required for external links"); return; }
-    if (form.link_type === "page" && !form.page_id) { setErr("Please select a page"); return; }
-    if (form.link_type === "category" && !form.url.trim()) { setErr("Please select a category"); return; }
-    setSaving(true); setErr("");
+    if (!form.label_en.trim()) { toast("English label is required", "error"); return; }
+    if (form.link_type === "external" && !form.url.trim()) { toast("URL is required for external links", "error"); return; }
+    if (form.link_type === "page" && !form.page_id) { toast("Please select a page", "error"); return; }
+    if (form.link_type === "category" && !form.url.trim()) { toast("Please select a category", "error"); return; }
+    setSaving(true);
     try {
       const payload = {
         menu_type: tab,
@@ -124,17 +123,17 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to add link", "error"); return; }
       setItems((p) => [...p, data.item]);
       setAddForm({ ...EMPTY_FORM, section_label_en: form.section_label_en, section_label_ne: form.section_label_ne });
       setNewSectionEn(""); setNewSectionNe("");
-      setOk("Link added.");
+      toast("Link added.", "success");
     } finally { setSaving(false); }
   }
 
   async function submitEdit() {
-    if (!editForm.label_en.trim() || !editId) { setErr("English label is required"); return; }
-    setSaving(true); setErr("");
+    if (!editForm.label_en.trim() || !editId) { toast("English label is required", "error"); return; }
+    setSaving(true);
     try {
       const payload = {
         label_en: editForm.label_en.trim(), label_ne: editForm.label_ne.trim(),
@@ -149,16 +148,20 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
         method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to update link", "error"); return; }
       setItems((p) => p.map((it) => it.id === editId ? { ...it, ...data.item } : it));
-      setEditId(null); setOk("Link updated.");
+      setEditId(null); toast("Link updated.", "success");
     } finally { setSaving(false); }
   }
 
   async function deleteItem(id: string) {
-    if (!confirm("Remove this menu link?")) return;
     const res = await fetch(`/api/menu/${id}`, { method: "DELETE" });
-    if (res.ok) setItems((p) => p.filter((it) => it.id !== id));
+    if (res.ok) {
+      setItems((p) => p.filter((it) => it.id !== id));
+      toast("Menu link removed.", "success");
+    } else {
+      toast("Failed to remove link.", "error");
+    }
   }
 
   async function moveItem(sectionItems: MenuItem[], index: number, dir: -1 | 1) {
@@ -230,9 +233,6 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
           Bottom Bar ({bottom.length})
         </button>
       </div>
-
-      {err && <p className={styles.errMsg}>{err}</p>}
-      {ok && <p className={styles.successMsg}>{ok}</p>}
 
       {/* ══════ NAVBAR + BOTTOM TABS ══════ */}
       {(tab === "navbar" || tab === "bottom") && (
@@ -379,7 +379,6 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                 onClick={() => {
                   setAF("section_label_en", newSectionEn.trim());
                   setAF("section_label_ne", newSectionNe.trim());
-                  setOk(""); setErr("");
                 }}>
                 {addForm.section_label_en === newSectionEn.trim() && newSectionEn.trim()
                   ? `Adding to "${newSectionEn.trim()}" →`

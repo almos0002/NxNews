@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "@/lib/toast";
 import styles from "./cms.module.css";
 import sStyles from "./SettingsClient.module.css";
 
@@ -12,8 +13,6 @@ interface Props {
 export default function SeoSettingsClient({ initialSettings }: Props) {
   const [s, setS] = useState({ ...initialSettings });
   const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
-  const [ok, setOk] = useState("");
   const [ogUploading, setOgUploading] = useState(false);
 
   function set(key: string, value: string) {
@@ -21,7 +20,7 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
   }
 
   async function save() {
-    setSaving(true); setErr(""); setOk("");
+    setSaving(true);
     try {
       const res = await fetch("/api/settings", {
         method: "POST",
@@ -29,19 +28,19 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
         body: JSON.stringify(s),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Save failed"); return; }
-      setOk("SEO settings saved successfully.");
+      if (!res.ok) { toast(data.error ?? "Save failed", "error"); return; }
+      toast("SEO settings saved successfully.", "success");
     } finally { setSaving(false); }
   }
 
   async function uploadOgImage(file: File) {
-    setOgUploading(true); setErr("");
+    setOgUploading(true);
     try {
       const form = new FormData();
       form.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: form });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Upload failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Upload failed", "error"); return; }
       set("seo_og_image_url", data.url);
     } finally { setOgUploading(false); }
   }
@@ -62,9 +61,6 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
           </button>
         </div>
       </div>
-
-      {err && <p className={styles.errMsg}>{err}</p>}
-      {ok && <p className={styles.successMsg}>{ok}</p>}
 
       <div className={sStyles.sections}>
 
@@ -289,8 +285,6 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
       </div>
 
       <div className={sStyles.saveBar}>
-        {err && <p className={styles.errMsg} style={{ margin: 0 }}>{err}</p>}
-        {ok && <p className={styles.successMsg} style={{ margin: 0 }}>{ok}</p>}
         <button className={styles.submitBtn} onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save SEO Settings"}
         </button>

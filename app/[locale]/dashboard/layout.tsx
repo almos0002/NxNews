@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import DashboardSidebar from "@/app/_components/DashboardSidebar";
+import Toaster from "@/app/_components/Toaster";
 import styles from "./layout.module.css";
 
 export default async function DashboardLayout({
@@ -25,6 +26,7 @@ export default async function DashboardLayout({
       <div className={styles.mainWrap}>
         {children}
       </div>
+      <Toaster />
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "@/lib/toast";
+import ConfirmDialog from "./ConfirmDialog";
 import styles from "./cms.module.css";
 import type { Video } from "@/lib/videos";
 import Combobox from "./Combobox";
@@ -27,49 +29,68 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ ...EMPTY });
   const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  function openAdd() { setForm({ ...EMPTY }); setEditId(null); setShowForm(true); setErr(""); }
+  function openAdd() { setForm({ ...EMPTY }); setEditId(null); setShowForm(true); }
   function openEdit(v: Video) {
     setForm({ title_en: v.title_en, title_ne: v.title_ne, youtube_url: v.youtube_url, description_en: v.description_en, description_ne: v.description_ne, status: v.status, category: v.category ?? "", duration: v.duration ?? "" });
-    setEditId(v.id); setShowForm(true); setErr("");
+    setEditId(v.id); setShowForm(true);
   }
-  function closeForm() { setShowForm(false); setEditId(null); setErr(""); }
+  function closeForm() { setShowForm(false); setEditId(null); }
 
   function setF<K extends keyof typeof form>(k: K, v: typeof form[K]) {
     setForm((p) => ({ ...p, [k]: v }));
   }
 
   async function submit() {
-    if (!form.title_en.trim()) { setErr("English title is required"); return; }
-    if (!form.youtube_url.trim()) { setErr("YouTube URL is required"); return; }
-    setSaving(true); setErr("");
+    if (!form.title_en.trim()) { toast("English title is required", "error"); return; }
+    if (!form.youtube_url.trim()) { toast("YouTube URL is required", "error"); return; }
+    setSaving(true);
     try {
       const url = editId ? `/api/videos/${editId}` : "/api/videos";
       const method = editId ? "PUT" : "POST";
       const body = editId ? form : { ...form, author_id: authorId };
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to save video", "error"); return; }
       if (editId) {
         setVideos((p) => p.map((v) => v.id === editId ? data.video : v));
+        toast("Video updated.", "success");
       } else {
         setVideos((p) => [data.video, ...p]);
+        toast("Video added.", "success");
       }
       closeForm();
     } finally { setSaving(false); }
   }
 
   async function deleteVideo(id: string) {
-    if (!confirm("Delete this video?")) return;
     const res = await fetch(`/api/videos/${id}`, { method: "DELETE" });
-    if (res.ok) setVideos((p) => p.filter((v) => v.id !== id));
+    if (res.ok) {
+      setVideos((p) => p.filter((v) => v.id !== id));
+      setDeleteConfirm(null);
+      toast("Video deleted.", "success");
+    } else {
+      toast("Failed to delete video.", "error");
+    }
   }
 
   const previewId = extractYoutubeId(form.youtube_url);
 
   return (
     <div className={styles.page}>
+      {deleteConfirm && (
+        <ConfirmDialog
+          title="Delete Video"
+          message="Are you sure you want to delete this video? This action cannot be undone."
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          variant="danger"
+          onConfirm={() => deleteVideo(deleteConfirm)}
+          onCancel={() => setDeleteConfirm(null)}
+        />
+      )}
+
       <div className={styles.pageHeader}>
         <div className={styles.pageHeaderLeft}>
           <Link href="/en/dashboard" className={styles.breadcrumb}>← Dashboard</Link>
@@ -82,7 +103,6 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
       {showForm && (
         <div className={styles.formCard}>
           <p className={styles.formTitle}>{editId ? "Edit Video" : "Add Video"}</p>
-          {err && <p className={styles.errMsg}>{err}</p>}
           <div className={styles.formGrid}>
             <div className={styles.field}>
               <label className={styles.label}>Title (English) *</label>
@@ -199,7 +219,7 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
                         <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
                       </svg>
                     </button>
-                    <button className={styles.deleteBtn} onClick={() => deleteVideo(v.id)} title="Delete">
+                    <button className={styles.deleteBtn} onClick={() => setDeleteConfirm(v.id)} title="Delete">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
                         <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>

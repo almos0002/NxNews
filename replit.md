@@ -117,6 +117,7 @@ Migration script: `scripts/migrate.mjs`
 | `/dashboard/taxonomy` | Moderator+ | Categories & tags (tabbed inline CRUD) |
 | `/dashboard/users` | Admin | User role + ban management |
 | `/dashboard/moderation` | Moderator+ | Article review queue (approve/reject) |
+| `/dashboard/featured` | Moderator+ | Featured posts management (search + toggle star) |
 | `/dashboard/profile` | All roles | Edit own name, bio, change password |
 | `/dashboard/menu` | Moderator+ | Navbar & footer menu manager with page/URL links and sort order |
 | `/dashboard/ads` | Admin | Ad slot enable/disable + ad code/script editor |
@@ -140,6 +141,9 @@ Migration script: `scripts/migrate.mjs`
 | `MenuClient.tsx` | Dual-menu manager (navbar/footer) with page selector, URL, and up/down sort |
 | `DashboardSidebar.tsx` | Role-aware navigation sidebar |
 | `cms.module.css` | Shared CSS module for all CMS/dashboard table pages |
+| `Toaster.tsx` | Global toast notification system (dispatched via `lib/toast.ts` CustomEvent) |
+| `ConfirmDialog.tsx` | Modal confirm dialog for destructive actions (delete, ban, etc.) |
+| `FeaturedClient.tsx` | Featured posts manager — search + feature/unfeature published articles |
 
 ### API Routes
 | Route | Methods | Auth |
@@ -158,6 +162,7 @@ Migration script: `scripts/migrate.mjs`
 | `/api/menu` | GET, POST | Moderator+ |
 | `/api/menu/[id]` | PUT, DELETE | Moderator+ |
 | `/api/menu/reorder` | POST | Moderator+ — bulk sort_order update |
+| `/api/articles/featured` | GET, POST | Moderator+ — list/toggle featured posts |
 | `/api/profile` | GET, PATCH | Session — update own name/bio |
 | `/api/upload` | POST | Session — saves to `public/uploads/`, 8MB max |
 | `/api/auth/[...all]` | GET, POST | Better Auth handler |

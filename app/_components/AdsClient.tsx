@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "@/lib/toast";
 import styles from "./cms.module.css";
 import type { AdSlotConfig } from "@/lib/ads";
 
@@ -13,11 +14,9 @@ export default function AdsClient({ initialAds }: Props) {
   const [editSlot, setEditSlot] = useState<string | null>(null);
   const [editCode, setEditCode] = useState("");
   const [saving, setSaving] = useState<string | null>(null);
-  const [msg, setMsg] = useState("");
 
   async function toggleEnabled(slot: string, current: boolean) {
     setSaving(slot);
-    setMsg("");
     try {
       const res = await fetch(`/api/ads/${slot}`, {
         method: "PUT",
@@ -25,11 +24,9 @@ export default function AdsClient({ initialAds }: Props) {
         body: JSON.stringify({ enabled: !current }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setMsg(data.error ?? "Failed");
-        return;
-      }
+      if (!res.ok) { toast(data.error ?? "Failed to update slot", "error"); return; }
       setAds((p) => p.map((a) => (a.slot === slot ? { ...a, enabled: !current } : a)));
+      toast(!current ? "Ad slot enabled." : "Ad slot disabled.", "success");
     } finally {
       setSaving(null);
     }
@@ -38,13 +35,11 @@ export default function AdsClient({ initialAds }: Props) {
   function openEdit(ad: AdSlotConfig) {
     setEditSlot(ad.slot);
     setEditCode(ad.code);
-    setMsg("");
   }
 
   async function saveCode() {
     if (!editSlot) return;
     setSaving(editSlot);
-    setMsg("");
     try {
       const res = await fetch(`/api/ads/${editSlot}`, {
         method: "PUT",
@@ -52,13 +47,10 @@ export default function AdsClient({ initialAds }: Props) {
         body: JSON.stringify({ code: editCode }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setMsg(data.error ?? "Failed");
-        return;
-      }
+      if (!res.ok) { toast(data.error ?? "Failed to save code", "error"); return; }
       setAds((p) => p.map((a) => (a.slot === editSlot ? { ...a, code: editCode } : a)));
       setEditSlot(null);
-      setMsg("Saved successfully.");
+      toast("Ad code saved successfully.", "success");
     } finally {
       setSaving(null);
     }
@@ -74,13 +66,10 @@ export default function AdsClient({ initialAds }: Props) {
         </p>
       </div>
 
-      {msg && <div className={styles.successBanner} style={{ marginBottom: 16 }}>{msg}</div>}
-
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {ads.map((ad) => (
           <div key={ad.slot} className={styles.tableCard} style={{ padding: 20 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-              {/* Toggle + label */}
               <label className={styles.toggle} style={{ opacity: saving === ad.slot ? 0.6 : 1 }}>
                 <span className={styles.toggleTrack} data-on={String(ad.enabled)}>
                   <span className={styles.toggleThumb} />
@@ -101,7 +90,6 @@ export default function AdsClient({ initialAds }: Props) {
                 </div>
               </label>
 
-              {/* Code status + edit button */}
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{
                   fontSize: "0.78rem",
@@ -142,7 +130,7 @@ export default function AdsClient({ initialAds }: Props) {
                   </button>
                   <button
                     className={styles.cancelBtn}
-                    onClick={() => { setEditSlot(null); setMsg(""); }}
+                    onClick={() => setEditSlot(null)}
                   >
                     Cancel
                   </button>

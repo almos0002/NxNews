@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "@/lib/toast";
 import styles from "./cms.module.css";
 
 interface Article {
@@ -23,10 +24,9 @@ interface Props { initialArticles: Article[]; }
 export default function ModerationClient({ initialArticles }: Props) {
   const [articles, setArticles] = useState(initialArticles);
   const [processing, setProcessing] = useState<string | null>(null);
-  const [err, setErr] = useState("");
 
   async function changeStatus(id: string, status: "published" | "draft") {
-    setProcessing(id); setErr("");
+    setProcessing(id);
     try {
       const res = await fetch(`/api/articles/${id}`, {
         method: "PUT",
@@ -34,8 +34,9 @@ export default function ModerationClient({ initialArticles }: Props) {
         body: JSON.stringify({ status }),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to update status", "error"); return; }
       setArticles((p) => p.filter((a) => a.id !== id));
+      toast(status === "published" ? "Article approved and published." : "Article rejected.", "success");
     } finally { setProcessing(null); }
   }
 
@@ -51,8 +52,6 @@ export default function ModerationClient({ initialArticles }: Props) {
         </span>
       </div>
 
-      {err && <p className={styles.errMsg}>{err}</p>}
-
       {articles.length === 0 ? (
         <div className={styles.formCard} style={{ textAlign: "center", padding: "60px 24px" }}>
           <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>✓</div>
@@ -65,7 +64,6 @@ export default function ModerationClient({ initialArticles }: Props) {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {articles.map((a) => (
             <div key={a.id} style={{ background: "#fff", border: "1.5px solid var(--color-border)", borderRadius: 10, padding: "18px 20px", display: "flex", gap: 16, alignItems: "flex-start" }}>
-              {/* Category label */}
               <div style={{ flexShrink: 0, width: 6, alignSelf: "stretch", borderRadius: 3, background: "var(--color-accent)" }} />
 
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -99,7 +97,6 @@ export default function ModerationClient({ initialArticles }: Props) {
                 </div>
               </div>
 
-              {/* Actions */}
               <div style={{ display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
                 <button
                   onClick={() => changeStatus(a.id, "published")}

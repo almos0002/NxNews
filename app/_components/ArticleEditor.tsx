@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { toast } from "@/lib/toast";
 import styles from "./ArticleEditor.module.css";
 import Combobox from "./Combobox";
 import type { ComboboxOption } from "./Combobox";
@@ -86,8 +87,6 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
   const [tagInput, setTagInput] = useState(initial?.tags.join(", ") ?? "");
   const [slugManual, setSlugManual] = useState(!!initial?.id);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const [imgMode, setImgMode] = useState<ImgMode>("url");
   const [uploading, setUploading] = useState(false);
@@ -95,8 +94,6 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
 
   const set = useCallback(<K extends keyof ArticleFormValues>(k: K, v: ArticleFormValues[K]) => {
     setValues((prev) => ({ ...prev, [k]: v }));
-    setError("");
-    setSuccess("");
   }, []);
 
   function onTitleEnChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -139,25 +136,22 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
       if (res.ok) {
         set("featured_image", data.url);
       } else {
-        setError(data.error ?? "Upload failed.");
+        toast(data.error ?? "Upload failed.", "error");
       }
     } catch {
-      setError("Upload error — please try again.");
+      toast("Upload error — please try again.", "error");
     } finally {
       setUploading(false);
     }
   }
 
   async function submit(targetStatus: Status) {
-    setError("");
-    setSuccess("");
-
     if (!values.title_en.trim()) {
-      setError("English title is required.");
+      toast("English title is required.", "error");
       return;
     }
     if (!values.slug.trim()) {
-      setError("Slug is required.");
+      toast("Slug is required.", "error");
       return;
     }
 
@@ -175,11 +169,11 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong.");
+        toast(data.error ?? "Something went wrong.", "error");
         return;
       }
 
-      setSuccess(targetStatus === "published" ? "Article published!" : "Saved as draft.");
+      toast(targetStatus === "published" ? "Article published!" : targetStatus === "archived" ? "Article archived." : "Saved as draft.", "success");
 
       if (!isEdit && data.article?.id) {
         router.push(`/en/dashboard/articles/${data.article.id}/edit`);
@@ -187,7 +181,7 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
         router.refresh();
       }
     } catch {
-      setError("Network error — please try again.");
+      toast("Network error — please try again.", "error");
     } finally {
       setSaving(false);
     }
@@ -212,8 +206,6 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
           </span>
         </div>
         <div className={styles.topActions}>
-          {error && <span className={styles.topError}>{error}</span>}
-          {success && <span className={styles.topSuccess}>{success}</span>}
           {isEdit && values.status === "published" && (
             <button
               className={styles.btnSecondary}

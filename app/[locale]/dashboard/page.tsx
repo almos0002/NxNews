@@ -88,8 +88,8 @@ export default async function DashboardPage() {
         </span>
       </div>
 
-      {/* Stats */}
-      <div className={styles.statsGrid}>
+      {/* Stats — only for authors and above */}
+      {isAuthor && <div className={styles.statsGrid}>
         {isAdmin && adminStats && <>
           <div className={styles.statCard}>
             <p className={styles.statLabel}>Total Users</p>
@@ -152,19 +152,26 @@ export default async function DashboardPage() {
             <p className={styles.statSub}>Total article views</p>
           </div>
         </>}
-        {!isAuthor && <>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Account</p>
-            <p className={styles.statValue}>Active</p>
-            <p className={styles.statSub}>Member since {user.createdAt ? new Date(user.createdAt).getFullYear() : "—"}</p>
+      </div>}
+
+      {/* Reader welcome card */}
+      {!isAuthor && (
+        <section className={styles.section}>
+          <div className={styles.profileCard} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.95rem", color: "var(--color-ink-muted)", margin: 0 }}>
+              You are signed in as a reader. Browse the latest news, or head to your profile to update your details.
+            </p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <a href="/en" style={{ display: "inline-block", padding: "8px 18px", background: "var(--color-ink)", color: "#fff", fontFamily: "var(--font-serif)", fontWeight: 700, fontSize: "0.82rem", borderRadius: 6, textDecoration: "none" }}>
+                Browse News
+              </a>
+              <a href="/en/dashboard/profile" style={{ display: "inline-block", padding: "8px 18px", border: "1.5px solid var(--color-border)", color: "var(--color-ink)", fontFamily: "var(--font-serif)", fontWeight: 700, fontSize: "0.82rem", borderRadius: 6, textDecoration: "none" }}>
+                Edit Profile
+              </a>
+            </div>
           </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Newsletter</p>
-            <p className={styles.statValue}>Active</p>
-            <p className={styles.statSub}>Daily Briefing</p>
-          </div>
-        </>}
-      </div>
+        </section>
+      )}
 
       {/* Profile card */}
       <section className={styles.section}>

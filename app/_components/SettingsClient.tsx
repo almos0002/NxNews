@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "@/lib/toast";
 import styles from "./cms.module.css";
 import sStyles from "./SettingsClient.module.css";
 
@@ -12,8 +13,6 @@ interface Props {
 export default function SettingsClient({ initialSettings }: Props) {
   const [s, setS] = useState({ ...initialSettings });
   const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
-  const [ok, setOk] = useState("");
   const [logoUploading, setLogoUploading] = useState(false);
   const [faviconUploading, setFaviconUploading] = useState(false);
 
@@ -22,7 +21,7 @@ export default function SettingsClient({ initialSettings }: Props) {
   }
 
   async function save() {
-    setSaving(true); setErr(""); setOk("");
+    setSaving(true);
     try {
       const res = await fetch("/api/settings", {
         method: "POST",
@@ -30,20 +29,20 @@ export default function SettingsClient({ initialSettings }: Props) {
         body: JSON.stringify(s),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Save failed"); return; }
-      setOk("Settings saved successfully.");
+      if (!res.ok) { toast(data.error ?? "Save failed", "error"); return; }
+      toast("Settings saved successfully.", "success");
     } finally { setSaving(false); }
   }
 
   async function uploadFile(field: "logo_url" | "favicon_url", file: File) {
     const setUploading = field === "logo_url" ? setLogoUploading : setFaviconUploading;
-    setUploading(true); setErr("");
+    setUploading(true);
     try {
       const form = new FormData();
       form.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: form });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Upload failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Upload failed", "error"); return; }
       set(field, data.url);
     } finally { setUploading(false); }
   }
@@ -61,9 +60,6 @@ export default function SettingsClient({ initialSettings }: Props) {
           </button>
         </div>
       </div>
-
-      {err && <p className={styles.errMsg}>{err}</p>}
-      {ok && <p className={styles.successMsg}>{ok}</p>}
 
       <div className={sStyles.sections}>
 
@@ -228,8 +224,6 @@ export default function SettingsClient({ initialSettings }: Props) {
       </div>
 
       <div className={sStyles.saveBar}>
-        {err && <p className={styles.errMsg} style={{ margin: 0 }}>{err}</p>}
-        {ok && <p className={styles.successMsg} style={{ margin: 0 }}>{ok}</p>}
         <button className={styles.submitBtn} onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save All Settings"}
         </button>

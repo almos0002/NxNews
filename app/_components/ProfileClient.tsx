@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "@/lib/toast";
 import styles from "./cms.module.css";
 
 const ROLE_LABELS: Record<string, string> = { admin: "Admin", moderator: "Moderator", author: "Author", user: "Reader" };
@@ -18,19 +19,15 @@ export default function ProfileClient({ user }: Props) {
   const [name, setName] = useState(user.name ?? "");
   const [bio, setBio] = useState(user.bio ?? "");
   const [saving, setSaving] = useState(false);
-  const [profileOk, setProfileOk] = useState("");
-  const [profileErr, setProfileErr] = useState("");
 
   const [curPwd, setCurPwd] = useState("");
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
   const [pwdSaving, setPwdSaving] = useState(false);
-  const [pwdOk, setPwdOk] = useState("");
-  const [pwdErr, setPwdErr] = useState("");
 
   async function saveProfile() {
-    if (!name.trim()) { setProfileErr("Name is required"); return; }
-    setSaving(true); setProfileErr(""); setProfileOk("");
+    if (!name.trim()) { toast("Name is required", "error"); return; }
+    setSaving(true);
     try {
       const res = await fetch("/api/profile", {
         method: "PATCH",
@@ -38,20 +35,20 @@ export default function ProfileClient({ user }: Props) {
         body: JSON.stringify({ name: name.trim(), bio: bio.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) { setProfileErr(data.error ?? "Failed"); return; }
-      setProfileOk("Profile updated successfully.");
+      if (!res.ok) { toast(data.error ?? "Failed to save profile", "error"); return; }
+      toast("Profile updated successfully.", "success");
     } finally { setSaving(false); }
   }
 
   async function changePassword() {
-    if (!curPwd || !newPwd) { setPwdErr("All fields required"); return; }
-    if (newPwd !== confirmPwd) { setPwdErr("New passwords do not match"); return; }
-    if (newPwd.length < 8) { setPwdErr("New password must be at least 8 characters"); return; }
-    setPwdSaving(true); setPwdErr(""); setPwdOk("");
+    if (!curPwd || !newPwd) { toast("All fields required", "error"); return; }
+    if (newPwd !== confirmPwd) { toast("New passwords do not match", "error"); return; }
+    if (newPwd.length < 8) { toast("New password must be at least 8 characters", "error"); return; }
+    setPwdSaving(true);
     try {
       const result = await authClient.changePassword({ currentPassword: curPwd, newPassword: newPwd });
-      if (result.error) { setPwdErr(result.error.message ?? "Failed to change password"); return; }
-      setPwdOk("Password changed successfully.");
+      if (result.error) { toast(result.error.message ?? "Failed to change password", "error"); return; }
+      toast("Password changed successfully.", "success");
       setCurPwd(""); setNewPwd(""); setConfirmPwd("");
     } finally { setPwdSaving(false); }
   }
@@ -66,7 +63,6 @@ export default function ProfileClient({ user }: Props) {
         </div>
       </div>
 
-      {/* Profile card */}
       <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
         {/* Avatar + meta */}
         <div className={styles.formCard} style={{ width: 200, flexShrink: 0, textAlign: "center" }}>
@@ -101,8 +97,6 @@ export default function ProfileClient({ user }: Props) {
                 <label className={styles.label}>Bio</label>
                 <textarea className={styles.textarea} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="A short bio about yourself…" rows={3} style={{ resize: "vertical" }} />
               </div>
-              {profileErr && <p className={styles.errMsg}>{profileErr}</p>}
-              {profileOk && <p className={styles.successMsg}>{profileOk}</p>}
               <div>
                 <button className={styles.submitBtn} onClick={saveProfile} disabled={saving}>
                   {saving ? "Saving…" : "Save Profile"}
@@ -126,8 +120,6 @@ export default function ProfileClient({ user }: Props) {
                 <label className={styles.label}>Confirm New Password</label>
                 <input className={styles.input} type="password" value={confirmPwd} onChange={(e) => setConfirmPwd(e.target.value)} placeholder="Repeat new password" onKeyDown={(e) => e.key === "Enter" && changePassword()} />
               </div>
-              {pwdErr && <p className={styles.errMsg}>{pwdErr}</p>}
-              {pwdOk && <p className={styles.successMsg}>{pwdOk}</p>}
               <div>
                 <button className={styles.submitBtn} onClick={changePassword} disabled={pwdSaving}>
                   {pwdSaving ? "Updating…" : "Change Password"}

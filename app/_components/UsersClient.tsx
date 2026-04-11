@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "@/lib/toast";
+import ConfirmDialog from "./ConfirmDialog";
 import styles from "./cms.module.css";
 import Combobox from "./Combobox";
 
@@ -27,7 +29,7 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
   const [users, setUsers] = useState(initialUsers);
   const [search, setSearch] = useState("");
   const [updating, setUpdating] = useState<string | null>(null);
-  const [err, setErr] = useState("");
+  const [banConfirm, setBanConfirm] = useState<{ id: string; name: string } | null>(null);
 
   const filtered = users.filter((u) =>
     u.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -36,7 +38,7 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
   );
 
   async function patchUser(userId: string, patch: { role?: string; banned?: boolean }) {
-    setUpdating(userId); setErr("");
+    setUpdating(userId);
     try {
       const res = await fetch("/api/users", {
         method: "PATCH",
@@ -44,13 +46,35 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
         body: JSON.stringify({ userId, ...patch }),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed to update"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to update user", "error"); return; }
       setUsers((p) => p.map((u) => u.id === userId ? { ...u, ...data.user } : u));
+      if (patch.role) toast(`Role updated to ${ROLE_LABELS[patch.role] ?? patch.role}.`, "success");
+      if (patch.banned === false) toast("User unbanned successfully.", "success");
     } finally { setUpdating(null); }
+  }
+
+  async function confirmBan() {
+    if (!banConfirm) return;
+    await patchUser(banConfirm.id, { banned: true });
+    toast(`${banConfirm.name} has been banned.`, "success");
+    setBanConfirm(null);
   }
 
   return (
     <div className={styles.page}>
+      {banConfirm && (
+        <ConfirmDialog
+          title="Ban User"
+          message={`Are you sure you want to ban "${banConfirm.name}"? They will no longer be able to access their account.`}
+          confirmLabel="Ban User"
+          cancelLabel="Cancel"
+          variant="danger"
+          loading={updating === banConfirm.id}
+          onConfirm={confirmBan}
+          onCancel={() => setBanConfirm(null)}
+        />
+      )}
+
       <div className={styles.pageHeader}>
         <div className={styles.pageHeaderLeft}>
           <Link href="/en/dashboard" className={styles.breadcrumb}>← Dashboard</Link>
@@ -60,8 +84,6 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
           {users.length} registered {users.length === 1 ? "user" : "users"}
         </span>
       </div>
-
-      {err && <p className={styles.errMsg}>{err}</p>}
 
       <div style={{ marginBottom: 16 }}>
         <input
@@ -137,7 +159,7 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
                             Unban
                           </button>
                         ) : (
-                          <button className={styles.deleteBtn} disabled={isDisabled} onClick={() => { if (confirm(`Ban ${u.name}?`)) patchUser(u.id, { banned: true }); }}>
+                          <button className={styles.deleteBtn} disabled={isDisabled} onClick={() => setBanConfirm({ id: u.id, name: u.name })}>
                             Ban
                           </button>
                         )}

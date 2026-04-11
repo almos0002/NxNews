@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "@/lib/toast";
+import ConfirmDialog from "./ConfirmDialog";
 import styles from "./cms.module.css";
 import type { Category, Tag } from "@/lib/taxonomy";
 
@@ -18,7 +20,6 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
   const [tab, setTab] = useState<"categories" | "tags">("categories");
   const [categories, setCategories] = useState(initialCategories);
   const [tags, setTags] = useState(initialTags);
-  const [err, setErr] = useState("");
 
   const [newCat, setNewCat] = useState({ name_en: "", name_ne: "" });
   const [editCatId, setEditCatId] = useState<string | null>(null);
@@ -30,9 +31,12 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
   const [editTag, setEditTag] = useState({ name_en: "", name_ne: "" });
   const [savingTag, setSavingTag] = useState(false);
 
+  const [deleteConfirm, setDeleteConfirm] = useState<{ type: "category" | "tag"; id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   async function addCategory() {
-    if (!newCat.name_en.trim()) { setErr("English name required"); return; }
-    setSavingCat(true); setErr("");
+    if (!newCat.name_en.trim()) { toast("English name required", "error"); return; }
+    setSavingCat(true);
     try {
       const res = await fetch("/api/categories", {
         method: "POST",
@@ -40,15 +44,16 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
         body: JSON.stringify({ ...newCat, slug: toSlug(newCat.name_en) }),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to add category", "error"); return; }
       setCategories((p) => [...p, data.category].sort((a, b) => a.name_en.localeCompare(b.name_en)));
       setNewCat({ name_en: "", name_ne: "" });
+      toast("Category added.", "success");
     } finally { setSavingCat(false); }
   }
 
   async function saveCategory() {
     if (!editCat.name_en.trim() || !editCatId) return;
-    setSavingCat(true); setErr("");
+    setSavingCat(true);
     try {
       const res = await fetch(`/api/categories/${editCatId}`, {
         method: "PUT",
@@ -56,21 +61,16 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
         body: JSON.stringify({ ...editCat, slug: toSlug(editCat.name_en) }),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to update category", "error"); return; }
       setCategories((p) => p.map((c) => c.id === editCatId ? data.category : c));
       setEditCatId(null);
+      toast("Category updated.", "success");
     } finally { setSavingCat(false); }
   }
 
-  async function deleteCategory(id: string) {
-    if (!confirm("Delete this category?")) return;
-    const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
-    if (res.ok) setCategories((p) => p.filter((c) => c.id !== id));
-  }
-
   async function addTag() {
-    if (!newTag.name_en.trim()) { setErr("English name required"); return; }
-    setSavingTag(true); setErr("");
+    if (!newTag.name_en.trim()) { toast("English name required", "error"); return; }
+    setSavingTag(true);
     try {
       const res = await fetch("/api/tags", {
         method: "POST",
@@ -78,15 +78,16 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
         body: JSON.stringify({ ...newTag, slug: toSlug(newTag.name_en) }),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to add tag", "error"); return; }
       setTags((p) => [...p, data.tag].sort((a, b) => a.name_en.localeCompare(b.name_en)));
       setNewTag({ name_en: "", name_ne: "" });
+      toast("Tag added.", "success");
     } finally { setSavingTag(false); }
   }
 
   async function saveTag() {
     if (!editTag.name_en.trim() || !editTagId) return;
-    setSavingTag(true); setErr("");
+    setSavingTag(true);
     try {
       const res = await fetch(`/api/tags/${editTagId}`, {
         method: "PUT",
@@ -94,20 +95,48 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
         body: JSON.stringify({ ...editTag, slug: toSlug(editTag.name_en) }),
       });
       const data = await res.json();
-      if (!res.ok) { setErr(data.error ?? "Failed"); return; }
+      if (!res.ok) { toast(data.error ?? "Failed to update tag", "error"); return; }
       setTags((p) => p.map((t) => t.id === editTagId ? data.tag : t));
       setEditTagId(null);
+      toast("Tag updated.", "success");
     } finally { setSavingTag(false); }
   }
 
-  async function deleteTag(id: string) {
-    if (!confirm("Delete this tag?")) return;
-    const res = await fetch(`/api/tags/${id}`, { method: "DELETE" });
-    if (res.ok) setTags((p) => p.filter((t) => t.id !== id));
+  async function confirmDelete() {
+    if (!deleteConfirm) return;
+    setDeleting(true);
+    try {
+      const url = deleteConfirm.type === "category"
+        ? `/api/categories/${deleteConfirm.id}`
+        : `/api/tags/${deleteConfirm.id}`;
+      const res = await fetch(url, { method: "DELETE" });
+      if (!res.ok) { toast("Failed to delete. It may be in use.", "error"); return; }
+      if (deleteConfirm.type === "category") {
+        setCategories((p) => p.filter((c) => c.id !== deleteConfirm.id));
+        toast("Category deleted.", "success");
+      } else {
+        setTags((p) => p.filter((t) => t.id !== deleteConfirm.id));
+        toast("Tag deleted.", "success");
+      }
+      setDeleteConfirm(null);
+    } finally { setDeleting(false); }
   }
 
   return (
     <div className={styles.page}>
+      {deleteConfirm && (
+        <ConfirmDialog
+          title={`Delete ${deleteConfirm.type === "category" ? "Category" : "Tag"}`}
+          message={`Are you sure you want to delete "${deleteConfirm.name}"? This cannot be undone.`}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          variant="danger"
+          loading={deleting}
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteConfirm(null)}
+        />
+      )}
+
       <div className={styles.pageHeader}>
         <div className={styles.pageHeaderLeft}>
           <Link href="/en/dashboard" className={styles.breadcrumb}>← Dashboard</Link>
@@ -118,23 +147,20 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
       <div className={styles.tabs}>
         <button
           className={`${styles.tab} ${tab === "categories" ? styles.tabActive : ""}`}
-          onClick={() => { setTab("categories"); setErr(""); }}
+          onClick={() => setTab("categories")}
         >
           Categories ({categories.length})
         </button>
         <button
           className={`${styles.tab} ${tab === "tags" ? styles.tabActive : ""}`}
-          onClick={() => { setTab("tags"); setErr(""); }}
+          onClick={() => setTab("tags")}
         >
           Tags ({tags.length})
         </button>
       </div>
 
-      {err && <p className={styles.errMsg}>{err}</p>}
-
       {tab === "categories" && (
         <div className={styles.twoCol}>
-          {/* Add form */}
           <div className={styles.formCard}>
             <p className={styles.formTitle}>Add Category</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -154,7 +180,6 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
             </div>
           </div>
 
-          {/* List */}
           <div className={styles.tableCard}>
             <table className={styles.table}>
               <thead>
@@ -188,7 +213,7 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
                         <td>
                           <div className={styles.actionRow}>
                             <button className={styles.editBtn} onClick={() => { setEditCatId(c.id); setEditCat({ name_en: c.name_en, name_ne: c.name_ne }); }}>Edit</button>
-                            <button className={styles.deleteBtn} onClick={() => deleteCategory(c.id)}>Delete</button>
+                            <button className={styles.deleteBtn} onClick={() => setDeleteConfirm({ type: "category", id: c.id, name: c.name_en })}>Delete</button>
                           </div>
                         </td>
                       </>
@@ -203,7 +228,6 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
 
       {tab === "tags" && (
         <div className={styles.twoCol}>
-          {/* Add form */}
           <div className={styles.formCard}>
             <p className={styles.formTitle}>Add Tag</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -224,7 +248,6 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
             </div>
           </div>
 
-          {/* List */}
           <div className={styles.tableCard}>
             <table className={styles.table}>
               <thead>
@@ -258,7 +281,7 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
                         <td>
                           <div className={styles.actionRow}>
                             <button className={styles.editBtn} onClick={() => { setEditTagId(t.id); setEditTag({ name_en: t.name_en, name_ne: t.name_ne }); }}>Edit</button>
-                            <button className={styles.deleteBtn} onClick={() => deleteTag(t.id)}>Delete</button>
+                            <button className={styles.deleteBtn} onClick={() => setDeleteConfirm({ type: "tag", id: t.id, name: t.name_en })}>Delete</button>
                           </div>
                         </td>
                       </>
