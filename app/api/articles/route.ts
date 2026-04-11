@@ -14,9 +14,12 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") ?? "50", 10);
     const offset = parseInt(searchParams.get("offset") ?? "0", 10);
 
+    const role = (session.user as { role?: string }).role ?? "user";
+    const authorId = role === "author" ? session.user.id : (searchParams.get("authorId") ?? undefined);
+
     const [articles, counts] = await Promise.all([
-      listArticles({ status, search, category, limit, offset }),
-      countByStatus(),
+      listArticles({ status, search, category, limit, offset, authorId }),
+      countByStatus(authorId),
     ]);
 
     return NextResponse.json({ articles, counts });

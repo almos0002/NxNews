@@ -5,9 +5,12 @@ import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
+import PaginationBar from "@/app/_components/PaginationBar";
 import {
   getPublicArticles,
+  countPublicArticles,
   getBreakingHeadline,
+  PUBLIC_PAGE_SIZE,
 } from "@/lib/public";
 import { listCategories } from "@/lib/taxonomy";
 
@@ -37,7 +40,10 @@ const categoryDescriptionsNe: Record<string, string> = {
   entertainment: "फिल्म, टेलिभिजन, संगीत, सेलिब्रिटी — कथाहरूका पछाडिका कथाहरू।",
 };
 
-type Props = { params: Promise<{ locale: string; category: string }> };
+type Props = {
+  params: Promise<{ locale: string; category: string }>;
+  searchParams: Promise<Record<string, string>>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, category } = await params;
@@ -72,8 +78,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props) {
   const { category, locale } = await params;
+  const sp = await searchParams;
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10));
+  const offset = (page - 1) * PUBLIC_PAGE_SIZE;
 
   if (RESERVED.has(category)) notFound();
 
@@ -83,8 +92,9 @@ export default async function CategoryPage({ params }: Props) {
 
   const t = await getTranslations("archive");
 
-  const [articles, headline] = await Promise.all([
-    getPublicArticles(locale, { category }),
+  const [articles, total, headline] = await Promise.all([
+    getPublicArticles(locale, { category, limit: PUBLIC_PAGE_SIZE, offset }),
+    countPublicArticles({ category }),
     getBreakingHeadline(locale),
   ]);
 
@@ -98,6 +108,8 @@ export default async function CategoryPage({ params }: Props) {
     ? (cat.name_ne || cat.name_en)
     : cat.name_en;
 
+  const totalPages = Math.ceil(total / PUBLIC_PAGE_SIZE);
+
   return (
     <>
       <BreakingTicker headline={headline} />
@@ -106,8 +118,14 @@ export default async function CategoryPage({ params }: Props) {
         badge={t("categoryBadge")}
         title={title}
         description={description}
-        count={articles.length}
+        count={total}
         articles={articles}
+        paginationSlot={
+          <PaginationBar
+            page={page}
+            totalPages={totalPages}
+          />
+        }
       />
       <Footer />
     </>

@@ -14,11 +14,19 @@ export interface Page {
   view_count?: number;
 }
 
-export async function listPages(): Promise<Page[]> {
+export async function listPages(opts?: { limit?: number; offset?: number }): Promise<Page[]> {
+  const limit = opts?.limit ?? 1000;
+  const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
-    "SELECT * FROM pages ORDER BY updated_at DESC"
+    "SELECT * FROM pages ORDER BY updated_at DESC LIMIT $1 OFFSET $2",
+    [limit, offset]
   );
   return rows;
+}
+
+export async function countPages(): Promise<number> {
+  const { rows } = await pool.query("SELECT COUNT(*)::int AS cnt FROM pages");
+  return rows[0]?.cnt ?? 0;
 }
 
 export async function getPageById(id: string): Promise<Page | null> {

@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { getAllSettings } from "@/lib/settings";
 
@@ -37,10 +36,11 @@ export async function GET() {
 ${urls}
 </urlset>`;
 
-  return new NextResponse(xml, {
+  return new Response(xml, {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
       "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }

@@ -34,9 +34,19 @@ export function youtubeThumbnail(url: string): string {
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
 }
 
-export async function listVideos(): Promise<Video[]> {
-  const { rows } = await pool.query("SELECT * FROM videos ORDER BY created_at DESC");
+export async function listVideos(opts?: { limit?: number; offset?: number }): Promise<Video[]> {
+  const limit = opts?.limit ?? 1000;
+  const offset = opts?.offset ?? 0;
+  const { rows } = await pool.query(
+    "SELECT * FROM videos ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+    [limit, offset]
+  );
   return rows;
+}
+
+export async function countVideos(): Promise<number> {
+  const { rows } = await pool.query("SELECT COUNT(*)::int AS cnt FROM videos");
+  return rows[0]?.cnt ?? 0;
 }
 
 export async function getVideoById(id: string): Promise<Video | null> {

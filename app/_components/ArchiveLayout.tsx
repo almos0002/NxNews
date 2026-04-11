@@ -15,6 +15,7 @@ interface ArchiveLayoutProps {
   count: number;
   articles: Article[];
   profileSlot?: React.ReactNode;
+  paginationSlot?: React.ReactNode;
 }
 
 async function ArchiveSidebar() {
@@ -92,6 +93,7 @@ export default async function ArchiveLayout({
   count,
   articles,
   profileSlot,
+  paginationSlot,
 }: ArchiveLayoutProps) {
   const t = await getTranslations("archive");
 
@@ -121,6 +123,7 @@ export default async function ArchiveLayout({
                 <Link href="/" className={styles.emptyLink}>{t("backHome")}</Link>
               </div>
             ) : (
+              <>
               <div className={styles.grid}>
                 {articles.map((article) => (
                   <Link
@@ -169,6 +172,12 @@ export default async function ArchiveLayout({
                   </Link>
                 ))}
               </div>
+              {paginationSlot && (
+                <div style={{ borderTop: "1px solid var(--color-border)", marginTop: 8 }}>
+                  {paginationSlot}
+                </div>
+              )}
+              </>
             )}
           </div>
 

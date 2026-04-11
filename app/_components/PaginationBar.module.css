@@ -1,0 +1,69 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 36px 0 8px;
+  flex-wrap: wrap;
+}
+
+.pageNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 4px;
+  border-radius: 5px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.pageNum:hover {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+.pageActive {
+  background: var(--color-accent) !important;
+  color: #fff !important;
+  border-color: var(--color-accent) !important;
+  cursor: default;
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 5px;
+  color: var(--color-ink);
+  text-decoration: none;
+  border: 1.5px solid var(--color-border);
+  transition: background 0.15s;
+}
+
+.arrow:hover {
+  background: var(--color-surface);
+}
+
+.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  cursor: default;
+}
+
+.ellipsis {
+  padding: 0 6px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 36px;
+  user-select: none;
+}

@@ -5,14 +5,20 @@ import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
+import PaginationBar from "@/app/_components/PaginationBar";
 import {
   getPublicArticlesByAuthorName,
+  countPublicArticlesByAuthorName,
   getAuthorInfo,
   getBreakingHeadline,
+  PUBLIC_PAGE_SIZE,
 } from "@/lib/public";
 import styles from "@/app/author/[slug]/page.module.css";
 
-type Props = { params: Promise<{ locale: string; slug: string }> };
+type Props = {
+  params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<Record<string, string>>;
+};
 
 function slugToName(slug: string): string {
   return slug
@@ -101,21 +107,26 @@ function AuthorProfile({
   );
 }
 
-export default async function AuthorPage({ params }: Props) {
+export default async function AuthorPage({ params, searchParams }: Props) {
   const { slug, locale } = await params;
+  const sp = await searchParams;
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10));
+  const offset = (page - 1) * PUBLIC_PAGE_SIZE;
   const authorName = slugToName(slug);
 
   const t = await getTranslations("archive");
 
-  const [articles, authorInfo, headline] = await Promise.all([
-    getPublicArticlesByAuthorName(authorName, locale),
+  const [articles, total, authorInfo, headline] = await Promise.all([
+    getPublicArticlesByAuthorName(authorName, locale, { limit: PUBLIC_PAGE_SIZE, offset }),
+    countPublicArticlesByAuthorName(authorName),
     getAuthorInfo(authorName),
     getBreakingHeadline(locale),
   ]);
 
-  if (!authorInfo && articles.length === 0) notFound();
+  if (!authorInfo && total === 0) notFound();
 
   const displayName = authorInfo?.name ?? authorName;
+  const totalPages = Math.ceil(total / PUBLIC_PAGE_SIZE);
 
   return (
     <>
@@ -124,17 +135,20 @@ export default async function AuthorPage({ params }: Props) {
       <ArchiveLayout
         badge={t("journalistBadge")}
         title={displayName}
-        count={articles.length}
+        count={total}
         articles={articles}
         profileSlot={
           <AuthorProfile
             name={displayName}
             role={authorInfo?.role ?? "Contributor"}
             bio={authorInfo?.bio ?? `${displayName} is a contributor to KumariHub.`}
-            articleCount={articles.length}
+            articleCount={total}
             twitter={authorInfo?.twitter}
             linkedin={authorInfo?.linkedin}
           />
+        }
+        paginationSlot={
+          <PaginationBar page={page} totalPages={totalPages} />
         }
       />
       <Footer />

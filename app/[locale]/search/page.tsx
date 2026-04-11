@@ -4,11 +4,14 @@ import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
+import PaginationBar from "@/app/_components/PaginationBar";
 import SearchInput from "@/app/_components/SearchInput";
 import {
   searchPublicArticles,
+  countSearchArticles,
   getPublicTags,
   getBreakingHeadline,
+  PUBLIC_PAGE_SIZE,
 } from "@/lib/public";
 import { Link } from "@/i18n/navigation";
 import styles from "@/app/search/page.module.css";
@@ -31,21 +34,25 @@ export async function generateMetadata({
 
 type Props = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 };
 
 export default async function LocaleSearchPage({ params, searchParams }: Props) {
   const { locale } = await params;
-  const { q } = await searchParams;
+  const { q, page: pageStr } = await searchParams;
   const query = q?.trim() ?? "";
+  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
+  const offset = (page - 1) * PUBLIC_PAGE_SIZE;
 
-  const [results, tags, headline] = await Promise.all([
-    query ? searchPublicArticles(query, locale) : Promise.resolve([]),
+  const [results, total, tags, headline] = await Promise.all([
+    query ? searchPublicArticles(query, locale, { limit: PUBLIC_PAGE_SIZE, offset }) : Promise.resolve([]),
+    query ? countSearchArticles(query) : Promise.resolve(0),
     getPublicTags(),
     getBreakingHeadline(locale),
   ]);
 
   const t = await getTranslations("search");
+  const totalPages = Math.ceil(total / PUBLIC_PAGE_SIZE);
 
   return (
     <>
@@ -67,9 +74,16 @@ export default async function LocaleSearchPage({ params, searchParams }: Props) 
         <ArchiveLayout
           badge={t("badge")}
           title={`"${query}"`}
-          description={results.length === 0 ? t("noResults") : undefined}
-          count={results.length}
+          description={total === 0 ? t("noResults") : undefined}
+          count={total}
           articles={results}
+          paginationSlot={
+            <PaginationBar
+              page={page}
+              totalPages={totalPages}
+              params={query ? { q: query } : {}}
+            />
+          }
         />
       ) : (
         <div className={styles.browse}>

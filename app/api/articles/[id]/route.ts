@@ -28,6 +28,11 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     const existing = await getArticleById(id);
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+    const role = (session.user as { role?: string }).role ?? "user";
+    if (role === "author" && existing.author_id !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await req.json();
     const { title_en, title_ne, slug, excerpt_en, excerpt_ne,
             content_en, content_ne, category, tags, status, featured_image } = body;
@@ -67,6 +72,16 @@ export async function DELETE(req: NextRequest, { params }: Ctx) {
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
+
+    const role = (session.user as { role?: string }).role ?? "user";
+    if (role === "author") {
+      const existing = await getArticleById(id);
+      if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+      if (existing.author_id !== session.user.id) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
+
     const deleted = await deleteArticle(id);
     if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true });

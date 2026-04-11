@@ -13,10 +13,21 @@ A modern multilingual news portal built with Next.js 16 App Router. Features a c
 - `/dashboard/seo` — Full SEO settings: meta, canonical, OG, GA4, Google/Bing/Yandex/Baidu/Pinterest verification, sitemap viewer, robots.txt preview
 
 ### SEO / Sitemap Routes
-- `/sitemap.xml` — Main sitemap (Next.js `app/sitemap.ts`) covering all locales, categories, static pages, and published articles
+- `/sitemap.xml` — Main sitemap via `app/sitemap.xml/route.ts` (native Response, X-Content-Type-Options: nosniff) covering all locales, categories, static pages, and published articles
 - `/article-sitemap.xml` — Full article sitemap (up to 5000 articles) via `app/article-sitemap.xml/route.ts`
 - `/news-sitemap.xml` — Google News sitemap (last 48 hours) via `app/news-sitemap.xml/route.ts`
 - `/robots.txt` — Dynamic robots.txt via `app/robots.ts` respecting `seo_robots_noindex` setting
+
+### Pagination
+- `PaginationBar` component (`app/_components/PaginationBar.tsx`) — server component, page number links, prev/next arrows, ellipsis
+- `PUBLIC_PAGE_SIZE = 20` from `lib/public.ts` — used by all public archive pages
+- All public archive pages paginated: category, tags, author, search
+- All dashboard list pages paginated: articles, users, videos, pages, moderation (20 items/page)
+
+### Role-Based Article Visibility
+- Authors can only see/edit/delete their own articles (dashboard list, edit page, API GET/PUT/DELETE)
+- Admin/Moderator see all articles
+- Enforced at: `dashboard/articles/page.tsx`, `dashboard/articles/[id]/edit/page.tsx`, `api/articles/route.ts`, `api/articles/[id]/route.ts`
 
 ## Tech Stack
 - **Framework**: Next.js 16.2.2 (App Router, Turbopack)

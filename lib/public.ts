@@ -183,39 +183,50 @@ export async function getRelatedPublicArticles(
 
 export async function getPublicArticlesByTag(
   tag: string,
-  locale: string
+  locale: string,
+  opts?: { limit?: number; offset?: number }
 ): Promise<PublicArticle[]> {
+  const limit = opts?.limit ?? 1000;
+  const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
     `SELECT a.*, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.status = 'published' AND $1 = ANY(a.tags)
-     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC`,
-    [tag]
+     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
+     LIMIT $2 OFFSET $3`,
+    [tag, limit, offset]
   );
   return rows.map((r) => mapArticle(r, locale));
 }
 
 export async function getPublicArticlesByAuthorName(
   authorName: string,
-  locale: string
+  locale: string,
+  opts?: { limit?: number; offset?: number }
 ): Promise<PublicArticle[]> {
+  const limit = opts?.limit ?? 1000;
+  const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
     `SELECT a.*, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.status = 'published' AND LOWER(u.name) = LOWER($1)
-     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC`,
-    [authorName]
+     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
+     LIMIT $2 OFFSET $3`,
+    [authorName, limit, offset]
   );
   return rows.map((r) => mapArticle(r, locale));
 }
 
 export async function searchPublicArticles(
   query: string,
-  locale: string
+  locale: string,
+  opts?: { limit?: number; offset?: number }
 ): Promise<PublicArticle[]> {
   if (!query.trim()) return [];
+  const limit = opts?.limit ?? 20;
+  const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
     `SELECT a.*, u.name AS author_name
      FROM article a
@@ -226,8 +237,8 @@ export async function searchPublicArticles(
             OR LOWER(a.category) ILIKE $1
             OR u.name ILIKE $1)
      ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
-     LIMIT 50`,
-    [`%${query}%`]
+     LIMIT $2 OFFSET $3`,
+    [`%${query}%`, limit, offset]
   );
   return rows.map((r) => mapArticle(r, locale));
 }
@@ -359,4 +370,53 @@ export async function getActiveLiveCount(): Promise<number> {
   } catch {
     return 0;
   }
+}
+
+export const PUBLIC_PAGE_SIZE = 20;
+
+export async function countPublicArticles(opts?: { category?: string }): Promise<number> {
+  const conditions = ["a.status = 'published'"];
+  const values: unknown[] = [];
+  let idx = 1;
+  if (opts?.category) {
+    conditions.push(`LOWER(a.category) = $${idx++}`);
+    values.push(opts.category.toLowerCase());
+  }
+  const where = `WHERE ${conditions.join(" AND ")}`;
+  const { rows } = await pool.query(`SELECT COUNT(*)::int AS cnt FROM article a ${where}`, values);
+  return rows[0]?.cnt ?? 0;
+}
+
+export async function countPublicArticlesByTag(tag: string): Promise<number> {
+  const { rows } = await pool.query(
+    `SELECT COUNT(*)::int AS cnt FROM article WHERE status = 'published' AND $1 = ANY(tags)`,
+    [tag]
+  );
+  return rows[0]?.cnt ?? 0;
+}
+
+export async function countPublicArticlesByAuthorName(authorName: string): Promise<number> {
+  const { rows } = await pool.query(
+    `SELECT COUNT(*)::int AS cnt
+     FROM article a
+     LEFT JOIN "user" u ON u.id = a.author_id
+     WHERE a.status = 'published' AND LOWER(u.name) = LOWER($1)`,
+    [authorName]
+  );
+  return rows[0]?.cnt ?? 0;
+}
+
+export async function countSearchArticles(query: string): Promise<number> {
+  if (!query.trim()) return 0;
+  const { rows } = await pool.query(
+    `SELECT COUNT(*)::int AS cnt
+     FROM article a
+     LEFT JOIN "user" u ON u.id = a.author_id
+     WHERE a.status = 'published'
+       AND (a.title_en ILIKE $1 OR a.title_ne ILIKE $1
+            OR a.excerpt_en ILIKE $1 OR a.excerpt_ne ILIKE $1
+            OR LOWER(a.category) ILIKE $1 OR u.name ILIKE $1)`,
+    [`%${query}%`]
+  );
+  return rows[0]?.cnt ?? 0;
 }

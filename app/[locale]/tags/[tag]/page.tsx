@@ -5,13 +5,19 @@ import BreakingTicker from "@/app/_components/BreakingTicker";
 import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import ArchiveLayout from "@/app/_components/ArchiveLayout";
+import PaginationBar from "@/app/_components/PaginationBar";
 import {
   getPublicArticlesByTag,
+  countPublicArticlesByTag,
   getPublicTags,
   getBreakingHeadline,
+  PUBLIC_PAGE_SIZE,
 } from "@/lib/public";
 
-type Props = { params: Promise<{ locale: string; tag: string }> };
+type Props = {
+  params: Promise<{ locale: string; tag: string }>;
+  searchParams: Promise<Record<string, string>>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { tag, locale } = await params;
@@ -43,20 +49,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function TagPage({ params }: Props) {
+export default async function TagPage({ params, searchParams }: Props) {
   const { tag, locale } = await params;
+  const sp = await searchParams;
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10));
+  const offset = (page - 1) * PUBLIC_PAGE_SIZE;
 
-  const [tags, articles, headline] = await Promise.all([
+  const [tags, articles, total, headline] = await Promise.all([
     getPublicTags(),
-    getPublicArticlesByTag(tag, locale),
+    getPublicArticlesByTag(tag, locale, { limit: PUBLIC_PAGE_SIZE, offset }),
+    countPublicArticlesByTag(tag),
     getBreakingHeadline(locale),
   ]);
 
   const tagData = tags.find((t) => t.slug === tag);
-  if (!tagData && articles.length === 0) notFound();
+  if (!tagData && total === 0) notFound();
 
   const t = await getTranslations("archive");
   const label = tagData?.label ?? tag.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const totalPages = Math.ceil(total / PUBLIC_PAGE_SIZE);
 
   return (
     <>
@@ -66,8 +77,11 @@ export default async function TagPage({ params }: Props) {
         badge={t("topicBadge")}
         title={label}
         description={tagData?.description}
-        count={articles.length}
+        count={total}
         articles={articles}
+        paginationSlot={
+          <PaginationBar page={page} totalPages={totalPages} />
+        }
       />
       <Footer />
     </>
