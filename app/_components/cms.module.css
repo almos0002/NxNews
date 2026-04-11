@@ -120,33 +120,49 @@
 /* Action buttons */
 .actionRow {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
-.editBtn, .deleteBtn {
-  font-family: var(--font-serif);
-  font-size: 0.78rem;
-  font-weight: 600;
-  border-radius: 5px;
-  padding: 4px 12px;
+.editBtn, .deleteBtn, .viewBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-ink-muted);
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.15s ease;
-  border: 1px solid;
+  padding: 0;
 }
-.editBtn {
-  background: #fff;
-  color: var(--color-ink);
-  border-color: var(--color-border);
-}
-.editBtn:hover { border-color: var(--color-ink); }
 
-.deleteBtn {
-  background: #fff;
-  color: #dc2626;
-  border-color: #fca5a5;
+.viewBtn:hover  { color: #0891b2; border-color: #bae6fd; background: #f0f9ff; }
+.editBtn:hover  { color: #059669; border-color: #6ee7b7; background: #ecfdf5; }
+.deleteBtn:hover { color: #b91c1c; border-color: #fecaca; background: #fef2f2; }
+
+/* Shared date / views cell styles */
+.dateCell {
+  white-space: nowrap;
+  color: var(--color-ink-muted);
+  font-size: 0.8rem;
 }
-.deleteBtn:hover { background: #fef2f2; }
+
+.viewsCell { white-space: nowrap; }
+
+.viewsValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--color-ink);
+}
+
+.none { color: var(--color-ink-muted); }
 
 /* Form card */
 .formCard {

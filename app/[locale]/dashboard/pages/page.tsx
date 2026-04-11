@@ -59,22 +59,26 @@ export default async function PagesPage() {
                 <td><strong>{p.title_en}</strong>{p.title_ne && <><br /><span style={{ color: "var(--color-ink-muted)", fontSize: "0.8rem" }}>{p.title_ne}</span></>}</td>
                 <td style={{ fontFamily: "monospace", fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>/{p.slug}</td>
                 <td><span className={`${styles.badge} ${statusClass(p.status)}`}>{p.status}</span></td>
-                <td style={{ whiteSpace: "nowrap" }}>
+                <td className={styles.viewsCell}>
                   {p.view_count != null && p.view_count > 0 ? (
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 600, color: "var(--color-ink)", fontSize: "0.82rem" }}>
+                    <span className={styles.viewsValue}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
                       </svg>
                       {(p.view_count ?? 0) >= 1000 ? `${((p.view_count ?? 0) / 1000).toFixed(1)}k` : (p.view_count ?? 0).toLocaleString()}
                     </span>
-                  ) : <span style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem" }}>—</span>}
+                  ) : <span className={styles.none}>—</span>}
                 </td>
-                <td style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem" }}>
-                  {new Date(p.updated_at).toLocaleDateString("en-GB")}
+                <td className={styles.dateCell}>
+                  {new Date(p.updated_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                 </td>
                 <td>
                   <div className={styles.actionRow}>
-                    <Link href={`/en/dashboard/pages/${p.id}/edit`} className={styles.editBtn}>Edit</Link>
+                    <Link href={`/en/dashboard/pages/${p.id}/edit`} className={styles.editBtn} title="Edit">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                      </svg>
+                    </Link>
                   </div>
                 </td>
               </tr>

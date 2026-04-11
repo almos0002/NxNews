@@ -122,7 +122,7 @@
 .table tbody tr:hover td { background: var(--color-bg); }
 
 /* ── Cells ───────────────────────────────────────── */
-.titleCell { max-width: 320px; }
+.titleCell { max-width: 200px; }
 
 .titleEn {
   display: block;
