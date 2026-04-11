@@ -115,8 +115,13 @@ export default function LiveAdminClient({ initialStreams, livePageViews }: Props
           <h1 className={styles.pageTitle}>Live Streams</h1>
           <p className={styles.pageSubtitle}>Manage live YouTube channels and stream links shown on the public Live page.</p>
           <p style={{ margin: "6px 0 0", fontSize: "0.82rem", color: "var(--color-ink-muted)", display: "flex", alignItems: "center", gap: 5 }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Live page total views: <strong>{livePageViews.toLocaleString()}</strong>
+            Live page total views:&nbsp;
+            <span className={styles.viewsValue} style={{ fontSize: "0.82rem" }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+              </svg>
+              {livePageViews >= 1000 ? `${(livePageViews / 1000).toFixed(1)}k` : livePageViews.toLocaleString()}
+            </span>
           </p>
         </div>
         <div className={styles.pageHeaderRight} style={{ display: "flex", alignItems: "center", gap: 10 }}>

@@ -400,8 +400,15 @@ export default function EventsAdminClient({ initialEvents }: Props) {
                     {ev.images.length} photo{ev.images.length !== 1 ? "s" : ""}
                   </span>
                 </td>
-                <td style={{ textAlign: "center", fontSize: "0.85rem", color: "var(--color-ink-secondary)" }}>
-                  {(ev.view_count ?? 0).toLocaleString()}
+                <td className={styles.viewsCell}>
+                  {(ev.view_count ?? 0) > 0 ? (
+                    <span className={styles.viewsValue}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {(ev.view_count ?? 0) >= 1000 ? `${((ev.view_count ?? 0) / 1000).toFixed(1)}k` : (ev.view_count ?? 0).toLocaleString()}
+                    </span>
+                  ) : <span className={styles.none}>—</span>}
                 </td>
                 <td>
                   <span className={`${styles.badge} ${ev.status === "published" ? styles.badgePublished : styles.badgeDraft}`}>
