@@ -19,7 +19,7 @@ export default function SplitPanel({
       <div className={styles.heading}>
         <h2 className={styles.sectionTitle}>{title}</h2>
         <div className={styles.rule} />
-        <a href="#" className={styles.seeAll}>See all →</a>
+        <a href="#" className={styles.seeAll}>See all</a>
       </div>
 
       <div className={styles.cols}>

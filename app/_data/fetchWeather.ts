@@ -21,19 +21,19 @@ const CITIES = [
 ];
 
 function wmoToCondition(code: number): { label: string; icon: string } {
-  if (code === 0)                   return { label: "Clear Sky",       icon: "☀️" };
-  if (code === 1)                   return { label: "Mainly Clear",    icon: "🌤️" };
-  if (code === 2)                   return { label: "Partly Cloudy",   icon: "⛅" };
-  if (code === 3)                   return { label: "Overcast",        icon: "☁️" };
-  if (code === 45 || code === 48)   return { label: "Foggy",           icon: "🌫️" };
-  if (code >= 51 && code <= 57)     return { label: "Drizzle",         icon: "🌦️" };
-  if (code >= 61 && code <= 67)     return { label: "Rainy",           icon: "🌧️" };
-  if (code >= 71 && code <= 77)     return { label: "Snowy",           icon: "🌨️" };
-  if (code >= 80 && code <= 82)     return { label: "Rain Showers",    icon: "🌦️" };
-  if (code === 85 || code === 86)   return { label: "Snow Showers",    icon: "🌨️" };
-  if (code === 95)                  return { label: "Thunderstorm",    icon: "⛈️" };
-  if (code === 96 || code === 99)   return { label: "Severe Storm",    icon: "⛈️" };
-  return { label: "Unknown", icon: "🌡️" };
+  if (code === 0)                   return { label: "Clear Sky",    icon: "sunny" };
+  if (code === 1)                   return { label: "Mainly Clear", icon: "sunny" };
+  if (code === 2)                   return { label: "Partly Cloudy",icon: "partly-cloudy" };
+  if (code === 3)                   return { label: "Overcast",     icon: "cloudy" };
+  if (code === 45 || code === 48)   return { label: "Foggy",        icon: "foggy" };
+  if (code >= 51 && code <= 57)     return { label: "Drizzle",      icon: "drizzle" };
+  if (code >= 61 && code <= 67)     return { label: "Rainy",        icon: "rainy" };
+  if (code >= 71 && code <= 77)     return { label: "Snowy",        icon: "snowy" };
+  if (code >= 80 && code <= 82)     return { label: "Rain Showers", icon: "drizzle" };
+  if (code === 85 || code === 86)   return { label: "Snow Showers", icon: "snowy" };
+  if (code === 95)                  return { label: "Thunderstorm", icon: "stormy" };
+  if (code === 96 || code === 99)   return { label: "Severe Storm", icon: "stormy" };
+  return { label: "Unknown", icon: "cloudy" };
 }
 
 function cToF(c: number) {

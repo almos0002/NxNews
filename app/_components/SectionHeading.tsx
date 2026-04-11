@@ -8,7 +8,7 @@ export default function SectionHeading({ title, href }: { title: string; href?: 
       <div className={styles.rule} />
       {href && (
         <Link href={href} className={styles.viewAll}>
-          View All →
+          View All
         </Link>
       )}
     </div>

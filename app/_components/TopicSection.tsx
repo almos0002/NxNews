@@ -95,7 +95,7 @@ export default function TopicSection({
         <h2 className={styles.title}>{title}</h2>
         <div className={styles.rule} />
         <a href={`/${title.toLowerCase().replace(/\s+&\s+/, "-")}`} className={styles.seeAll}>
-          See all →
+          See all
         </a>
       </div>
 

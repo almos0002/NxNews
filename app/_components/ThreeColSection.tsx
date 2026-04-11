@@ -67,7 +67,7 @@ export default async function ThreeColSection({
         <h2 className={styles.sectionTitle}>{title}</h2>
         <div className={styles.rule} />
         {href
-          ? <Link href={href} className={styles.seeAll}>{t("seeAll")} →</Link>
+          ? <Link href={href} className={styles.seeAll}>{t("seeAll")}</Link>
           : <span className={styles.seeAll}>{t("seeAll")}</span>
         }
       </div>

@@ -18,7 +18,7 @@ export default async function EntertainmentSection({
       <div className={styles.heading}>
         <h2 className={styles.title}>{t("entertainment")}</h2>
         <div className={styles.rule} />
-        <Link href="/entertainment" className={styles.seeAll}>{t("seeAll")} →</Link>
+        <Link href="/entertainment" className={styles.seeAll}>{t("seeAll")}</Link>
       </div>
 
       <div className={styles.grid}>

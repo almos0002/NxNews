@@ -164,3 +164,12 @@
 @media (max-width: 680px) {
   .cols { grid-template-columns: 1fr; }
 }
+
+.viewAll::after {
+  content: " →";
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.viewAll:hover::after {
+  transform: translateX(3px);
+}

@@ -349,3 +349,14 @@ export async function getAuthorInfo(
     bio: rows[0].bio || `${rows[0].name} is a contributor to KumariHub.`,
   };
 }
+
+export async function getActiveLiveCount(): Promise<number> {
+  try {
+    const { rows } = await pool.query(
+      `SELECT COUNT(*)::int AS cnt FROM live_streams WHERE is_active = true`
+    );
+    return rows[0]?.cnt ?? 0;
+  } catch {
+    return 0;
+  }
+}

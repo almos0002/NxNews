@@ -188,8 +188,18 @@
   text-decoration: none;
 }
 
+.emptyLink::after {
+  content: " →";
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
 .emptyLink:hover {
   text-decoration: underline;
+}
+
+.emptyLink:hover::after {
+  transform: translateX(3px);
 }
 
 /* ── Sidebar ──────────────────────────────────────── */

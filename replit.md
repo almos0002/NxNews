@@ -12,6 +12,12 @@ A modern multilingual news portal built with Next.js 16 App Router. Features a c
 - `/dashboard/live` — Manage live stream links (CRUD, toggle active, display order)
 - `/dashboard/seo` — Full SEO settings: meta, canonical, OG, GA4, Google/Bing/Yandex/Baidu/Pinterest verification, sitemap viewer, robots.txt preview
 
+### SEO / Sitemap Routes
+- `/sitemap.xml` — Main sitemap (Next.js `app/sitemap.ts`) covering all locales, categories, static pages, and published articles
+- `/article-sitemap.xml` — Full article sitemap (up to 5000 articles) via `app/article-sitemap.xml/route.ts`
+- `/news-sitemap.xml` — Google News sitemap (last 48 hours) via `app/news-sitemap.xml/route.ts`
+- `/robots.txt` — Dynamic robots.txt via `app/robots.ts` respecting `seo_robots_noindex` setting
+
 ## Tech Stack
 - **Framework**: Next.js 16.2.2 (App Router, Turbopack)
 - **Runtime**: Node.js 22

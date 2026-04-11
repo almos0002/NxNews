@@ -21,7 +21,7 @@ export default function CategoryLists({ columns }: { columns: Column[] }) {
               <div className={styles.cardHeader}>
                 <span className={styles.cardLabel}>{col.label}</span>
                 {col.href && (
-                  <Link href={col.href} className={styles.viewAll}>View All →</Link>
+                  <Link href={col.href} className={styles.viewAll}>View All</Link>
                 )}
               </div>
 

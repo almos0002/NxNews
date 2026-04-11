@@ -126,3 +126,12 @@
     grid-template-columns: 1fr;
   }
 }
+
+.seeAll::after {
+  content: " →";
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.seeAll:hover::after {
+  transform: translateX(3px);
+}

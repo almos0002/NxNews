@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import { getNavbarItems } from "@/lib/menu";
 import type { MenuItem } from "@/lib/menu";
+import { getActiveLiveCount } from "@/lib/public";
 import LanguageSwitcher from "./LanguageSwitcher";
 import MobileNav from "./MobileNav";
 import DateTimeClock from "./DateTimeClock";
@@ -13,11 +14,12 @@ import styles from "./Header.module.css";
 
 export default async function Header() {
   const hdrs = await headers();
-  const [t, locale, navItems, sessionResult] = await Promise.all([
+  const [t, locale, navItems, sessionResult, liveCount] = await Promise.all([
     getTranslations("nav"),
     getLocale(),
     getNavbarItems().catch(() => []),
     auth.api.getSession({ headers: hdrs }).catch(() => null),
+    getActiveLiveCount().catch(() => 0),
   ]);
   const session = sessionResult;
 
@@ -111,6 +113,12 @@ export default async function Header() {
                 })}
               </ul>
             </nav>
+            {liveCount > 0 && (
+              <Link href="/live" className={styles.liveBtn} aria-label={`${liveCount} live stream${liveCount > 1 ? "s" : ""}`}>
+                <span className={styles.liveDot} aria-hidden="true" />
+                LIVE
+              </Link>
+            )}
             <Link href="/search" className={styles.searchBtn} aria-label="Search">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"

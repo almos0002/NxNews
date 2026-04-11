@@ -213,3 +213,37 @@
     display: none;
   }
 }
+
+/* ── Live button ── */
+.liveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 9px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.liveBtn:hover {
+  opacity: 0.85;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+  animation: livePulse 1.4s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}

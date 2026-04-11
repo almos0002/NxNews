@@ -13,7 +13,7 @@ export default async function EditorsPick({ articles }: { articles: Article[] })
       <div className={styles.header}>
         <div className={styles.headerTop}>
           <span className={styles.label}>{t("editorsPick")}</span>
-          <Link href="/search" className={styles.viewAll}>{t("seeAll")} →</Link>
+          <Link href="/search" className={styles.viewAll}>{t("seeAll")}</Link>
         </div>
         <p className={styles.sub}>{t("editorsPickSub")}</p>
       </div>
