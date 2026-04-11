@@ -13,9 +13,21 @@ import {
 import { Link } from "@/i18n/navigation";
 import styles from "@/app/search/page.module.css";
 
-export const metadata: Metadata = {
-  title: "Search — KumariHub",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const title = locale === "ne" ? "खोज्नुहोस् — KumariHub" : "Search — KumariHub";
+  return {
+    title,
+    description: locale === "ne"
+      ? "KumariHub मा समाचार, लेख र विषयहरू खोज्नुहोस्।"
+      : "Search news articles, topics and more on KumariHub.",
+    robots: { index: false, follow: false },
+  };
+}
 
 type Props = {
   params: Promise<{ locale: string }>;

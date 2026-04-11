@@ -46,11 +46,31 @@ function isYoutubeUrl(url: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
+  const isNe = locale === "ne";
+  const title = isNe ? "सिधा प्रसारण — KumariHub" : "Live — KumariHub";
+  const description = isNe
+    ? "KumariHub को सिधा प्रसारण हेर्नुहोस् — नेपाल र विश्वका ताजा घटनाहरू।"
+    : "Watch KumariHub live streams and broadcasts — breaking news and events from Nepal and beyond.";
   return {
-    title: locale === "ne" ? "सिधा प्रसारण — KumariHub" : "Live — KumariHub",
-    description: locale === "ne"
-      ? "KumariHub को सिधा प्रसारण हेर्नुहोस्"
-      : "Watch KumariHub live streams and broadcasts.",
+    title,
+    description,
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: `/${locale}/live`,
+      languages: { en: "/en/live", ne: "/ne/live" },
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `/${locale}/live`,
+      locale: isNe ? "ne_NP" : "en_US",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 

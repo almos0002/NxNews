@@ -32,11 +32,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = isNe ? (s.site_description_ne || s.site_description_en || "") : (s.site_description_en || "");
 
   const title = tagline ? `${siteName} — ${tagline}` : siteName;
+  const ogImage = s.logo_url || undefined;
 
   return {
     title,
-    description,
-    alternates: { languages: { en: "/en", ne: "/ne" } },
+    description: description || undefined,
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: `/${locale}`,
+      languages: { en: "/en", ne: "/ne" },
+    },
+    openGraph: {
+      title,
+      description: description || undefined,
+      type: "website",
+      url: `/${locale}`,
+      siteName: s.site_title_en || "KumariHub",
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: siteName }] : undefined,
+      locale: locale === "ne" ? "ne_NP" : "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: description || undefined,
+      images: ogImage ? [ogImage] : undefined,
+    },
   };
 }
 

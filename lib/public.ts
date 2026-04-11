@@ -140,7 +140,7 @@ export async function getPublicArticles(
 export async function getPublicArticleBySlug(
   slug: string,
   locale: string
-): Promise<(PublicArticle & { content: string; tags: string[] }) | null> {
+): Promise<(PublicArticle & { content: string; tags: string[]; publishedAt: string | null; updatedAt: string | null }) | null> {
   const { rows } = await pool.query(
     `SELECT a.*, u.name AS author_name
      FROM article a
@@ -157,6 +157,8 @@ export async function getPublicArticleBySlug(
     ...base,
     content,
     tags: Array.isArray(row.tags) ? row.tags : [],
+    publishedAt: row.published_at ? new Date(row.published_at as string).toISOString() : null,
+    updatedAt:   row.updated_at   ? new Date(row.updated_at   as string).toISOString() : null,
   };
 }
 

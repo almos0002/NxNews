@@ -235,6 +235,29 @@ Redirects to locale login with `?from=` param if missing.
 - **Critical**: The app uses `NEON_DATABASE_URL` (Neon cloud PostgreSQL), NOT the Replit helium `DATABASE_URL`. Using the wrong connection shows an empty user table — always use `NEON_DATABASE_URL` for database operations.
 - Category values stored in articles use the slug (e.g. "technology"); the public query filters via `LOWER(a.category) = slug` so older articles stored as "Technology" still match
 
+## Production Readiness (Audit Complete)
+- **Build**: Clean production build, zero TypeScript errors — 157 routes compiled (Turbopack).
+- **DB Indexes** (`scripts/` or applied via node-pg):
+  - `idx_article_status_published` on `article(status, published_at DESC NULLS LAST)` — all archive/listing queries
+  - `idx_article_slug` on `article(slug)` — single-article lookup
+  - `idx_article_status_featured` on `article(status, is_featured)` — featured hero panel
+  - `idx_article_category_status` on `article(LOWER(category), status)` — related articles, category archive
+  - `idx_article_tags_gin` GIN on `article(tags)` — tag array `ANY()` queries
+  - `idx_user_lower_name` on `"user"(LOWER(name))` — author lookup (ILIKE/LOWER queries)
+  - `idx_page_views_content` on `page_views(content_type, content_id)` — view count joins
+  - `idx_videos_status_created` on `videos(status, created_at DESC)` — videos listing
+  - `idx_article_view_count` on `article(view_count DESC)` — trending sort
+- **SEO**: All public pages now have full metadata:
+  - `metadataBase` set from `seo_canonical_base_url` setting (falls back to `https://kumarihub.com`)
+  - `openGraph` (type, title, description, images, locale, publishedTime/modifiedTime on articles, section, tags)
+  - `twitter` card (summary_large_image on article/home, summary on archives)
+  - `alternates.canonical` on every public page
+  - `robots: { index: false, follow: false }` on `/search` (prevents search result pages being indexed)
+  - `robots: { index: true, follow: true }` explicitly on all other public pages
+  - `getPublicArticleBySlug` returns `publishedAt` + `updatedAt` ISO strings for OG `article:published_time`
+- **BreakingTicker**: Now accepts both `headline?: string` (single-string legacy) and `headlines?: Headline[]` (array) — fully backwards-compatible
+- **lib/public.ts** `getPublicArticleBySlug` return type extended with `publishedAt: string | null`, `updatedAt: string | null`
+
 ## Completed Features
 - **SEO Settings** (`/dashboard/seo`) — meta title templates, OG image, GA4/GSC integration, robots noindex toggle, JSON-LD toggle
 - **Dashboard overview** — real DB stats for admin/author, recent articles table, moderation queue preview

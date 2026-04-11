@@ -26,11 +26,39 @@ type Props = { params: Promise<{ locale: string; id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, locale } = await params;
   const article = await getPublicArticleBySlug(id, locale);
-  if (!article) return {};
+  if (!article) return { title: "Article — KumariHub" };
+
+  const title = `${article.title} — KumariHub`;
+  const description = article.excerpt || undefined;
+  const image = article.imageUrl || undefined;
+  const canonicalPath = `/article/${id}`;
+
   return {
-    title: `${article.title} — KumariHub`,
-    description: article.excerpt,
-    alternates: { languages: { en: `/en/article/${id}`, ne: `/ne/article/${id}` } },
+    title,
+    description,
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: canonicalPath,
+      languages: { en: `/en/article/${id}`, ne: `/ne/article/${id}` },
+    },
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      url: canonicalPath,
+      images: image ? [{ url: image, width: 1200, height: 630, alt: article.title }] : undefined,
+      publishedTime: article.publishedAt || undefined,
+      modifiedTime:  article.updatedAt   || undefined,
+      section: article.category || undefined,
+      tags: article.tags?.length ? article.tags : undefined,
+      locale: locale === "ne" ? "ne_NP" : "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 

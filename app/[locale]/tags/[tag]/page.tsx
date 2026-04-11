@@ -14,14 +14,32 @@ import {
 type Props = { params: Promise<{ locale: string; tag: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { tag } = await params;
+  const { tag, locale } = await params;
   const tags = await getPublicTags();
   const tagData = tags.find((t) => t.slug === tag);
   const label = tagData?.label ?? tag.replace(/-/g, " ");
+  const title = `${label} — KumariHub`;
+  const description = tagData?.description || `Articles tagged with "${label}" on KumariHub.`;
   return {
-    title: `${label} — KumariHub`,
-    description: tagData?.description,
-    alternates: { languages: { en: `/en/tags/${tag}`, ne: `/ne/tags/${tag}` } },
+    title,
+    description,
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: `/${locale}/tags/${tag}`,
+      languages: { en: `/en/tags/${tag}`, ne: `/ne/tags/${tag}` },
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `/${locale}/tags/${tag}`,
+      locale: locale === "ne" ? "ne_NP" : "en_US",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 

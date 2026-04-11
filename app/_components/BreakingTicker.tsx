@@ -10,15 +10,22 @@ interface Headline {
 
 interface Props {
   headlines?: Headline[];
+  headline?: string;
   locale?: string;
 }
 
-export default function BreakingTicker({ headlines = [], locale = "en" }: Props) {
-  if (headlines.length === 0) return null;
+export default function BreakingTicker({ headlines, headline, locale = "en" }: Props) {
+  const resolved: Headline[] = headlines?.length
+    ? headlines
+    : headline
+      ? [{ title: headline, slug: "" }]
+      : [];
 
-  const repeated = headlines.length < 4
-    ? [...headlines, ...headlines, ...headlines]
-    : [...headlines, ...headlines];
+  if (resolved.length === 0) return null;
+
+  const repeated = resolved.length < 4
+    ? [...resolved, ...resolved, ...resolved]
+    : [...resolved, ...resolved];
 
   return (
     <div className={styles.wrapper}>
@@ -29,13 +36,17 @@ export default function BreakingTicker({ headlines = [], locale = "en" }: Props)
             <div className={styles.scrollContent}>
               {repeated.map((h, i) => (
                 <span key={i} className={styles.item}>
-                  <Link
-                    href={`/${locale}/article/${h.slug}`}
-                    className={styles.link}
-                    prefetch={false}
-                  >
-                    {h.title}
-                  </Link>
+                  {h.slug ? (
+                    <Link
+                      href={`/${locale}/article/${h.slug}`}
+                      className={styles.link}
+                      prefetch={false}
+                    >
+                      {h.title}
+                    </Link>
+                  ) : (
+                    <span className={styles.link}>{h.title}</span>
+                  )}
                   <span className={styles.sep} aria-hidden="true">◆</span>
                 </span>
               ))}

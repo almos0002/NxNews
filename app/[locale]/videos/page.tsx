@@ -14,7 +14,31 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "nav" });
-  return { title: `${t("videos")} — KumariHub` };
+  const title = `${t("videos")} — KumariHub`;
+  const description = locale === "ne"
+    ? "KumariHub मा नेपाल र विश्वका समाचार भिडियोहरू हेर्नुहोस्।"
+    : "Watch the latest news videos from Nepal and around the world on KumariHub.";
+  return {
+    title,
+    description,
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: `/${locale}/videos`,
+      languages: { en: "/en/videos", ne: "/ne/videos" },
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `/${locale}/videos`,
+      locale: locale === "ne" ? "ne_NP" : "en_US",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
 }
 
 export default async function VideosPage({ params }: Props) {

@@ -34,7 +34,11 @@ export async function generateMetadata({
   if (s.seo_baidu_verification)     verificationOther["baidu-site-verification"] = s.seo_baidu_verification;
   if (s.seo_pinterest_verification) verificationOther["p:domain_verify"]        = s.seo_pinterest_verification;
 
+  const baseUrl = s.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
+  const ogLogoUrl = s.logo_url || `${baseUrl}/og-default.png`;
+
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     icons: { icon: favicon },
@@ -44,8 +48,23 @@ export async function generateMetadata({
       other:   Object.keys(verificationOther).length > 0 ? verificationOther : undefined,
     },
     alternates: {
-      canonical: `/${locale}`,
-      languages: { en: "/en", ne: "/ne" },
+      canonical: `${baseUrl}/${locale}`,
+      languages: { en: `${baseUrl}/en`, ne: `${baseUrl}/ne` },
+    },
+    openGraph: {
+      siteName: s.site_title_en || "KumariHub",
+      title,
+      description: description || undefined,
+      url: `${baseUrl}/${locale}`,
+      type: "website",
+      images: ogLogoUrl ? [{ url: ogLogoUrl, width: 1200, height: 630, alt: title }] : undefined,
+      locale: locale === "ne" ? "ne_NP" : "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: description || undefined,
+      images: ogLogoUrl ? [ogLogoUrl] : undefined,
     },
   };
 }

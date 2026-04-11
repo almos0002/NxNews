@@ -132,7 +132,7 @@ export default function LiveAdminClient({ initialStreams }: { initialStreams: Li
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Title (Nepali)</label>
-              <input className={styles.input} value={form.title_ne} onChange={(e) => setF("title_ne", e.target.value)} placeholder="कुमारी हब समाचार" />
+              <input className={styles.input} value={form.title_ne ?? ""} onChange={(e) => setF("title_ne", e.target.value)} placeholder="कुमारी हब समाचार" />
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label className={styles.label}>Stream URL *</label>
@@ -175,11 +175,11 @@ export default function LiveAdminClient({ initialStreams }: { initialStreams: Li
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label className={styles.label}>Description (English)</label>
-              <textarea className={styles.textarea} rows={2} value={form.description_en} onChange={(e) => setF("description_en", e.target.value)} placeholder="Brief description of this stream..." />
+              <textarea className={styles.textarea} rows={2} value={form.description_en ?? ""} onChange={(e) => setF("description_en", e.target.value)} placeholder="Brief description of this stream..." />
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label className={styles.label}>Description (Nepali)</label>
-              <textarea className={styles.textarea} rows={2} value={form.description_ne} onChange={(e) => setF("description_ne", e.target.value)} placeholder="यस प्रसारणको संक्षिप्त विवरण..." />
+              <textarea className={styles.textarea} rows={2} value={form.description_ne ?? ""} onChange={(e) => setF("description_ne", e.target.value)} placeholder="यस प्रसारणको संक्षिप्त विवरण..." />
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>

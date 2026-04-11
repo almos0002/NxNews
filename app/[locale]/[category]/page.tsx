@@ -46,9 +46,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const label = cat
     ? (locale === "ne" ? cat.name_ne || cat.name_en : cat.name_en)
     : category.charAt(0).toUpperCase() + category.slice(1);
+  const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
+  const description = descriptions[category as keyof typeof descriptions];
+  const title = `${label} — KumariHub`;
   return {
-    title: `${label} — KumariHub`,
-    alternates: { languages: { en: `/en/${category}`, ne: `/ne/${category}` } },
+    title,
+    description,
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: `/${locale}/${category}`,
+      languages: { en: `/en/${category}`, ne: `/ne/${category}` },
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `/${locale}/${category}`,
+      locale: locale === "ne" ? "ne_NP" : "en_US",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 

@@ -24,10 +24,30 @@ function slugToName(slug: string): string {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const name = slugToName(slug);
+  const title = `${name} — KumariHub`;
+  const description = `Read articles by ${name} on KumariHub — Nepal's multilingual news portal.`;
   return {
-    title: `${name} — KumariHub`,
+    title,
+    description,
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: `/${locale}/author/${slug}`,
+      languages: { en: `/en/author/${slug}`, ne: `/ne/author/${slug}` },
+    },
+    openGraph: {
+      title,
+      description,
+      type: "profile",
+      url: `/${locale}/author/${slug}`,
+      locale: locale === "ne" ? "ne_NP" : "en_US",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 
