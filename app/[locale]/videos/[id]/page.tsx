@@ -8,6 +8,7 @@ import Footer from "@/app/_components/Footer";
 import AdUnit from "@/app/_components/AdUnit";
 import { Link } from "@/i18n/navigation";
 import { getPublicVideos, getPublicVideoById, getBreakingHeadline } from "@/lib/public";
+import ViewTracker from "@/app/_components/ViewTracker";
 import styles from "./video.module.css";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
@@ -37,6 +38,7 @@ export default async function VideoDetailPage({ params }: Props) {
     <>
       <BreakingTicker headline={headline} />
       <Header />
+      <ViewTracker type="video" id={video.id} />
 
       <div className={styles.wrapper}>
         <div className={styles.inner}>

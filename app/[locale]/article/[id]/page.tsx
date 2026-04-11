@@ -7,6 +7,7 @@ import Header from "@/app/_components/Header";
 import Footer from "@/app/_components/Footer";
 import CategoryBadge from "@/app/_components/CategoryBadge";
 import AdUnit from "@/app/_components/AdUnit";
+import ViewTracker from "@/app/_components/ViewTracker";
 
 import {
   getPublicArticleBySlug,
@@ -49,6 +50,9 @@ export default async function ArticlePage({ params }: Props) {
     <>
       <BreakingTicker headline={headline} />
       <Header />
+      {article.rawId && (
+        <ViewTracker type="article" id={article.rawId} />
+      )}
 
       <main className={styles.main}>
         <div className={styles.articleHeader}>
@@ -69,6 +73,18 @@ export default async function ArticlePage({ params }: Props) {
             )}
             <span className={styles.metaDot} />
             <span>{article.readTime} {t("minRead")}</span>
+            {typeof article.viewCount === "number" && article.viewCount > 0 && (
+              <>
+                <span className={styles.metaDot} />
+                <span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: "middle", marginRight: 3 }} aria-hidden="true">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                  {article.viewCount.toLocaleString()}
+                </span>
+              </>
+            )}
           </div>
 
           <div className={styles.actions}>

@@ -11,19 +11,14 @@ import DateTimeClock from "./DateTimeClock";
 import styles from "./Header.module.css";
 
 export default async function Header() {
-  const [t, locale] = await Promise.all([
+  const hdrs = await headers();
+  const [t, locale, navItems, sessionResult] = await Promise.all([
     getTranslations("nav"),
     getLocale(),
+    getNavbarItems().catch(() => []),
+    auth.api.getSession({ headers: hdrs }).catch(() => null),
   ]);
-
-  let session = null;
-  try {
-    session = await auth.api.getSession({ headers: await headers() });
-  } catch {
-    // DB unavailable — render unauthenticated state
-  }
-
-  const navItems = await getNavbarItems().catch(() => []);
+  const session = sessionResult;
 
   function label(item: MenuItem): string {
     return (locale === "ne" && item.label_ne) ? item.label_ne : item.label_en;

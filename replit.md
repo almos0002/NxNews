@@ -1,7 +1,7 @@
 # KumariHub — Multilingual News Portal
 
 ## Overview
-A modern multilingual news portal built with Next.js 16 App Router. Features a contemporary editorial design with clean card-based layouts, strong typographic hierarchy, full English + Nepali language support via next-intl, and a complete authentication system with role-based access control.
+A modern multilingual news portal built with Next.js 16 App Router. Features a contemporary editorial design with clean card-based layouts, strong typographic hierarchy, full English + Nepali language support via next-intl, and a complete authentication system with role-based access control. Includes unique view tracking (IP + date deduplication) with geolocation and a live Recent Viewers dashboard widget.
 
 ## Tech Stack
 - **Framework**: Next.js 16.2.2 (App Router, Turbopack)

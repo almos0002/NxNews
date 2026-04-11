@@ -23,6 +23,8 @@ export interface PublicArticle {
   readTime: string;
   imageUrl: string;
   featured?: boolean;
+  viewCount?: number;
+  rawId?: string;
 }
 
 export interface PublicVideo {
@@ -65,6 +67,7 @@ function mapArticle(row: Record<string, unknown>, locale: string): PublicArticle
   const content = (isNe && row.content_ne) ? String(row.content_ne) : String(row.content_en ?? "");
   return {
     id: String(row.slug ?? row.id),
+    rawId: String(row.id),
     title,
     excerpt,
     category: String(row.category ?? ""),
@@ -73,6 +76,7 @@ function mapArticle(row: Record<string, unknown>, locale: string): PublicArticle
     time: formatTime(row.created_at as string),
     readTime: estimateReadTime(content),
     imageUrl: sanitizeImageUrl(String(row.featured_image ?? "")),
+    viewCount: typeof row.view_count === "number" ? row.view_count : parseInt(String(row.view_count ?? "0"), 10),
   };
 }
 

@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { pool } from "@/lib/db";
 import { countByStatus, listArticles } from "@/lib/articles";
 import styles from "./dashboard.module.css";
+import RecentViewsWidget from "@/app/_components/RecentViewsWidget";
 
 export const metadata: Metadata = { title: "Dashboard — KumariHub" };
 
@@ -325,6 +326,13 @@ export default async function DashboardPage() {
               </tbody>
             </table>
           </div>
+        </section>
+      )}
+
+      {/* Admin/Moderator: Recent Views */}
+      {(isAdmin || isModerator) && (
+        <section className={styles.section}>
+          <RecentViewsWidget />
         </section>
       )}
 
