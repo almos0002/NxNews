@@ -149,6 +149,19 @@
   color: var(--color-ink-secondary);
 }
 
+.viewsCell {
+  white-space: nowrap;
+}
+
+.viewsValue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--color-ink);
+}
+
 .dateCell {
   white-space: nowrap;
   color: var(--color-ink-muted);

@@ -9,6 +9,25 @@ interface ArticleCardProps {
   variant?: "hero" | "sidebar" | "grid" | "compact";
 }
 
+function EyeIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ verticalAlign: "middle", flexShrink: 0 }}>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function ViewCount({ count }: { count: number }) {
+  if (!count || count <= 0) return null;
+  return (
+    <span className={styles.views}>
+      <EyeIcon />
+      {count >= 1000 ? `${(count / 1000).toFixed(1)}k` : count.toLocaleString()}
+    </span>
+  );
+}
+
 export default function ArticleCard({
   article,
   variant = "grid",
@@ -36,6 +55,12 @@ export default function ArticleCard({
             <time className={styles.date}>{article.date}</time>
             <span className={styles.separator}>·</span>
             <span className={styles.readTime}>{article.readTime}</span>
+            {article.viewCount != null && article.viewCount > 0 && (
+              <>
+                <span className={styles.separator}>·</span>
+                <ViewCount count={article.viewCount} />
+              </>
+            )}
           </div>
         </div>
       </article>
@@ -63,6 +88,12 @@ export default function ArticleCard({
             <span className={styles.author}>{article.author}</span>
             <span className={styles.separator}>·</span>
             <span className={styles.readTime}>{article.readTime}</span>
+            {article.viewCount != null && article.viewCount > 0 && (
+              <>
+                <span className={styles.separator}>·</span>
+                <ViewCount count={article.viewCount} />
+              </>
+            )}
           </div>
         </div>
       </Link>
@@ -81,6 +112,12 @@ export default function ArticleCard({
             <span className={styles.author}>{article.author}</span>
             <span className={styles.separator}>·</span>
             <span className={styles.readTime}>{article.readTime}</span>
+            {article.viewCount != null && article.viewCount > 0 && (
+              <>
+                <span className={styles.separator}>·</span>
+                <ViewCount count={article.viewCount} />
+              </>
+            )}
           </div>
         </div>
       </Link>
@@ -110,6 +147,12 @@ export default function ArticleCard({
           <span className={styles.author}>{article.author}</span>
           <span className={styles.separator}>·</span>
           <span className={styles.readTime}>{article.readTime}</span>
+          {article.viewCount != null && article.viewCount > 0 && (
+            <>
+              <span className={styles.separator}>·</span>
+              <ViewCount count={article.viewCount} />
+            </>
+          )}
         </div>
       </div>
     </Link>

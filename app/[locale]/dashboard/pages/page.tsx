@@ -42,6 +42,7 @@ export default async function PagesPage() {
               <th>Title</th>
               <th>Slug</th>
               <th>Status</th>
+              <th>Views</th>
               <th>Updated</th>
               <th>Actions</th>
             </tr>
@@ -49,7 +50,7 @@ export default async function PagesPage() {
           <tbody>
             {pages.length === 0 ? (
               <tr>
-                <td colSpan={5} className={styles.emptyRow}>
+                <td colSpan={6} className={styles.emptyRow}>
                   No pages yet. <Link href="/en/dashboard/pages/new">Create your first page</Link>.
                 </td>
               </tr>
@@ -58,6 +59,16 @@ export default async function PagesPage() {
                 <td><strong>{p.title_en}</strong>{p.title_ne && <><br /><span style={{ color: "var(--color-ink-muted)", fontSize: "0.8rem" }}>{p.title_ne}</span></>}</td>
                 <td style={{ fontFamily: "monospace", fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>/{p.slug}</td>
                 <td><span className={`${styles.badge} ${statusClass(p.status)}`}>{p.status}</span></td>
+                <td style={{ whiteSpace: "nowrap" }}>
+                  {p.view_count != null && p.view_count > 0 ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 600, color: "var(--color-ink)", fontSize: "0.82rem" }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {(p.view_count ?? 0) >= 1000 ? `${((p.view_count ?? 0) / 1000).toFixed(1)}k` : (p.view_count ?? 0).toLocaleString()}
+                    </span>
+                  ) : <span style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem" }}>—</span>}
+                </td>
                 <td style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem" }}>
                   {new Date(p.updated_at).toLocaleDateString("en-GB")}
                 </td>

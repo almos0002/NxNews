@@ -228,6 +228,13 @@
   font-weight: 400;
 }
 
+.views {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 400;
+}
+
 /* ── Responsive ──────────────────────────────────── */
 @media (max-width: 768px) {
   .hero {

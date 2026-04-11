@@ -144,13 +144,14 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
               <th>Title</th>
               <th>YouTube</th>
               <th>Status</th>
+              <th>Views</th>
               <th>Date</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {videos.length === 0 ? (
-              <tr><td colSpan={6} className={styles.emptyRow}>No videos yet. Click "Add Video" to get started.</td></tr>
+              <tr><td colSpan={7} className={styles.emptyRow}>No videos yet. Click "Add Video" to get started.</td></tr>
             ) : videos.map((v) => (
               <tr key={v.id}>
                 <td>
@@ -177,6 +178,16 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
                   <span className={`${styles.badge} ${v.status === "published" ? styles.badgePublished : styles.badgeDraft}`}>
                     {v.status}
                   </span>
+                </td>
+                <td style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem", whiteSpace: "nowrap" }}>
+                  {v.view_count != null && v.view_count > 0 ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 600, color: "var(--color-ink)" }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {(v.view_count ?? 0) >= 1000 ? `${((v.view_count ?? 0) / 1000).toFixed(1)}k` : (v.view_count ?? 0).toLocaleString()}
+                    </span>
+                  ) : "—"}
                 </td>
                 <td style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem" }}>
                   {new Date(v.created_at).toLocaleDateString("en-GB")}

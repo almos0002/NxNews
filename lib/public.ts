@@ -36,6 +36,7 @@ export interface PublicVideo {
   date: string;
   duration: string;
   thumbnailUrl: string;
+  viewCount?: number;
 }
 
 function estimateReadTime(html: string): string {
@@ -91,6 +92,7 @@ function mapVideo(row: Record<string, unknown>, locale: string): PublicVideo {
     date: formatDate(row.created_at as string),
     duration: String(row.duration ?? ""),
     thumbnailUrl: String(row.thumbnail ?? ""),
+    viewCount: typeof row.view_count === "number" ? row.view_count : parseInt(String(row.view_count ?? "0"), 10),
   };
 }
 

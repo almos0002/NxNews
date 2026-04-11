@@ -193,6 +193,7 @@ export default async function DashboardPage() {
                   <th>Title</th>
                   <th>Category</th>
                   <th>Status</th>
+                  <th>Views</th>
                   <th>Date</th>
                   <th>Actions</th>
                 </tr>
@@ -200,7 +201,7 @@ export default async function DashboardPage() {
               <tbody>
                 {recentArticles.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className={styles.emptyRow}>
+                    <td colSpan={6} className={styles.emptyRow}>
                       No articles yet.{" "}
                       <a href="/en/dashboard/articles/new">Click here</a> to write your first article.
                     </td>
@@ -228,6 +229,16 @@ export default async function DashboardPage() {
                         >
                           {a.status}
                         </span>
+                      </td>
+                      <td style={{ whiteSpace: "nowrap", fontSize: "0.82rem" }}>
+                        {a.view_count != null && a.view_count > 0 ? (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 600, color: "var(--color-ink)" }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                            </svg>
+                            {(a.view_count ?? 0) >= 1000 ? `${((a.view_count ?? 0) / 1000).toFixed(1)}k` : (a.view_count ?? 0).toLocaleString()}
+                          </span>
+                        ) : <span style={{ color: "var(--color-ink-muted)" }}>—</span>}
                       </td>
                       <td style={{ whiteSpace: "nowrap", fontSize: "0.82rem" }}>
                         {new Date(a.created_at).toLocaleDateString("en-GB", {

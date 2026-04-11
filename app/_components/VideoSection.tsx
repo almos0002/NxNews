@@ -55,6 +55,18 @@ export default async function VideoSection() {
                 <span className={styles.author}>{video.author}</span>
                 <span className={styles.dot} />
                 <span>{video.date}</span>
+                {video.viewCount != null && video.viewCount > 0 && (
+                  <>
+                    <span className={styles.dot} />
+                    <span className={styles.viewCount}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ verticalAlign: "middle", marginRight: 3 }}>
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {video.viewCount >= 1000 ? `${(video.viewCount / 1000).toFixed(1)}k` : video.viewCount.toLocaleString()}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </Link>

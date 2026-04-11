@@ -17,6 +17,7 @@ export interface Article {
   published_at: Date | null;
   created_at: Date;
   updated_at: Date;
+  view_count?: number;
 }
 
 export interface ArticleWithAuthor extends Article {

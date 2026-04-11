@@ -14,6 +14,7 @@ export interface Video {
   author_id: string;
   created_at: string;
   updated_at: string;
+  view_count?: number;
 }
 
 export function extractYoutubeId(url: string): string | null {

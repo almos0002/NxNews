@@ -85,6 +85,17 @@ export default async function VideoDetailPage({ params }: Props) {
                   <span className={styles.duration}>{video.duration}</span>
                 </>
               )}
+              {video.viewCount != null && video.viewCount > 0 && (
+                <>
+                  <span className={styles.dot} />
+                  <span className={styles.duration} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                    </svg>
+                    {video.viewCount >= 1000 ? `${(video.viewCount / 1000).toFixed(1)}k` : video.viewCount.toLocaleString()}
+                  </span>
+                </>
+              )}
             </div>
 
             <p className={styles.excerpt}>{video.excerpt}</p>

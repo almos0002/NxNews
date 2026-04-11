@@ -200,6 +200,12 @@
   flex-shrink: 0;
 }
 
+.viewCount {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255,255,255,0.65);
+}
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .card {

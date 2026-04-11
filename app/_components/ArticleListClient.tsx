@@ -123,6 +123,7 @@ export default function ArticleListClient({
                 <th>Category</th>
                 <th>Status</th>
                 <th>Author</th>
+                <th>Views</th>
                 <th>Date</th>
                 <th>Actions</th>
               </tr>
@@ -150,6 +151,16 @@ export default function ArticleListClient({
                   </td>
                   <td className={styles.authorCell}>
                     {article.author_name ?? "—"}
+                  </td>
+                  <td className={styles.viewsCell}>
+                    {article.view_count != null && article.view_count > 0 ? (
+                      <span className={styles.viewsValue}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+                        </svg>
+                        {(article.view_count ?? 0) >= 1000 ? `${((article.view_count ?? 0) / 1000).toFixed(1)}k` : (article.view_count ?? 0).toLocaleString()}
+                      </span>
+                    ) : <span className={styles.none}>—</span>}
                   </td>
                   <td className={styles.dateCell}>
                     {formatDate(article.created_at)}

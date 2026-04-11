@@ -11,6 +11,7 @@ export interface Page {
   author_id: string;
   created_at: string;
   updated_at: string;
+  view_count?: number;
 }
 
 export async function listPages(): Promise<Page[]> {
