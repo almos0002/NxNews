@@ -204,7 +204,7 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
           <div className={sStyles.sectionHead}>
             <h2 className={sStyles.sectionTitle}>Analytics &amp; Verification</h2>
             <p className={sStyles.sectionDesc}>
-              Connect Google Analytics and verify ownership with Google Search Console.
+              Connect analytics and verify site ownership with major search engines.
             </p>
           </div>
           <div className={sStyles.sectionBody}>
@@ -228,7 +228,112 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
                   placeholder="abc123xyz..."
                 />
                 <p className={styles.hint}>
-                  The content value from the <code>&lt;meta name=&quot;google-site-verification&quot;&gt;</code> tag provided by Google Search Console.
+                  Content value from the <code>&lt;meta name=&quot;google-site-verification&quot;&gt;</code> tag in Google Search Console → Settings → Ownership verification.
+                </p>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Bing Webmaster Tools Verification</label>
+                <input
+                  className={styles.input}
+                  value={s.seo_bing_verification ?? ""}
+                  onChange={(e) => set("seo_bing_verification", e.target.value)}
+                  placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                />
+                <p className={styles.hint}>
+                  Content value from the <code>&lt;meta name=&quot;msvalidate.01&quot;&gt;</code> tag. Found in Bing Webmaster Tools → Settings → Site Verification.
+                </p>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Yandex Webmaster Verification</label>
+                <input
+                  className={styles.input}
+                  value={s.seo_yandex_verification ?? ""}
+                  onChange={(e) => set("seo_yandex_verification", e.target.value)}
+                  placeholder="XXXXXXXXXXXXXXXX"
+                />
+                <p className={styles.hint}>
+                  Content value from the <code>&lt;meta name=&quot;yandex-verification&quot;&gt;</code> tag in Yandex Webmaster → Site Verification.
+                </p>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Baidu Webmaster Verification</label>
+                <input
+                  className={styles.input}
+                  value={s.seo_baidu_verification ?? ""}
+                  onChange={(e) => set("seo_baidu_verification", e.target.value)}
+                  placeholder="..."
+                />
+                <p className={styles.hint}>
+                  Content value from <code>&lt;meta name=&quot;baidu-site-verification&quot;&gt;</code> for Baidu Search Resource Platform.
+                </p>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Pinterest Domain Verification</label>
+                <input
+                  className={styles.input}
+                  value={s.seo_pinterest_verification ?? ""}
+                  onChange={(e) => set("seo_pinterest_verification", e.target.value)}
+                  placeholder="..."
+                />
+                <p className={styles.hint}>
+                  Content value from <code>&lt;meta name=&quot;p:domain_verify&quot;&gt;</code> in Pinterest analytics.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Sitemap ── */}
+        <div className={sStyles.section}>
+          <div className={sStyles.sectionHead}>
+            <h2 className={sStyles.sectionTitle}>Sitemap</h2>
+            <p className={sStyles.sectionDesc}>
+              Submit your sitemap URLs to search engines for faster indexing of your content.
+            </p>
+          </div>
+          <div className={sStyles.sectionBody}>
+            <div className={styles.formGrid}>
+              <div className={`${styles.field} ${styles.formGridFull}`}>
+                <label className={styles.label}>Sitemap URLs</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {[
+                    { label: "Main Sitemap", path: "/sitemap.xml" },
+                    { label: "Article Sitemap", path: "/article-sitemap.xml" },
+                    { label: "News Sitemap", path: "/news-sitemap.xml" },
+                  ].map(({ label, path }) => {
+                    const base = s.seo_canonical_base_url?.replace(/\/$/, "") ?? "";
+                    const full = base ? `${base}${path}` : path;
+                    return (
+                      <div key={path} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "var(--color-bg)", border: "1px solid var(--color-border)", borderRadius: 8 }}>
+                        <span style={{ fontSize: "0.75rem", color: "var(--color-ink-muted)", minWidth: 130 }}>{label}</span>
+                        <code style={{ fontSize: "0.8rem", color: "var(--color-accent)", flex: 1 }}>{full}</code>
+                        <a href={full} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.75rem", color: "var(--color-ink-muted)", textDecoration: "none", padding: "3px 8px", border: "1px solid var(--color-border)", borderRadius: 4 }}>Open ↗</a>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className={styles.hint}>
+                  Submit these URLs in Google Search Console, Bing Webmaster Tools, and Yandex Webmaster for faster crawling.
+                  Make sure your Canonical Base URL above is set correctly.
+                </p>
+              </div>
+              <div className={`${styles.field} ${styles.formGridFull}`}>
+                <label className={styles.label}>robots.txt Preview</label>
+                <textarea
+                  className={styles.textarea}
+                  rows={6}
+                  readOnly
+                  value={[
+                    "User-agent: *",
+                    s.seo_robots_noindex === "true" ? "Disallow: /" : "Allow: /",
+                    "",
+                    `Sitemap: ${(s.seo_canonical_base_url ?? "").replace(/\/$/, "")}/sitemap.xml`,
+                    `Sitemap: ${(s.seo_canonical_base_url ?? "").replace(/\/$/, "")}/news-sitemap.xml`,
+                  ].join("\n")}
+                  style={{ fontFamily: "monospace", fontSize: "0.8rem", cursor: "text", color: "var(--color-ink-muted)" }}
+                />
+                <p className={styles.hint}>
+                  Preview of what your <code>robots.txt</code> would look like based on current settings. Your actual robots.txt file may differ.
                 </p>
               </div>
             </div>

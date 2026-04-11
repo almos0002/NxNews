@@ -21,6 +21,10 @@ export interface SiteSettings {
   seo_canonical_base_url: string;
   seo_ga4_id: string;
   seo_gsc_verification: string;
+  seo_bing_verification: string;
+  seo_yandex_verification: string;
+  seo_baidu_verification: string;
+  seo_pinterest_verification: string;
   seo_robots_noindex: string;
   seo_structured_data_enabled: string;
   seo_twitter_card: string;

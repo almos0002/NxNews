@@ -3,6 +3,15 @@
 ## Overview
 A modern multilingual news portal built with Next.js 16 App Router. Features a contemporary editorial design with clean card-based layouts, strong typographic hierarchy, full English + Nepali language support via next-intl, and a complete authentication system with role-based access control. Includes unique view tracking (IP + date deduplication) with geolocation and a live Recent Viewers dashboard widget.
 
+### Key Public Pages
+- `/calendar` — Interactive dual-mode calendar: English (Gregorian/AD) and Nepali (Bikram Sambat/BS) with date cross-reference and full Nepali numeral/weekday localization
+- `/live` — Live streams page showing active YouTube embeds and channel links configured via the admin dashboard
+- `/videos` — Video gallery; `/article/*` — article detail; `/[category]` — category archives
+
+### Key Dashboard Pages (admin/moderator/author)
+- `/dashboard/live` — Manage live stream links (CRUD, toggle active, display order)
+- `/dashboard/seo` — Full SEO settings: meta, canonical, OG, GA4, Google/Bing/Yandex/Baidu/Pinterest verification, sitemap viewer, robots.txt preview
+
 ## Tech Stack
 - **Framework**: Next.js 16.2.2 (App Router, Turbopack)
 - **Runtime**: Node.js 22

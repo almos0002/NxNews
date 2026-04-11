@@ -29,10 +29,20 @@ export async function generateMetadata({
   const description = isNe ? (s.site_description_ne || s.site_description_en || "")          : (s.site_description_en || "");
   const favicon     = s.favicon_url || "/favicon.ico";
 
+  const verificationOther: Record<string, string> = {};
+  if (s.seo_bing_verification)      verificationOther["msvalidate.01"]         = s.seo_bing_verification;
+  if (s.seo_baidu_verification)     verificationOther["baidu-site-verification"] = s.seo_baidu_verification;
+  if (s.seo_pinterest_verification) verificationOther["p:domain_verify"]        = s.seo_pinterest_verification;
+
   return {
     title,
     description,
     icons: { icon: favicon },
+    verification: {
+      google:  s.seo_gsc_verification     || undefined,
+      yandex:  s.seo_yandex_verification  || undefined,
+      other:   Object.keys(verificationOther).length > 0 ? verificationOther : undefined,
+    },
     alternates: {
       canonical: `/${locale}`,
       languages: { en: "/en", ne: "/ne" },
