@@ -64,6 +64,11 @@
   color: var(--color-accent, #e63946);
 }
 
+.caretOpenUp {
+  transform: rotate(0deg);
+  color: var(--color-accent, #e63946);
+}
+
 /* ── Dropdown ── */
 .dropdown {
   position: absolute;
@@ -77,6 +82,12 @@
   box-shadow: 0 8px 28px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
   overflow: hidden;
   min-width: 180px;
+}
+
+.dropdownUp {
+  top: auto;
+  bottom: calc(100% + 4px);
+  box-shadow: 0 -8px 28px rgba(0,0,0,0.1), 0 -2px 8px rgba(0,0,0,0.06);
 }
 
 .searchRow {

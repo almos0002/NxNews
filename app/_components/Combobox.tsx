@@ -18,10 +18,13 @@ interface Props {
   searchable?: boolean;
 }
 
+const DROPDOWN_HEIGHT = 280;
+
 export default function Combobox({
   options, value, onChange, placeholder = "— select —", disabled = false, searchable = true,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [openUp, setOpenUp] = useState(false);
   const [query, setQuery] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -39,6 +42,11 @@ export default function Combobox({
 
   function openList() {
     if (disabled) return;
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setOpenUp(spaceBelow < DROPDOWN_HEIGHT);
+    }
     setOpen(true);
     setQuery("");
     setTimeout(() => inputRef.current?.focus(), 10);
@@ -83,13 +91,16 @@ export default function Combobox({
         <span className={selected ? styles.selectedLabel : styles.placeholder}>
           {selected ? selected.label : placeholder}
         </span>
-        <svg className={`${styles.caret} ${open ? styles.caretOpen : ""}`} width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <svg className={`${styles.caret} ${open && !openUp ? styles.caretOpen : open && openUp ? styles.caretOpenUp : ""}`} width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
 
       {open && (
-        <div className={styles.dropdown} onKeyDown={handleKeyDown}>
+        <div
+          className={`${styles.dropdown} ${openUp ? styles.dropdownUp : ""}`}
+          onKeyDown={handleKeyDown}
+        >
           {searchable && (
             <div className={styles.searchRow}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.45 }}>
