@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -8,6 +9,9 @@ import Footer from "@/app/_components/Footer";
 import CategoryBadge from "@/app/_components/CategoryBadge";
 import AdUnit from "@/app/_components/AdUnit";
 import ViewTracker from "@/app/_components/ViewTracker";
+import BookmarkButton from "@/app/_components/BookmarkButton";
+import { auth } from "@/lib/auth";
+import { isBookmarked } from "@/lib/account";
 
 import {
   getPublicArticleBySlug,
@@ -33,14 +37,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ArticlePage({ params }: Props) {
   const { id, locale } = await params;
 
-  const [article, headline] = await Promise.all([
+  const [article, headline, session] = await Promise.all([
     getPublicArticleBySlug(id, locale),
     getBreakingHeadline(locale),
+    auth.api.getSession({ headers: await headers() }).catch(() => null),
   ]);
 
   if (!article) notFound();
 
-  const related = await getRelatedPublicArticles(id, article.category, locale, 4);
+  const [related, bookmarked] = await Promise.all([
+    getRelatedPublicArticles(id, article.category, locale, 4),
+    session?.user?.id && article.rawId
+      ? isBookmarked(session.user.id, article.rawId)
+      : Promise.resolve(false),
+  ]);
+
   const t = await getTranslations("article");
 
   const content = article.content || "";
@@ -88,6 +99,13 @@ export default async function ArticlePage({ params }: Props) {
           </div>
 
           <div className={styles.actions}>
+            {article.rawId && (
+              <BookmarkButton
+                articleId={article.rawId}
+                initialBookmarked={!!bookmarked}
+                isLoggedIn={!!session?.user}
+              />
+            )}
             <button className={styles.actionBtn} aria-label="Share on X">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.264 5.638 5.9-5.638Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />

@@ -118,7 +118,9 @@ Migration script: `scripts/migrate.mjs`
 | `/dashboard/users` | Admin | User role + ban management |
 | `/dashboard/moderation` | Moderator+ | Article review queue (approve/reject) |
 | `/dashboard/featured` | Moderator+ | Featured posts management (search + toggle star) |
-| `/dashboard/profile` | All roles | Edit own name, bio, change password |
+| `/dashboard/profile` | Author+ | Edit own name, bio, change password (within dashboard) |
+| `/account` | Reader (user role) | Personal account page: bookmarks + reading history |
+| `/account/edit` | Reader (user role) | Edit profile name, bio, change password (public layout) |
 | `/dashboard/menu` | Moderator+ | Navbar & footer menu manager with page/URL links and sort order |
 | `/dashboard/ads` | Admin | Ad slot enable/disable + ad code/script editor |
 | `/dashboard/settings` | Admin | Site-wide settings (title, description, social links, etc.) |
@@ -163,6 +165,8 @@ Migration script: `scripts/migrate.mjs`
 | `/api/menu/[id]` | PUT, DELETE | Moderator+ |
 | `/api/menu/reorder` | POST | Moderator+ — bulk sort_order update |
 | `/api/articles/featured` | GET, POST | Moderator+ — list/toggle featured posts |
+| `/api/bookmarks` | GET, POST | Session — list/toggle article bookmarks |
+| `/api/views` | GET, POST | View tracking + auto-logs reading history for logged-in users |
 | `/api/profile` | GET, PATCH | Session — update own name/bio |
 | `/api/upload` | POST | Session — saves to `public/uploads/`, 8MB max |
 | `/api/auth/[...all]` | GET, POST | Better Auth handler |

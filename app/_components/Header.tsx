@@ -58,16 +58,20 @@ export default async function Header() {
             <LanguageSwitcher />
           </span>
 
-          {session ? (
-            <Link href="/dashboard" className={styles.userBtn}>
-              <span className={styles.userAvatar}>
-                {session.user.name?.charAt(0).toUpperCase() ?? "U"}
-              </span>
-              <span className={styles.userName}>
-                {session.user.name?.split(" ")[0] ?? "Account"}
-              </span>
-            </Link>
-          ) : (
+          {session ? (() => {
+            const role = (session.user as { role?: string }).role ?? "user";
+            const accountHref = role === "user" ? "/account" : "/dashboard";
+            return (
+              <Link href={accountHref} className={styles.userBtn}>
+                <span className={styles.userAvatar}>
+                  {session.user.name?.charAt(0).toUpperCase() ?? "U"}
+                </span>
+                <span className={styles.userName}>
+                  {session.user.name?.split(" ")[0] ?? "Account"}
+                </span>
+              </Link>
+            );
+          })() : (
             <Link href="/login" className={styles.signInLink}>
               {t("signIn")}
             </Link>

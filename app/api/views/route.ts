@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
+import { auth } from "@/lib/auth";
 import { createHash } from "crypto";
 
 function getClientIp(req: NextRequest): string {
@@ -61,6 +62,16 @@ export async function POST(req: NextRequest) {
         `SELECT view_count FROM ${type === "article" ? "article" : type === "page" ? "pages" : "videos"} WHERE id = $1`,
         [id]
       );
+      if (type === "article") {
+        const session = await auth.api.getSession({ headers: req.headers }).catch(() => null);
+        if (session?.user?.id) {
+          pool.query(
+            `INSERT INTO reading_history (user_id, article_id, read_at) VALUES ($1, $2, now())
+             ON CONFLICT (user_id, article_id) DO UPDATE SET read_at = now()`,
+            [session.user.id, id]
+          ).catch(() => {});
+        }
+      }
       return NextResponse.json({ views: countRow.rows[0]?.view_count ?? 0, isNew: false });
     }
 
@@ -78,6 +89,17 @@ export async function POST(req: NextRequest) {
       `UPDATE ${table} SET view_count = view_count + 1 WHERE id = $1 RETURNING view_count`,
       [id]
     );
+
+    if (type === "article") {
+      const session = await auth.api.getSession({ headers: req.headers }).catch(() => null);
+      if (session?.user?.id) {
+        pool.query(
+          `INSERT INTO reading_history (user_id, article_id, read_at) VALUES ($1, $2, now())
+           ON CONFLICT (user_id, article_id) DO UPDATE SET read_at = now()`,
+          [session.user.id, id]
+        ).catch(() => {});
+      }
+    }
 
     return NextResponse.json({
       views: updated.rows[0]?.view_count ?? 1,
