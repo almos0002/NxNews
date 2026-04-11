@@ -44,6 +44,15 @@ export default function CategoryLists({ columns }: { columns: Column[] }) {
                       <span className={styles.author}>{lead.author}</span>
                       <span className={styles.dot}>·</span>
                       <span>{lead.readTime}</span>
+                      {lead.viewCount != null && lead.viewCount > 0 && (
+                        <>
+                          <span className={styles.dot}>·</span>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            {lead.viewCount >= 1000 ? `${(lead.viewCount / 1000).toFixed(1)}k` : lead.viewCount.toLocaleString()}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </Link>
@@ -57,6 +66,15 @@ export default function CategoryLists({ columns }: { columns: Column[] }) {
                     <span className={styles.author}>{article.author}</span>
                     <span className={styles.dot}>·</span>
                     <span>{article.readTime}</span>
+                    {article.viewCount != null && article.viewCount > 0 && (
+                      <>
+                        <span className={styles.dot}>·</span>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                          {article.viewCount >= 1000 ? `${(article.viewCount / 1000).toFixed(1)}k` : article.viewCount.toLocaleString()}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </Link>
               ))}

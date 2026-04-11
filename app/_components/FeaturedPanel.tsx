@@ -35,6 +35,15 @@ export default async function FeaturedPanel({
               <span>{primary.time}</span>
               <span className={styles.dot}>·</span>
               <span>{primary.readTime} {t("readMin")}</span>
+              {primary.viewCount != null && primary.viewCount > 0 && (
+                <>
+                  <span className={styles.dot}>·</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    {primary.viewCount >= 1000 ? `${(primary.viewCount / 1000).toFixed(1)}k` : primary.viewCount.toLocaleString()}
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -58,6 +67,15 @@ export default async function FeaturedPanel({
                   <span className={styles.author}>{article.author}</span>
                   <span className={styles.dot}>·</span>
                   <span>{article.readTime}</span>
+                  {article.viewCount != null && article.viewCount > 0 && (
+                    <>
+                      <span className={styles.dot}>·</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        {article.viewCount >= 1000 ? `${(article.viewCount / 1000).toFixed(1)}k` : article.viewCount.toLocaleString()}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
