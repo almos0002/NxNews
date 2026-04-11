@@ -8,6 +8,7 @@ import type { MenuItem } from "@/lib/menu";
 import LanguageSwitcher from "./LanguageSwitcher";
 import MobileNav from "./MobileNav";
 import DateTimeClock from "./DateTimeClock";
+import UserMenu from "./UserMenu";
 import styles from "./Header.module.css";
 
 export default async function Header() {
@@ -60,16 +61,17 @@ export default async function Header() {
 
           {session ? (() => {
             const role = (session.user as { role?: string }).role ?? "user";
-            const accountHref = role === "user" ? "/account" : "/dashboard";
+            const isReader = role === "user";
+            const accountHref = `/${locale}${isReader ? "/account" : "/dashboard"}`;
+            const accountLabel = isReader ? "My Account" : "Dashboard";
             return (
-              <Link href={accountHref} className={styles.userBtn}>
-                <span className={styles.userAvatar}>
-                  {session.user.name?.charAt(0).toUpperCase() ?? "U"}
-                </span>
-                <span className={styles.userName}>
-                  {session.user.name?.split(" ")[0] ?? "Account"}
-                </span>
-              </Link>
+              <UserMenu
+                name={session.user.name ?? "User"}
+                email={session.user.email}
+                accountHref={accountHref}
+                accountLabel={accountLabel}
+                locale={locale}
+              />
             );
           })() : (
             <Link href="/login" className={styles.signInLink}>
