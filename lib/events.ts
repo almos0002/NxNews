@@ -19,6 +19,7 @@ export interface EventPhoto {
   images: EventPhotoImage[];
   slug: string;
   status: "published" | "draft";
+  view_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -39,9 +40,11 @@ async function ensureTable() {
       slug        TEXT        UNIQUE NOT NULL,
       status      TEXT        NOT NULL DEFAULT 'published'
                               CHECK (status IN ('published','draft')),
+      view_count  INT         NOT NULL DEFAULT 0,
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    ALTER TABLE event_photos ADD COLUMN IF NOT EXISTS view_count INT NOT NULL DEFAULT 0;
     CREATE INDEX IF NOT EXISTS event_photos_status_idx ON event_photos(status);
     CREATE INDEX IF NOT EXISTS event_photos_slug_idx   ON event_photos(slug);
     CREATE INDEX IF NOT EXISTS event_photos_date_idx   ON event_photos(event_date DESC NULLS LAST);

@@ -361,13 +361,14 @@ export default function EventsAdminClient({ initialEvents }: Props) {
               <th>Location</th>
               <th>Date</th>
               <th>Photos</th>
+              <th>Views</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {events.length === 0 ? (
-              <tr><td colSpan={7} className={styles.emptyRow}>No events yet. Click &ldquo;+ New Event&rdquo; to create one.</td></tr>
+              <tr><td colSpan={8} className={styles.emptyRow}>No events yet. Click &ldquo;+ New Event&rdquo; to create one.</td></tr>
             ) : events.map((ev) => (
               <tr key={ev.id}>
                 <td>
@@ -398,6 +399,9 @@ export default function EventsAdminClient({ initialEvents }: Props) {
                   <span className={styles.badge} style={{ background: "var(--color-surface)" }}>
                     {ev.images.length} photo{ev.images.length !== 1 ? "s" : ""}
                   </span>
+                </td>
+                <td style={{ textAlign: "center", fontSize: "0.85rem", color: "var(--color-ink-secondary)" }}>
+                  {(ev.view_count ?? 0).toLocaleString()}
                 </td>
                 <td>
                   <span className={`${styles.badge} ${ev.status === "published" ? styles.badgePublished : styles.badgeDraft}`}>

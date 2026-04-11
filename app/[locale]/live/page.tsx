@@ -6,6 +6,8 @@ import Footer from "@/app/_components/Footer";
 import AdUnit from "@/app/_components/AdUnit";
 import { getBreakingHeadline } from "@/lib/public";
 import { pool } from "@/lib/db";
+import { getLivePageViewCount } from "@/lib/live-views";
+import ViewTracker from "@/app/_components/ViewTracker";
 import styles from "./live.module.css";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -76,9 +78,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LivePage({ params }: Props) {
   const { locale } = await params;
-  const [streams, headline] = await Promise.all([
+  const [streams, headline, livePageViews] = await Promise.all([
     getActiveStreams(),
     getBreakingHeadline(locale),
+    getLivePageViewCount(),
     getTranslations({ locale, namespace: "nav" }),
   ]);
 
@@ -103,7 +106,15 @@ export default async function LivePage({ params }: Props) {
               ? "KumariHub का सिधा कार्यक्रमहरू यहाँ हेर्नुहोस्"
               : "Watch our live programs, news broadcasts, and special coverage"}
           </p>
+          {livePageViews > 0 && (
+            <p className={styles.heroViews}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              {livePageViews.toLocaleString()} {isNe ? "दृश्य" : "view"}{livePageViews !== 1 ? "s" : ""}
+            </p>
+          )}
         </div>
+
+        <ViewTracker type="live" id="live-page" />
 
         <div className={styles.content}>
           <div className={styles.adTop}>

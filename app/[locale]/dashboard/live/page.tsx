@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { pool } from "@/lib/db";
+import { getLivePageViewCount } from "@/lib/live-views";
 import LiveAdminClient from "@/app/_components/LiveAdminClient";
 
 export const metadata: Metadata = { title: "Live Streams — KumariHub Dashboard" };
@@ -24,6 +25,6 @@ export default async function LiveAdminPage() {
   const role = (session.user as { role?: string }).role ?? "user";
   if (!["admin", "moderator"].includes(role)) redirect("/en/dashboard");
 
-  const streams = await getStreams();
-  return <LiveAdminClient initialStreams={streams} />;
+  const [streams, livePageViews] = await Promise.all([getStreams(), getLivePageViewCount()]);
+  return <LiveAdminClient initialStreams={streams} livePageViews={livePageViews} />;
 }

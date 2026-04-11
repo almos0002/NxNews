@@ -18,6 +18,8 @@ interface LiveStream {
   display_order: number;
 }
 
+interface Props { initialStreams: LiveStream[]; livePageViews: number; }
+
 const EMPTY: Omit<LiveStream, "id"> = {
   title_en: "", title_ne: "", description_en: "", description_ne: "",
   stream_url: "", platform: "youtube", is_active: true, display_order: 0,
@@ -28,7 +30,7 @@ function extractYoutubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
-export default function LiveAdminClient({ initialStreams }: { initialStreams: LiveStream[] }) {
+export default function LiveAdminClient({ initialStreams, livePageViews }: Props) {
   const router = useRouter();
   const [streams, setStreams] = useState(initialStreams);
   const [showForm, setShowForm] = useState(false);
@@ -112,6 +114,10 @@ export default function LiveAdminClient({ initialStreams }: { initialStreams: Li
         <div className={styles.pageHeaderLeft}>
           <h1 className={styles.pageTitle}>Live Streams</h1>
           <p className={styles.pageSubtitle}>Manage live YouTube channels and stream links shown on the public Live page.</p>
+          <p style={{ margin: "6px 0 0", fontSize: "0.82rem", color: "var(--color-ink-muted)", display: "flex", alignItems: "center", gap: 5 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Live page total views: <strong>{livePageViews.toLocaleString()}</strong>
+          </p>
         </div>
         <div className={styles.pageHeaderRight} style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <a href="/en/live" target="_blank" rel="noopener noreferrer" className={styles.submitBtn} style={{ background: "transparent", border: "1.5px solid var(--color-border)", color: "var(--color-ink-muted)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>

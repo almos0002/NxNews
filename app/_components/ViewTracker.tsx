@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 interface Props {
-  type: "article" | "page" | "video";
+  type: "article" | "page" | "video" | "event" | "live";
   id: string;
   onViewCounted?: (views: number) => void;
 }
