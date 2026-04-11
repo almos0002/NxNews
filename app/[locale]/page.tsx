@@ -14,6 +14,7 @@ import ThreeColSection from "@/app/_components/ThreeColSection";
 import VideoSection from "@/app/_components/VideoSection";
 import WeatherSection from "@/app/_components/WeatherSection";
 import EntertainmentSection from "@/app/_components/EntertainmentSection";
+import EventPhotosSection from "@/app/_components/EventPhotosSection";
 import Footer from "@/app/_components/Footer";
 import AdUnit from "@/app/_components/AdUnit";
 import { getPublicArticles, getFeaturedArticles, getBreakingHeadlines, getActiveLiveCount } from "@/lib/public";
@@ -194,6 +195,10 @@ export default async function LocaleHomePage({ params }: Props) {
 
         <section className={styles.section}>
           <EntertainmentSection articles={entertainment} />
+        </section>
+
+        <section className={styles.section}>
+          <EventPhotosSection />
         </section>
 
         <div className={styles.adSection}>
