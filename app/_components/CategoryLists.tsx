@@ -6,6 +6,7 @@ import styles from "./CategoryLists.module.css";
 type Column = {
   label: string;
   articles: Article[];
+  href?: string;
 };
 
 export default function CategoryLists({ columns }: { columns: Column[] }) {
@@ -19,6 +20,9 @@ export default function CategoryLists({ columns }: { columns: Column[] }) {
             <div key={ci} className={styles.card}>
               <div className={styles.cardHeader}>
                 <span className={styles.cardLabel}>{col.label}</span>
+                {col.href && (
+                  <Link href={col.href} className={styles.viewAll}>View All →</Link>
+                )}
               </div>
 
               {lead && (

@@ -30,6 +30,8 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
   const [form, setForm] = useState({ ...EMPTY });
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
 
   function openAdd() { setForm({ ...EMPTY }); setEditId(null); setShowForm(true); }
   function openEdit(v: Video) {
@@ -76,6 +78,13 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
   }
 
   const previewId = extractYoutubeId(form.youtube_url);
+
+  const vq = search.trim().toLowerCase();
+  const filteredVideos = videos.filter((v) => {
+    const matchStatus = statusFilter === "all" || v.status === statusFilter;
+    const matchSearch = !vq || v.title_en?.toLowerCase().includes(vq) || v.title_ne?.toLowerCase().includes(vq);
+    return matchStatus && matchSearch;
+  });
 
   return (
     <div className={styles.page}>
@@ -155,6 +164,35 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
         </div>
       )}
 
+      {/* Filter bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          {(["all", "published", "draft"] as const).map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              style={{
+                padding: "6px 14px", borderRadius: 6, border: "1.5px solid",
+                borderColor: statusFilter === s ? "var(--color-accent)" : "var(--color-border)",
+                background: statusFilter === s ? "var(--color-accent)" : "transparent",
+                color: statusFilter === s ? "#fff" : "var(--color-ink)",
+                fontFamily: "var(--font-serif)", fontSize: "0.8rem", fontWeight: 600, cursor: "pointer",
+                textTransform: "capitalize",
+              }}
+            >
+              {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
+            </button>
+          ))}
+        </div>
+        <input
+          className={styles.input}
+          style={{ maxWidth: 280 }}
+          placeholder="Search by title…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
       {/* List */}
       <div className={styles.tableCard}>
         <table className={styles.table}>
@@ -170,9 +208,9 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
             </tr>
           </thead>
           <tbody>
-            {videos.length === 0 ? (
-              <tr><td colSpan={7} className={styles.emptyRow}>No videos yet. Click "Add Video" to get started.</td></tr>
-            ) : videos.map((v) => (
+            {filteredVideos.length === 0 ? (
+              <tr><td colSpan={7} className={styles.emptyRow}>No videos found.</td></tr>
+            ) : filteredVideos.map((v) => (
               <tr key={v.id}>
                 <td>
                   {v.thumbnail ? (

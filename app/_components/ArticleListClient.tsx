@@ -78,6 +78,17 @@ export default function ArticleListClient({
     });
   }
 
+  const q = search.trim().toLowerCase();
+  const displayArticles = q
+    ? initialArticles.filter(
+        (a) =>
+          a.title_en?.toLowerCase().includes(q) ||
+          a.title_ne?.toLowerCase().includes(q) ||
+          a.category?.toLowerCase().includes(q) ||
+          a.author_name?.toLowerCase().includes(q)
+      )
+    : initialArticles;
+
   return (
     <div className={styles.listWrap}>
       {deleteConfirm && (
@@ -112,7 +123,7 @@ export default function ArticleListClient({
           <input
             type="search"
             className={styles.searchInput}
-            placeholder="Search by title…"
+            placeholder="Search by title, category, author…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -125,7 +136,7 @@ export default function ArticleListClient({
       </div>
 
       {/* Table */}
-      {initialArticles.length === 0 ? (
+      {displayArticles.length === 0 ? (
         <div className={styles.empty}>
           <p>No articles found.</p>
           <Link href="/en/dashboard/articles/new" className={styles.emptyLink}>
@@ -147,7 +158,7 @@ export default function ArticleListClient({
               </tr>
             </thead>
             <tbody>
-              {initialArticles.map((article) => (
+              {displayArticles.map((article) => (
                 <tr key={article.id}>
                   <td className={styles.titleCell}>
                     <span className={styles.titleEn}>{article.title_en || "—"}</span>

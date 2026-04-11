@@ -13,6 +13,7 @@ export default async function LatestFeed({ articles }: { articles: Article[] }) 
         <span className={styles.pulse} aria-hidden="true" />
         <h2 className={styles.heading}>{t("latest")}</h2>
         <span className={styles.updateNote}>{t("updatedContinuously")}</span>
+        <Link href="/search" className={styles.viewAll}>{t("seeAll")} →</Link>
       </div>
       <div className={styles.feed}>
         {articles.map((article) => (

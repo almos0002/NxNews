@@ -9,9 +9,11 @@ import styles from "./ThreeColSection.module.css";
 export default async function ThreeColSection({
   title,
   articles,
+  href,
 }: {
   title: string;
   articles: Article[];
+  href?: string;
 }) {
   const t = await getTranslations("home");
 
@@ -64,7 +66,10 @@ export default async function ThreeColSection({
       <div className={styles.heading}>
         <h2 className={styles.sectionTitle}>{title}</h2>
         <div className={styles.rule} />
-        <span className={styles.seeAll}>{t("seeAll")}</span>
+        {href
+          ? <Link href={href} className={styles.seeAll}>{t("seeAll")} →</Link>
+          : <span className={styles.seeAll}>{t("seeAll")}</span>
+        }
       </div>
 
       <div className={styles.cols}>

@@ -30,6 +30,8 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
   const [search, setSearch] = useState("");
   const [updating, setUpdating] = useState<string | null>(null);
   const [banConfirm, setBanConfirm] = useState<{ id: string; name: string } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const filtered = users.filter((u) =>
     u.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -60,6 +62,23 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
     setBanConfirm(null);
   }
 
+  async function confirmDelete() {
+    if (!deleteConfirm) return;
+    setDeleting(deleteConfirm.id);
+    try {
+      const res = await fetch("/api/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: deleteConfirm.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast(data.error ?? "Failed to delete user", "error"); return; }
+      setUsers((p) => p.filter((u) => u.id !== deleteConfirm.id));
+      toast(`${deleteConfirm.name} has been permanently deleted.`, "success");
+      setDeleteConfirm(null);
+    } finally { setDeleting(null); }
+  }
+
   return (
     <div className={styles.page}>
       {banConfirm && (
@@ -72,6 +91,19 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
           loading={updating === banConfirm.id}
           onConfirm={confirmBan}
           onCancel={() => setBanConfirm(null)}
+        />
+      )}
+
+      {deleteConfirm && (
+        <ConfirmDialog
+          title="Delete User"
+          message={`Permanently delete "${deleteConfirm.name}"? This removes their account and all associated data. This cannot be undone.`}
+          confirmLabel="Delete User"
+          cancelLabel="Cancel"
+          variant="danger"
+          loading={deleting === deleteConfirm.id}
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteConfirm(null)}
         />
       )}
 
@@ -155,14 +187,32 @@ export default function UsersClient({ initialUsers, currentUserId }: Props) {
                     {!isMe && (
                       <div className={styles.actionRow}>
                         {u.banned ? (
-                          <button className={styles.editBtn} disabled={isDisabled} onClick={() => patchUser(u.id, { banned: false })}>
-                            Unban
+                          <button className={styles.editBtn} disabled={isDisabled} onClick={() => patchUser(u.id, { banned: false })} title="Unban user">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/>
+                            </svg>
                           </button>
                         ) : (
-                          <button className={styles.deleteBtn} disabled={isDisabled} onClick={() => setBanConfirm({ id: u.id, name: u.name })}>
-                            Ban
+                          <button className={styles.deleteBtn} disabled={isDisabled} onClick={() => setBanConfirm({ id: u.id, name: u.name })} title="Ban user">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10"/>
+                              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                            </svg>
                           </button>
                         )}
+                        <button
+                          className={styles.deleteBtn}
+                          disabled={isDisabled || deleting === u.id}
+                          onClick={() => setDeleteConfirm({ id: u.id, name: u.name })}
+                          title="Delete user permanently"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                            <path d="M10 11v6"/><path d="M14 11v6"/>
+                            <path d="M9 6V4h6v2"/>
+                          </svg>
+                        </button>
                       </div>
                     )}
                   </td>

@@ -5,10 +5,15 @@
 }
 
 .header {
+  margin-bottom: 16px;
+}
+
+.headerTop {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 4px;
 }
 
 .label {
@@ -18,6 +23,19 @@
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: #ffffff;
+}
+
+.viewAll {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.viewAll:hover {
+  color: #fff;
 }
 
 .sub {

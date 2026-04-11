@@ -96,6 +96,18 @@ function mapVideo(row: Record<string, unknown>, locale: string): PublicVideo {
   };
 }
 
+export async function getFeaturedArticles(locale: string): Promise<PublicArticle[]> {
+  const { rows } = await pool.query(
+    `SELECT a.*, u.name AS author_name
+     FROM article a
+     LEFT JOIN "user" u ON u.id = a.author_id
+     WHERE a.status = 'published' AND a.is_featured = true
+     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
+     LIMIT 10`
+  );
+  return rows.map((r) => mapArticle(r, locale));
+}
+
 export async function getPublicArticles(
   locale: string,
   opts?: { limit?: number; offset?: number; category?: string }

@@ -38,6 +38,20 @@
   margin-left: auto;
 }
 
+.viewAll {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.viewAll:hover {
+  opacity: 0.7;
+}
+
 .feed {
   display: grid;
   grid-template-columns: 1fr 1fr;

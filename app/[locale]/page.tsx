@@ -16,7 +16,7 @@ import WeatherSection from "@/app/_components/WeatherSection";
 import EntertainmentSection from "@/app/_components/EntertainmentSection";
 import Footer from "@/app/_components/Footer";
 import AdUnit from "@/app/_components/AdUnit";
-import { getPublicArticles, getBreakingHeadlines } from "@/lib/public";
+import { getPublicArticles, getFeaturedArticles, getBreakingHeadlines } from "@/lib/public";
 import styles from "@/app/page.module.css";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -45,13 +45,15 @@ export default async function LocaleHomePage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
-  const [allArticles, headlines] = await Promise.all([
+  const [allArticles, featuredArticles, headlines] = await Promise.all([
     getPublicArticles(locale, { limit: 50 }),
+    getFeaturedArticles(locale),
     getBreakingHeadlines(locale, 10),
   ]);
 
-  const featured = allArticles[0];
-  const secondary = allArticles.slice(1, 4);
+  const featuredPool = featuredArticles.length >= 1 ? featuredArticles : allArticles;
+  const featured = featuredPool[0];
+  const secondary = featuredPool.slice(1, 4);
   const latest = allArticles.slice(0, 8);
   const picks = allArticles.slice(2, 6);
   const grid = allArticles.slice(0, 12);
@@ -67,9 +69,9 @@ export default async function LocaleHomePage({ params }: Props) {
   );
 
   const categoryColumns = [
-    { label: tNav("business"), articles: business.slice(0, 5) },
-    { label: tNav("technology"), articles: tech.slice(0, 5) },
-    { label: t("aroundTheWorld"), articles: grid.slice(0, 5) },
+    { label: tNav("business"), articles: business.slice(0, 5), href: "/business" },
+    { label: tNav("technology"), articles: tech.slice(0, 5), href: "/technology" },
+    { label: t("aroundTheWorld"), articles: grid.slice(0, 5), href: "/search" },
   ];
 
   if (!featured) {
@@ -116,7 +118,7 @@ export default async function LocaleHomePage({ params }: Props) {
 
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
-            <SectionHeading title={t("topStories")} />
+            <SectionHeading title={t("topStories")} href="/search" />
             <div className={styles.articleGrid}>
               {grid.map((article) => (
                 <ArticleCard key={article.id} article={article} variant="grid" />
@@ -139,7 +141,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </div>
 
         <div className={styles.topicDivider}>
-          <ThreeColSection title={t("scienceTech")} articles={tech} />
+          <ThreeColSection title={t("scienceTech")} articles={tech} href="/technology" />
         </div>
 
         <div className={styles.adSection}>
