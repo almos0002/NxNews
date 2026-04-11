@@ -31,16 +31,26 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 async function getAdminStats() {
-  const [usersRes, articlesRes, pendingRes] = await Promise.all([
+  const [usersRes, articlesRes, pendingRes, viewsRes] = await Promise.all([
     pool.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM \"user\""),
     pool.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM article WHERE status = 'published'"),
     pool.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM article WHERE status = 'review'"),
+    pool.query<{ cnt: string }>("SELECT COUNT(*) AS cnt FROM page_views"),
   ]);
   return {
     totalUsers: parseInt(usersRes.rows[0]?.cnt ?? "0", 10),
     publishedArticles: parseInt(articlesRes.rows[0]?.cnt ?? "0", 10),
     pendingReview: parseInt(pendingRes.rows[0]?.cnt ?? "0", 10),
+    totalViews: parseInt(viewsRes.rows[0]?.cnt ?? "0", 10),
   };
+}
+
+async function getAuthorViews(authorId: string): Promise<number> {
+  const res = await pool.query<{ total: string }>(
+    "SELECT COALESCE(SUM(view_count), 0) AS total FROM article WHERE author_id = $1",
+    [authorId]
+  );
+  return parseInt(res.rows[0]?.total ?? "0", 10);
 }
 
 export default async function DashboardPage() {
@@ -53,11 +63,12 @@ export default async function DashboardPage() {
   const isModerator = role === "admin" || role === "moderator";
   const isAuthor = role === "admin" || role === "moderator" || role === "author";
 
-  const [articleCounts, adminStats, recentArticles, recentQueue] = await Promise.all([
+  const [articleCounts, adminStats, recentArticles, recentQueue, authorViews] = await Promise.all([
     isAuthor ? countByStatus(isAdmin ? undefined : user.id) : Promise.resolve({} as Record<string, number>),
     isAdmin ? getAdminStats() : Promise.resolve(null),
     isAuthor ? listArticles({ authorId: isAdmin ? undefined : user.id, limit: 5 }) : Promise.resolve([]),
     isModerator ? listArticles({ status: "review", limit: 5 }) : Promise.resolve([]),
+    !isAdmin && isAuthor ? getAuthorViews(user.id) : Promise.resolve(null),
   ]);
 
   return (
@@ -100,6 +111,15 @@ export default async function DashboardPage() {
             <p className={styles.statValue}>{articleCounts.all ?? 0}</p>
             <p className={styles.statSub}>All statuses</p>
           </div>
+          <div className={styles.statCard}>
+            <p className={styles.statLabel}>Total Views</p>
+            <p className={styles.statValue}>
+              {adminStats.totalViews >= 1000
+                ? `${(adminStats.totalViews / 1000).toFixed(1)}k`
+                : adminStats.totalViews.toLocaleString()}
+            </p>
+            <p className={styles.statSub}>All content</p>
+          </div>
         </>}
         {!isAdmin && isAuthor && <>
           <div className={styles.statCard}>
@@ -121,6 +141,15 @@ export default async function DashboardPage() {
             <p className={styles.statLabel}>Under Review</p>
             <p className={styles.statValue}>{articleCounts.review ?? 0}</p>
             <p className={styles.statSub}>Awaiting approval</p>
+          </div>
+          <div className={styles.statCard}>
+            <p className={styles.statLabel}>My Views</p>
+            <p className={styles.statValue}>
+              {(authorViews ?? 0) >= 1000
+                ? `${((authorViews ?? 0) / 1000).toFixed(1)}k`
+                : (authorViews ?? 0).toLocaleString()}
+            </p>
+            <p className={styles.statSub}>Total article views</p>
           </div>
         </>}
         {!isAuthor && <>
