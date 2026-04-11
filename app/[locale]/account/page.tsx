@@ -66,7 +66,7 @@ export default async function AccountPage() {
                 <p className={styles.meta}>Member since {memberSince}</p>
               )}
             </div>
-            <Link href={`/${locale}/account/edit`} className={styles.editBtn}>
+            <Link href="/account/edit" className={styles.editBtn}>
               Edit Profile
             </Link>
           </div>
@@ -86,12 +86,12 @@ export default async function AccountPage() {
             {bookmarks.length === 0 ? (
               <div className={styles.empty}>
                 <p>No saved articles yet.</p>
-                <Link href={`/${locale}`} className={styles.emptyLink}>Browse the latest news →</Link>
+                <Link href="/" className={styles.emptyLink}>Browse the latest news →</Link>
               </div>
             ) : (
               <div className={styles.bookmarkGrid}>
                 {bookmarks.map((a) => (
-                  <Link key={a.id} href={`/${locale}/article/${a.slug}`} className={styles.bookmarkCard}>
+                  <Link key={a.id} href={`/article/${a.slug}`} className={styles.bookmarkCard}>
                     {a.featured_image && (
                       <div className={styles.bookmarkImg}>
                         <Image
@@ -150,7 +150,7 @@ export default async function AccountPage() {
                     )}
                     <div className={styles.historyBody}>
                       {a.category && <span className={styles.cat}>{a.category}</span>}
-                      <Link href={`/${locale}/article/${a.slug}`} className={styles.historyTitle}>
+                      <Link href={`/article/${a.slug}`} className={styles.historyTitle}>
                         {locale === "ne" && a.title_ne ? a.title_ne : a.title_en}
                       </Link>
                       <p className={styles.historyMeta}>
