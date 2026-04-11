@@ -12,18 +12,29 @@ async function getGeoInfo(ip: string): Promise<{ country: string | null; city: s
   if (ip === "0.0.0.0" || ip.startsWith("127.") || ip.startsWith("::1") || ip.startsWith("10.") || ip.startsWith("172.") || ip.startsWith("192.168.")) {
     return { country: "Local", city: null };
   }
+  // Primary: ip-api.com (more permissive rate limits)
+  try {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,city`, {
+      signal: AbortSignal.timeout(4000),
+    });
+    if (res.ok) {
+      const data = await res.json() as { status?: string; country?: string; city?: string };
+      if (data.status === "success" && data.country) {
+        return { country: data.country, city: data.city ?? null };
+      }
+    }
+  } catch { /* fall through to backup */ }
+  // Fallback: ipwho.is
   try {
     const res = await fetch(`https://ipwho.is/${ip}?fields=country,city,success`, {
-      signal: AbortSignal.timeout(3000),
-      headers: { "User-Agent": "KumariHub/1.0" },
+      signal: AbortSignal.timeout(4000),
     });
-    if (!res.ok) return { country: null, city: null };
-    const data = await res.json() as { success?: boolean; country?: string; city?: string };
-    if (!data.success) return { country: null, city: null };
-    return { country: data.country ?? null, city: data.city ?? null };
-  } catch {
-    return { country: null, city: null };
-  }
+    if (res.ok) {
+      const data = await res.json() as { success?: boolean; country?: string; city?: string };
+      if (data.success) return { country: data.country ?? null, city: data.city ?? null };
+    }
+  } catch { /* give up */ }
+  return { country: null, city: null };
 }
 
 export async function POST(req: NextRequest) {

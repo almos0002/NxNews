@@ -139,10 +139,14 @@
 }
 
 .contentCell {
+  max-width: 260px;
+}
+
+.contentInner {
   display: flex;
   align-items: center;
   gap: 6px;
-  max-width: 280px;
+  min-width: 0;
 }
 
 .typeIcon {

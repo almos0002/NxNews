@@ -155,10 +155,12 @@ export default function RecentViewsWidget() {
               {data.recent.map((row) => (
                 <tr key={row.id}>
                   <td className={styles.contentCell}>
-                    <span className={styles.typeIcon}>{typeIcon(row.content_type)}</span>
-                    <span className={styles.contentTitle} title={row.content_title ?? row.content_id}>
-                      {row.content_title ?? row.content_id}
-                    </span>
+                    <div className={styles.contentInner}>
+                      <span className={styles.typeIcon}>{typeIcon(row.content_type)}</span>
+                      <span className={styles.contentTitle} title={row.content_title ?? row.content_id}>
+                        {row.content_title ?? row.content_id}
+                      </span>
+                    </div>
                   </td>
                   <td className={styles.ipCell}>{maskIp(row.ip ?? "")}</td>
                   <td className={styles.countryCell}>
