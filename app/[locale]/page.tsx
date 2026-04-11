@@ -16,7 +16,8 @@ import WeatherSection from "@/app/_components/WeatherSection";
 import EntertainmentSection from "@/app/_components/EntertainmentSection";
 import Footer from "@/app/_components/Footer";
 import AdUnit from "@/app/_components/AdUnit";
-import { getPublicArticles, getFeaturedArticles, getBreakingHeadlines } from "@/lib/public";
+import { getPublicArticles, getFeaturedArticles, getBreakingHeadlines, getActiveLiveCount } from "@/lib/public";
+import { Link } from "@/i18n/navigation";
 import styles from "@/app/page.module.css";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -65,10 +66,11 @@ export default async function LocaleHomePage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
-  const [allArticles, featuredArticles, headlines] = await Promise.all([
+  const [allArticles, featuredArticles, headlines, liveCount] = await Promise.all([
     getPublicArticles(locale, { limit: 50 }),
     getFeaturedArticles(locale),
     getBreakingHeadlines(locale, 10),
+    getActiveLiveCount(),
   ]);
 
   const featuredPool = featuredArticles.length >= 1 ? featuredArticles : allArticles;
@@ -91,7 +93,7 @@ export default async function LocaleHomePage({ params }: Props) {
   const categoryColumns = [
     { label: tNav("business"), articles: business.slice(0, 5), href: "/business" },
     { label: tNav("technology"), articles: tech.slice(0, 5), href: "/technology" },
-    { label: t("aroundTheWorld"), articles: grid.slice(0, 5), href: "/search" },
+    { label: t("aroundTheWorld"), articles: grid.slice(0, 5), href: "/world" },
   ];
 
   if (!featured) {
@@ -114,6 +116,16 @@ export default async function LocaleHomePage({ params }: Props) {
     <>
       <BreakingTicker headlines={headlines} locale={locale} />
       <Header />
+
+      {liveCount > 0 && (
+        <div className={styles.watchLiveBar}>
+          <Link href="/live" className={styles.watchLiveBtn}>
+            <span className={styles.watchLiveDot} aria-hidden="true" />
+            {locale === "ne" ? "सिधा प्रसारण हेर्नुहोस्" : "Watch Live"}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </Link>
+        </div>
+      )}
 
       <main className={styles.main}>
         <section className={styles.section}>
@@ -138,7 +150,7 @@ export default async function LocaleHomePage({ params }: Props) {
 
         <section className={styles.storiesSection}>
           <div className={styles.storiesMain}>
-            <SectionHeading title={t("topStories")} href="/search" />
+            <SectionHeading title={t("topStories")} href="/latest" />
             <div className={styles.articleGrid}>
               {grid.map((article) => (
                 <ArticleCard key={article.id} article={article} variant="grid" />
