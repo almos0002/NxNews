@@ -15,24 +15,25 @@ Next.js 16 (App Router, Turbopack) multilingual news portal with English + Nepal
 ## Project Structure
 ```
 app/
-  layout.tsx              # Root pass-through (html/body in [locale] layout)
+  layout.tsx              # Root html/body — reads `x-locale` header from proxy
   page.tsx                # Root → /en redirect
   globals.css, fonts.ts, icon.svg
   sitemap.xml/, article-sitemap.xml/, news-sitemap.xml/, robots.ts
   not-found.tsx, page.module.css
   [locale]/               # All routes (locale-prefixed)
-    layout.tsx, page.tsx
-    article/[id]/         # Article detail
+    layout.tsx, page.tsx  # Locale-aware metadata + Org/WebSite JSON-LD
+    article/[id]/         # Article detail (NewsArticle + Breadcrumb JSON-LD)
     [category]/, tags/[tag]/, search/, author/[slug]/
     calendar/, live/, videos/
     login/, signup/, account/
-    dashboard/            # RBAC-protected CMS (own dark shell)
+    dashboard/            # RBAC-protected CMS (own dark shell, noindex)
       dashboard.module.css   # Consolidated layout + page styles
       articles/, pages/, videos/, taxonomy/, users/, moderation/,
       featured/, profile/, menu/, ads/, settings/, seo/, live/
   _components/            # Grouped by domain
     layout/    Header, Footer, MobileNav, LanguageSwitcher,
-               BreakingTicker, UserMenu, HtmlLang, DateTimeClock
+               BreakingTicker, UserMenu, DateTimeClock
+    seo/       JsonLd  (reusable <script type="application/ld+json">)
     home/      FeaturedPanel, LatestFeed, EditorsPick, CategoryLists,
                ThreeColSection, VideoSection, WeatherSection (+ fetchWeather, weather data),
                EntertainmentSection, EventPhotosSection, TrendingSidebar,

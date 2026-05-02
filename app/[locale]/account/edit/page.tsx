@@ -9,7 +9,10 @@ import Toaster from "@/app/_components/ui/Toaster";
 import ProfileClient from "@/app/_components/dashboard/ProfileClient";
 import { getLocale } from "next-intl/server";
 
-export const metadata: Metadata = { title: "Edit Profile — KumariHub" };
+export const metadata: Metadata = {
+  title: "Edit Profile — KumariHub",
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function AccountEditPage() {
   const session = await auth.api.getSession({ headers: await headers() });

@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/auth";
 import DashboardSidebar from "@/app/_components/dashboard/DashboardSidebar";
 import Toaster from "@/app/_components/ui/Toaster";
 import styles from "./dashboard.module.css";
+
+// Cascades noindex to every route inside /dashboard/* — no need to repeat it
+// on each individual dashboard page.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false, nocache: true, noarchive: true },
+};
 
 type Props = {
   children: React.ReactNode;

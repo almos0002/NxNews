@@ -21,7 +21,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}/calendar`,
-      languages: { en: "/en/calendar", ne: "/ne/calendar" },
+      languages: {
+        en: "/en/calendar",
+        ne: "/ne/calendar",
+        "x-default": "/en/calendar",
+      },
     },
     openGraph: {
       title,

@@ -6,6 +6,7 @@ import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
 import ArchiveLayout from "@/app/_components/article/ArchiveLayout";
 import PaginationBar from "@/app/_components/article/PaginationBar";
+import JsonLd from "@/app/_components/seo/JsonLd";
 import {
   getPublicArticles,
   countPublicArticles,
@@ -13,6 +14,7 @@ import {
   PUBLIC_PAGE_SIZE,
 } from "@/lib/content/public";
 import { listCategories } from "@/lib/content/taxonomy";
+import { getAllSettings } from "@/lib/cms/settings";
 
 const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author", "videos", "dashboard"]);
 
@@ -61,7 +63,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}/${category}`,
-      languages: { en: `/en/${category}`, ne: `/ne/${category}` },
+      languages: {
+        en: `/en/${category}`,
+        ne: `/ne/${category}`,
+        "x-default": `/en/${category}`,
+      },
     },
     openGraph: {
       title,
@@ -92,10 +98,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   const t = await getTranslations("archive");
 
-  const [articles, total, headline] = await Promise.all([
+  const [articles, total, headline, settings] = await Promise.all([
     getPublicArticles(locale, { category, limit: PUBLIC_PAGE_SIZE, offset }),
     countPublicArticles({ category }),
     getBreakingHeadline(locale),
+    getAllSettings().catch(() => ({} as Record<string, string>)),
   ]);
 
   const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
@@ -110,8 +117,35 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
   const totalPages = Math.ceil(total / PUBLIC_PAGE_SIZE);
 
+  // ── Structured data: ItemList of articles + BreadcrumbList ─────────
+  const baseUrl = settings.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
+  const isNe = locale === "ne";
+
+  const itemListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: title,
+    numberOfItems: articles.length,
+    itemListElement: articles.map((a, i) => ({
+      "@type": "ListItem",
+      position: (page - 1) * PUBLIC_PAGE_SIZE + i + 1,
+      url: `${baseUrl}/${locale}/article/${a.id}`,
+      name: a.title,
+    })),
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: isNe ? "गृहपृष्ठ" : "Home", item: `${baseUrl}/${locale}` },
+      { "@type": "ListItem", position: 2, name: title, item: `${baseUrl}/${locale}/${category}` },
+    ],
+  };
+
   return (
     <>
+      <JsonLd data={[breadcrumbLd, itemListLd]} />
       <BreakingTicker headline={headline} />
       <Header />
       <ArchiveLayout

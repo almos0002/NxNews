@@ -4,6 +4,8 @@ import { getAllSettings } from "@/lib/cms/settings";
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
+const LOCALES = ["en", "ne"] as const;
+
 export async function GET() {
   let baseUrl = "https://kumarihub.com";
   try {
@@ -21,19 +23,26 @@ export async function GET() {
     rows = result.rows;
   } catch { /* empty sitemap on error */ }
 
-  const urls = rows.map((r) => {
+  const blocks: string[] = [];
+  for (const r of rows) {
     const lastmod = r.updated_at ? new Date(r.updated_at).toISOString() : new Date().toISOString();
-    return `  <url>
-    <loc>${baseUrl}/en/article/${r.slug}</loc>
+    for (const locale of LOCALES) {
+      blocks.push(`  <url>
+    <loc>${baseUrl}/${locale}/article/${r.slug}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-  </url>`;
-  }).join("\n");
+    <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en/article/${r.slug}"/>
+    <xhtml:link rel="alternate" hreflang="ne" href="${baseUrl}/ne/article/${r.slug}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/article/${r.slug}"/>
+  </url>`);
+    }
+  }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${blocks.join("\n")}
 </urlset>`;
 
   return new Response(xml, {

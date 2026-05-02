@@ -42,7 +42,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}`,
-      languages: { en: "/en", ne: "/ne" },
+      languages: {
+        en: "/en",
+        ne: "/ne",
+        "x-default": "/en",
+      },
     },
     openGraph: {
       title,

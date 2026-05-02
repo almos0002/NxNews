@@ -7,9 +7,21 @@ import { getBreakingHeadline } from "@/lib/content/public";
 import SignupForm from "@/app/_components/auth/SignupForm";
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
-  title: "Create Account — KumariHub",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isNe = locale === "ne";
+  const title = isNe ? "खाता बनाउनुहोस् — KumariHub" : "Create Account — KumariHub";
+  return {
+    title,
+    // Sign-up screens are gated user flows — keep them out of search results.
+    robots: { index: false, follow: false, nocache: true },
+    alternates: { canonical: `/${locale}/signup` },
+  };
+}
 
 export default async function LocaleSignupPage({
   params,

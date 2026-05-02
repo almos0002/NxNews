@@ -10,7 +10,11 @@ import { Link } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import styles from "./account.module.css";
 
-export const metadata: Metadata = { title: "My Account — KumariHub" };
+export const metadata: Metadata = {
+  title: "My Account — KumariHub",
+  // Per-user account screens are noindex by definition.
+  robots: { index: false, follow: false, nocache: true },
+};
 
 function timeAgo(date: string): string {
   const diff = Date.now() - new Date(date).getTime();

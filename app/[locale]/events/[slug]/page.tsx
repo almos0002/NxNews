@@ -7,8 +7,10 @@ import Footer from "@/app/_components/layout/Footer";
 import { Link } from "@/i18n/navigation";
 import AdUnit from "@/app/_components/ads/AdUnit";
 import ViewTracker from "@/app/_components/article/ViewTracker";
+import JsonLd from "@/app/_components/seo/JsonLd";
 import { getEventPhotoBySlug, listEventPhotos } from "@/lib/cms/events";
 import { getBreakingHeadline } from "@/lib/content/public";
+import { getAllSettings } from "@/lib/cms/settings";
 import styles from "./gallery.module.css";
 
 type Props = {
@@ -31,7 +33,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}/events/${slug}`,
-      languages: { en: `/en/events/${slug}`, ne: `/ne/events/${slug}` },
+      languages: {
+        en: `/en/events/${slug}`,
+        ne: `/ne/events/${slug}`,
+        "x-default": `/en/events/${slug}`,
+      },
     },
     openGraph: {
       title: `${title} — KumariHub`,
@@ -49,10 +55,11 @@ export default async function EventGalleryPage({ params }: Props) {
   const { locale, slug } = await params;
   const isNe = locale === "ne";
 
-  const [event, related, headline] = await Promise.all([
+  const [event, related, headline, settings] = await Promise.all([
     getEventPhotoBySlug(slug),
     listEventPhotos({ limit: 4, status: "published" }),
     getBreakingHeadline(locale),
+    getAllSettings().catch(() => ({} as Record<string, string>)),
   ]);
 
   if (!event) notFound();
@@ -63,12 +70,16 @@ export default async function EventGalleryPage({ params }: Props) {
 
   const relatedEvents = related.filter((r) => r.id !== event.id).slice(0, 3);
 
+  // Absolute URLs in JSON-LD play best with Schema.org validators / Google
+  // Rich Results — relative URLs require the parser to know the page origin.
+  const baseUrl = settings.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ImageGallery",
     name: title,
     description: description ?? undefined,
-    url: `/${locale}/events/${slug}`,
+    url: `${baseUrl}/${locale}/events/${slug}`,
     datePublished: event.event_date ?? event.created_at,
     image: event.images.slice(0, 10).map((img) => ({
       "@type": "ImageObject",
@@ -77,15 +88,21 @@ export default async function EventGalleryPage({ params }: Props) {
     })),
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: isNe ? "गृहपृष्ठ" : "Home", item: `${baseUrl}/${locale}` },
+      { "@type": "ListItem", position: 2, name: isNe ? "कार्यक्रम फोटो" : "Event Photos", item: `${baseUrl}/${locale}/events` },
+      { "@type": "ListItem", position: 3, name: title },
+    ],
+  };
+
   return (
     <>
+      <JsonLd data={[jsonLd, breadcrumbLd]} />
       <BreakingTicker headline={headline} />
       <Header />
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <div className={styles.wrapper}>
         {/* Breadcrumb */}

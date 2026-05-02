@@ -3,9 +3,12 @@ import Image from "next/image";
 import BreakingTicker from "@/app/_components/layout/BreakingTicker";
 import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
+import PaginationBar from "@/app/_components/article/PaginationBar";
+import JsonLd from "@/app/_components/seo/JsonLd";
 import { Link } from "@/i18n/navigation";
 import { listEventPhotos, countEventPhotos } from "@/lib/cms/events";
 import { getBreakingHeadline } from "@/lib/content/public";
+import { getAllSettings } from "@/lib/cms/settings";
 import styles from "./events.module.css";
 
 type Props = {
@@ -26,7 +29,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}/events`,
-      languages: { en: "/en/events", ne: "/ne/events" },
+      languages: {
+        en: "/en/events",
+        ne: "/ne/events",
+        "x-default": "/en/events",
+      },
     },
     openGraph: { title, description, type: "website", url: `/${locale}/events`, locale: isNe ? "ne_NP" : "en_US" },
     twitter: { card: "summary", title, description },
@@ -42,16 +49,32 @@ export default async function EventsPage({ params, searchParams }: Props) {
   const offset = (page - 1) * PAGE_SIZE;
   const isNe = locale === "ne";
 
-  const [events, total, headline] = await Promise.all([
+  const [events, total, headline, settings] = await Promise.all([
     listEventPhotos({ limit: PAGE_SIZE, offset, status: "published" }),
     countEventPhotos({ status: "published" }),
     getBreakingHeadline(locale),
+    getAllSettings().catch(() => ({} as Record<string, string>)),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  const baseUrl = settings.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
+  const itemListLd = events.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: isNe ? "कार्यक्रम फोटो" : "Event Photos",
+    numberOfItems: events.length,
+    itemListElement: events.map((ev, i) => ({
+      "@type": "ListItem",
+      position: (page - 1) * PAGE_SIZE + i + 1,
+      url: `${baseUrl}/${locale}/events/${ev.slug}`,
+      name: (isNe && ev.title_ne) ? ev.title_ne : ev.title_en,
+    })),
+  } : null;
+
   return (
     <>
+      {itemListLd && <JsonLd data={itemListLd} />}
       <BreakingTicker headline={headline} />
       <Header />
       <div className={styles.wrapper}>
@@ -115,25 +138,9 @@ export default async function EventsPage({ params, searchParams }: Props) {
               })}
             </div>
 
-            {totalPages > 1 && (
-              <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 40, flexWrap: "wrap" }}>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <Link
-                    key={p}
-                    href={`/events?page=${p}`}
-                    style={{
-                      padding: "6px 14px", borderRadius: 6, fontSize: "0.85rem",
-                      fontFamily: "var(--font-serif)", fontWeight: 600, textDecoration: "none",
-                      border: "1.5px solid", borderColor: p === page ? "var(--color-accent)" : "var(--color-border)",
-                      background: p === page ? "var(--color-accent)" : "transparent",
-                      color: p === page ? "#fff" : "var(--color-ink)",
-                    }}
-                  >
-                    {p}
-                  </Link>
-                ))}
-              </div>
-            )}
+            <div style={{ marginTop: 40 }}>
+              <PaginationBar page={page} totalPages={totalPages} />
+            </div>
           </>
         )}
       </div>

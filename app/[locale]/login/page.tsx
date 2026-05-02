@@ -7,9 +7,22 @@ import { getBreakingHeadline } from "@/lib/content/public";
 import LoginForm from "@/app/_components/auth/LoginForm";
 import styles from "./page.module.css";
 
-export const metadata: Metadata = {
-  title: "Sign In — KumariHub",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isNe = locale === "ne";
+  const title = isNe ? "साइन इन — KumariHub" : "Sign In — KumariHub";
+  return {
+    title,
+    // Auth pages have no public content worth indexing and create
+    // duplicate / thin content signals if crawled.
+    robots: { index: false, follow: false, nocache: true },
+    alternates: { canonical: `/${locale}/login` },
+  };
+}
 
 export default async function LocaleLoginPage({
   params,

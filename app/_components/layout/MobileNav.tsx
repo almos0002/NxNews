@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { MenuItem } from "@/lib/cms/menu";
@@ -55,7 +56,14 @@ export default function MobileNav({ navItems, locale }: Props) {
       <div className={`${styles.drawer} ${open ? styles.drawerOpen : ""}`} aria-hidden={!open}>
         <div className={styles.drawerHeader}>
           <Link href="/" className={styles.drawerLogoLink} onClick={() => setOpen(false)}>
-            <img src="/logo.png" alt="KumariHub" className={styles.drawerLogoImg} />
+            <Image
+              src="/logo.png"
+              alt="KumariHub"
+              width={140}
+              height={40}
+              className={styles.drawerLogoImg}
+              priority={false}
+            />
           </Link>
           <button
             className={styles.closeBtn}

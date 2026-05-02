@@ -10,8 +10,10 @@ import CategoryBadge from "@/app/_components/article/CategoryBadge";
 import AdUnit from "@/app/_components/ads/AdUnit";
 import ViewTracker from "@/app/_components/article/ViewTracker";
 import BookmarkButton from "@/app/_components/article/BookmarkButton";
+import JsonLd from "@/app/_components/seo/JsonLd";
 import { auth } from "@/lib/auth/auth";
 import { isBookmarked } from "@/lib/auth/account";
+import { getAllSettings } from "@/lib/cms/settings";
 
 import {
   getPublicArticleBySlug,
@@ -26,12 +28,12 @@ type Props = { params: Promise<{ locale: string; id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, locale } = await params;
   const article = await getPublicArticleBySlug(id, locale);
-  if (!article) return { title: "Article — KumariHub" };
+  if (!article) return { title: "Article — KumariHub", robots: { index: false, follow: false } };
 
   const title = `${article.title} — KumariHub`;
   const description = article.excerpt || undefined;
   const image = article.imageUrl || undefined;
-  const canonicalPath = `/article/${id}`;
+  const canonicalPath = `/${locale}/article/${id}`;
 
   return {
     title,
@@ -39,7 +41,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots: { index: true, follow: true },
     alternates: {
       canonical: canonicalPath,
-      languages: { en: `/en/article/${id}`, ne: `/ne/article/${id}` },
+      languages: {
+        en: `/en/article/${id}`,
+        ne: `/ne/article/${id}`,
+        "x-default": `/en/article/${id}`,
+      },
     },
     openGraph: {
       title,
@@ -52,6 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       section: article.category || undefined,
       tags: article.tags?.length ? article.tags : undefined,
       locale: locale === "ne" ? "ne_NP" : "en_US",
+      alternateLocale: locale === "ne" ? ["en_US"] : ["ne_NP"],
     },
     twitter: {
       card: "summary_large_image",
@@ -65,10 +72,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ArticlePage({ params }: Props) {
   const { id, locale } = await params;
 
-  const [article, headline, session] = await Promise.all([
+  const [article, headline, session, settings] = await Promise.all([
     getPublicArticleBySlug(id, locale),
     getBreakingHeadline(locale),
     auth.api.getSession({ headers: await headers() }).catch(() => null),
+    getAllSettings().catch(() => ({} as Record<string, string>)),
   ]);
 
   if (!article) notFound();
@@ -85,8 +93,61 @@ export default async function ArticlePage({ params }: Props) {
   const content = article.content || "";
   const hasHtml = content.includes("<");
 
+  // ── Structured data ────────────────────────────────────────────────
+  const baseUrl = settings.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
+  const orgName = settings.site_title_en || "KumariHub";
+  const orgLogo = settings.logo_url || `${baseUrl}/logo.png`;
+  const articleUrl = `${baseUrl}/${locale}/article/${id}`;
+  const isNe = locale === "ne";
+
+  const newsArticleLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+    headline: article.title,
+    description: article.excerpt || undefined,
+    image: article.imageUrl ? [article.imageUrl] : undefined,
+    datePublished: article.publishedAt || undefined,
+    dateModified: article.updatedAt || article.publishedAt || undefined,
+    author: [{ "@type": "Person", name: article.author }],
+    publisher: {
+      "@type": "Organization",
+      "@id": `${baseUrl}/#organization`,
+      name: orgName,
+      logo: { "@type": "ImageObject", url: orgLogo },
+    },
+    articleSection: article.category || undefined,
+    keywords: article.tags?.length ? article.tags.join(", ") : undefined,
+    inLanguage: isNe ? "ne-NP" : "en-US",
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: isNe ? "गृहपृष्ठ" : "Home",
+        item: `${baseUrl}/${locale}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: isNe ? "ताजा समाचार" : "Latest",
+        item: `${baseUrl}/${locale}/latest`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: article.title,
+      },
+    ],
+  };
+
   return (
     <>
+      <JsonLd data={[newsArticleLd, breadcrumbLd]} />
       <BreakingTicker headline={headline} />
       <Header />
       {article.rawId && (
