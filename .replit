@@ -33,6 +33,7 @@ outputType = "webview"
 [userenv]
 
 [userenv.shared]
+BETTER_AUTH_SECRET = "PmD-nYWVE9diveyMBGQdwKEz30Dfn_60d0kNPABHKnbyzQreXKbFoAZfEJi5Dv-3"
 
 [[ports]]
 localPort = 5000
