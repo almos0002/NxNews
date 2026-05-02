@@ -95,8 +95,19 @@ export default function RecentViewsWidget() {
     setLoading(true);
     setError(false);
     fetch("/api/views/recent?limit=15")
-      .then((r) => r.json())
-      .then((d: ViewsData) => { setData(d); setLoading(false); })
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const d = await r.json();
+        // Defensive: API errors and old caches may return shapes without these.
+        const safe: ViewsData = {
+          recent: Array.isArray(d?.recent) ? d.recent : [],
+          total: typeof d?.total === "number" ? d.total : 0,
+          uniqueIps: typeof d?.uniqueIps === "number" ? d.uniqueIps : 0,
+          topCountries: Array.isArray(d?.topCountries) ? d.topCountries : [],
+        };
+        setData(safe);
+        setLoading(false);
+      })
       .catch(() => { setError(true); setLoading(false); });
   }, []);
 

@@ -266,6 +266,9 @@ ALTER TABLE page_views ADD COLUMN IF NOT EXISTS ip         TEXT;
 ALTER TABLE page_views ADD COLUMN IF NOT EXISTS city       TEXT;
 ALTER TABLE page_views ADD COLUMN IF NOT EXISTS user_agent TEXT;
 ALTER TABLE page_views ADD COLUMN IF NOT EXISTS view_hash  TEXT UNIQUE;
+ALTER TABLE page_views ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+CREATE INDEX IF NOT EXISTS idx_page_views_created_at
+  ON page_views (created_at DESC);
 
 CREATE TABLE IF NOT EXISTS global_view_counters (
   id         TEXT PRIMARY KEY,                              -- e.g. 'live-page'

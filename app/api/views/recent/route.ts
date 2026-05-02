@@ -15,9 +15,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "20"), 50);
 
+    // page_views uses `created_at` (TIMESTAMPTZ) as the precise timestamp;
+    // `viewed_date` (DATE) only stores the day. Alias so the API stays stable.
     const { rows } = await pool.query(
       `SELECT
-        pv.id, pv.content_type, pv.content_id, pv.ip, pv.country, pv.city, pv.viewed_at,
+        pv.id, pv.content_type, pv.content_id, pv.ip, pv.country, pv.city,
+        pv.created_at AS viewed_at,
         CASE
           WHEN pv.content_type = 'live' THEN 'Live Page'
           ELSE COALESCE(a.title_en, p.title_en, v.title_en, ep.title_en)
@@ -32,7 +35,7 @@ export async function GET(req: NextRequest) {
        LEFT JOIN pages         p  ON pv.content_type = 'page'    AND p.id::text  = pv.content_id
        LEFT JOIN videos        v  ON pv.content_type = 'video'   AND v.id::text  = pv.content_id
        LEFT JOIN event_photos  ep ON pv.content_type = 'event'   AND ep.id::text = pv.content_id
-       ORDER BY pv.viewed_at DESC
+       ORDER BY pv.created_at DESC
        LIMIT $1`,
       [limit]
     );
