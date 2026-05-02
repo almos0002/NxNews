@@ -3,6 +3,15 @@ import { pool } from "../db/db";
 
 const SETTINGS_CACHE_TAG = "settings";
 
+// Next.js 16 made the second arg of `revalidateTag(tag, profile)` required.
+// Settings writers all run inside route handlers (`app/api/settings/route.ts`),
+// not server actions — background revalidation is the right semantics. We use
+// the built-in `default` cacheLife profile (5m stale / 15m revalidate), which
+// matches the 5-minute `unstable_cache` TTL of `getAllSettings` below. Move a
+// writer to `updateTag(SETTINGS_CACHE_TAG)` if it ever runs in a server action
+// that needs read-your-own-writes.
+const SETTINGS_REVALIDATE_PROFILE = "default";
+
 export interface SiteSettings {
   site_title_en: string;
   site_title_ne: string;
@@ -89,7 +98,7 @@ export async function setSetting(key: string, value: string): Promise<void> {
       [baseKey, value]
     );
   }
-  revalidateTag(SETTINGS_CACHE_TAG, "default");
+  revalidateTag(SETTINGS_CACHE_TAG, SETTINGS_REVALIDATE_PROFILE);
 }
 
 export interface LocalizedSiteSettings {
@@ -153,5 +162,5 @@ export async function setSettings(entries: Record<string, string>): Promise<void
        value_ne = COALESCE(NULLIF(EXCLUDED.value_ne, ''), settings.value_ne)`,
     params
   );
-  revalidateTag(SETTINGS_CACHE_TAG, "default");
+  revalidateTag(SETTINGS_CACHE_TAG, SETTINGS_REVALIDATE_PROFILE);
 }

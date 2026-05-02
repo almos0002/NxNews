@@ -4,6 +4,16 @@ import { pool } from "../db/db";
 const CATEGORIES_TAG = "categories";
 const TAGS_TAG = "tags";
 
+// Next.js 16 made the second arg of `revalidateTag(tag, profile)` required.
+// Taxonomy writers all run inside route handlers (`app/api/categories/*`,
+// `app/api/tags/*`), not server actions — background revalidation is the
+// right semantics. We use the built-in `default` cacheLife profile (5m stale
+// / 15m revalidate), which matches the 5-minute `unstable_cache` TTL of the
+// `listCategories` / `listTags` reads below. Move a writer to
+// `updateTag(<TAG>)` if it ever runs in a server action that needs
+// read-your-own-writes.
+const TAXONOMY_REVALIDATE_PROFILE = "default";
+
 export interface Category {
   id: string;
   name_en: string;
@@ -38,7 +48,7 @@ export async function createCategory(data: Omit<Category, "id" | "created_at">):
     "INSERT INTO categories (name_en,name_ne,slug) VALUES ($1,$2,$3) RETURNING id,name_en,name_ne,slug,created_at",
     [data.name_en, data.name_ne, data.slug]
   );
-  revalidateTag(CATEGORIES_TAG, "default");
+  revalidateTag(CATEGORIES_TAG, TAXONOMY_REVALIDATE_PROFILE);
   return rows[0];
 }
 
@@ -50,13 +60,13 @@ export async function updateCategory(id: string, data: Partial<Omit<Category, "i
      WHERE id=$1 RETURNING id,name_en,name_ne,slug,created_at`,
     [id, data.name_en, data.name_ne, data.slug]
   );
-  revalidateTag(CATEGORIES_TAG, "default");
+  revalidateTag(CATEGORIES_TAG, TAXONOMY_REVALIDATE_PROFILE);
   return rows[0] ?? null;
 }
 
 export async function deleteCategory(id: string): Promise<boolean> {
   const { rowCount } = await pool.query("DELETE FROM categories WHERE id=$1", [id]);
-  revalidateTag(CATEGORIES_TAG, "default");
+  revalidateTag(CATEGORIES_TAG, TAXONOMY_REVALIDATE_PROFILE);
   return (rowCount ?? 0) > 0;
 }
 
@@ -76,7 +86,7 @@ export async function createTag(data: Omit<Tag, "id" | "created_at">): Promise<T
     "INSERT INTO tags (name_en,name_ne,slug) VALUES ($1,$2,$3) RETURNING id,name_en,name_ne,slug,created_at",
     [data.name_en, data.name_ne, data.slug]
   );
-  revalidateTag(TAGS_TAG, "default");
+  revalidateTag(TAGS_TAG, TAXONOMY_REVALIDATE_PROFILE);
   return rows[0];
 }
 
@@ -85,12 +95,12 @@ export async function updateTag(id: string, data: Partial<Omit<Tag, "id" | "crea
     `UPDATE tags SET name_en=COALESCE($2,name_en), name_ne=COALESCE($3,name_ne), slug=COALESCE($4,slug) WHERE id=$1 RETURNING id,name_en,name_ne,slug,created_at`,
     [id, data.name_en, data.name_ne, data.slug]
   );
-  revalidateTag(TAGS_TAG, "default");
+  revalidateTag(TAGS_TAG, TAXONOMY_REVALIDATE_PROFILE);
   return rows[0] ?? null;
 }
 
 export async function deleteTag(id: string): Promise<boolean> {
   const { rowCount } = await pool.query("DELETE FROM tags WHERE id=$1", [id]);
-  revalidateTag(TAGS_TAG, "default");
+  revalidateTag(TAGS_TAG, TAXONOMY_REVALIDATE_PROFILE);
   return (rowCount ?? 0) > 0;
 }

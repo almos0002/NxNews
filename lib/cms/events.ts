@@ -85,9 +85,16 @@ export async function getEventPhotoBySlug(slug: string): Promise<EventPhoto | nu
   return rows[0] ? row(rows[0]) : null;
 }
 
-export async function createEventPhoto(
-  data: Omit<EventPhoto, "id" | "created_at" | "updated_at">
-): Promise<EventPhoto> {
+// `view_count` is intentionally omitted from the input: it is owned by the
+// view-tracking writer in `app/api/views/route.ts` and seeded by the
+// `event_photos.view_count INTEGER NOT NULL DEFAULT 0` column default in
+// `scripts/schema.sql`. Creators must not set it.
+export type CreateEventPhotoInput = Omit<
+  EventPhoto,
+  "id" | "created_at" | "updated_at" | "view_count"
+>;
+
+export async function createEventPhoto(data: CreateEventPhotoInput): Promise<EventPhoto> {
   await ensureTable();
   const { rows } = await pool.query(
     `INSERT INTO event_photos
@@ -106,9 +113,12 @@ export async function createEventPhoto(
   return row(rows[0]);
 }
 
+// Same `view_count` exclusion as create — only `/api/views` may mutate it.
+export type UpdateEventPhotoInput = Partial<CreateEventPhotoInput>;
+
 export async function updateEventPhoto(
   id: string,
-  data: Partial<Omit<EventPhoto, "id" | "created_at" | "updated_at">>
+  data: UpdateEventPhotoInput
 ): Promise<EventPhoto | null> {
   await ensureTable();
   const fields: string[] = [];

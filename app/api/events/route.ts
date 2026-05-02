@@ -49,7 +49,6 @@ export async function POST(req: NextRequest) {
       images: Array.isArray(body.images) ? body.images : [],
       slug,
       status: body.status === "draft" ? "draft" : "published",
-      view_count: 0,
     });
     return NextResponse.json({ event }, { status: 201 });
   } catch (err: unknown) {

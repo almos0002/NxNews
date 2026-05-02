@@ -133,6 +133,14 @@ Migrations: `scripts/migrate.mjs` + `scripts/schema.sql` (single source of truth
 - `BreakingTicker` accepts `headline?: string` or `headlines?: Headline[]` (backwards-compatible).
 - `getPublicArticleBySlug` returns `publishedAt` + `updatedAt` ISO strings for OG `article:published_time`.
 
+## Next.js 16 Cache API Conventions
+Next 16 made the second argument of `revalidateTag(tag, profile)` **required**. The codebase follows these rules:
+
+1. **Reads** stay on `unstable_cache(fn, [key], { tags: [TAG], revalidate: 300 })` — see `lib/cms/settings.ts`, `lib/cms/menu.ts`, `lib/content/taxonomy.ts`.
+2. **Route-handler writers** (everything under `app/api/**`) call `revalidateTag(TAG, <PROFILE_CONST>)`, where `<PROFILE_CONST>` is a per-module named constant (e.g. `MENU_REVALIDATE_PROFILE`, `SETTINGS_REVALIDATE_PROFILE`, `TAXONOMY_REVALIDATE_PROFILE`). All currently resolve to the built-in `"default"` cacheLife profile (5m stale / 15m revalidate), which matches our 5-minute `unstable_cache` TTLs. Never inline the magic string `"default"` — go through the constant so the choice is intentional and easy to retune.
+3. **Server-action writers**: there are none today (no `"use server"` files exist). If a writer is ever moved into a server action and needs read-your-own-writes within the same request, switch that call to `updateTag(TAG)` instead. `updateTag` takes only the tag — no profile.
+4. **`view_count` is owned by `app/api/views/route.ts`.** Today only `article`, `event_photos`, and `global_view_counters` (live) actually carry a `view_count INTEGER NOT NULL DEFAULT 0` column in `scripts/schema.sql`; `pages` and `videos` are listed in `tableForType()` in the views route but do **not** have the column — that increment will throw at runtime and is a known pre-existing bug to fix separately (either add the columns + indexes or drop those branches). Content writers (e.g. `createEventPhoto` / `updateEventPhoto`) intentionally exclude `view_count` from their input types so only the views route may mutate it; apply the same pattern to any future view-tracked table.
+
 ## Neon Cost Optimization
 1. **Tiny client pool** for the `-pooler` endpoint: `max: 3`, `idleTimeoutMillis: 10_000`, `allowExitOnIdle: true` — short idle so Neon compute can auto-suspend.
 2. **No runtime DDL**: removed `CREATE TABLE IF NOT EXISTS` / `ALTER TABLE` from `lib/cms/events.ts`, `lib/cms/ads.ts`, `lib/cms/live-views.ts`, `app/api/views/route.ts`. All schema in `scripts/schema.sql`.

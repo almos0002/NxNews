@@ -3,6 +3,15 @@ import { pool } from "../db/db";
 
 const MENU_TAG = "menu";
 
+// Next.js 16 made the second arg of `revalidateTag(tag, profile)` required.
+// All menu writers run inside route handlers (see `app/api/menu/*`), not
+// server actions — so background revalidation is the right semantics. We
+// schedule the refresh under the built-in `default` cacheLife profile (5m
+// stale / 15m revalidate), which is a close match for our 5-minute
+// `unstable_cache` TTL above. If a writer ever moves into a server action
+// that needs read-your-own-writes, switch that call to `updateTag(MENU_TAG)`.
+const MENU_REVALIDATE_PROFILE = "default";
+
 export interface MenuItem {
   id: string;
   menu_type: "navbar" | "footer" | "bottom";
@@ -81,7 +90,7 @@ export async function createMenuItem(data: Omit<MenuItem, "id" | "created_at" | 
     [data.menu_type, data.label_en, data.label_ne, data.link_type, data.page_id ?? null, data.url,
      data.sort_order, data.open_new_tab, data.section_label_en ?? "", data.section_label_ne ?? ""]
   );
-  revalidateTag(MENU_TAG, "default");
+  revalidateTag(MENU_TAG, MENU_REVALIDATE_PROFILE);
   return rows[0];
 }
 
@@ -99,13 +108,13 @@ export async function updateMenuItem(
     [id, data.label_en, data.label_ne, data.link_type, data.page_id ?? null, data.url,
      data.sort_order, data.open_new_tab, data.section_label_en, data.section_label_ne]
   );
-  revalidateTag(MENU_TAG, "default");
+  revalidateTag(MENU_TAG, MENU_REVALIDATE_PROFILE);
   return rows[0] ?? null;
 }
 
 export async function deleteMenuItem(id: string): Promise<boolean> {
   const { rowCount } = await pool.query("DELETE FROM menu_items WHERE id=$1", [id]);
-  revalidateTag(MENU_TAG, "default");
+  revalidateTag(MENU_TAG, MENU_REVALIDATE_PROFILE);
   return (rowCount ?? 0) > 0;
 }
 
@@ -119,5 +128,5 @@ export async function reorderMenuItems(items: { id: string; sort_order: number }
      WHERE m.id = v.id`,
     params
   );
-  revalidateTag(MENU_TAG, "default");
+  revalidateTag(MENU_TAG, MENU_REVALIDATE_PROFILE);
 }
