@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllSettings } from "@/lib/settings";
+import { getAllSettings } from "@/lib/cms/settings";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   let baseUrl = "https://kumarihub.com";

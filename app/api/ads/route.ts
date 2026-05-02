@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAllAds } from "@/lib/ads";
+import { getAllAds } from "@/lib/cms/ads";
 
 export async function GET() {
   try {

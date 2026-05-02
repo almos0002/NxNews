@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { getPageById } from "@/lib/pages";
-import PageEditor from "@/app/_components/PageEditor";
+import { auth } from "@/lib/auth/auth";
+import { getPageById } from "@/lib/content/pages";
+import PageEditor from "@/app/_components/editor/PageEditor";
 
 export const metadata: Metadata = { title: "Edit Page — KumariHub Dashboard" };
 

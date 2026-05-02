@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { pool } from "@/lib/db";
-import { countByStatus, listArticles } from "@/lib/articles";
+import { auth } from "@/lib/auth/auth";
+import { pool } from "@/lib/db/db";
+import { countByStatus, listArticles } from "@/lib/content/articles";
 import styles from "./dashboard.module.css";
-import RecentViewsWidget from "@/app/_components/RecentViewsWidget";
+import RecentViewsWidget from "@/app/_components/home/RecentViewsWidget";
 
 export const metadata: Metadata = { title: "Dashboard — KumariHub" };
 

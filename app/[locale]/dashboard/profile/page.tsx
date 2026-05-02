@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { pool } from "@/lib/db";
-import ProfileClient from "@/app/_components/ProfileClient";
+import { auth } from "@/lib/auth/auth";
+import { pool } from "@/lib/db/db";
+import ProfileClient from "@/app/_components/dashboard/ProfileClient";
 
 export const metadata: Metadata = { title: "My Profile — KumariHub Dashboard" };
 

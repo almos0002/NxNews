@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
-import ArchiveLayout from "@/app/_components/ArchiveLayout";
-import PaginationBar from "@/app/_components/PaginationBar";
-import SearchInput from "@/app/_components/SearchInput";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
+import ArchiveLayout from "@/app/_components/article/ArchiveLayout";
+import PaginationBar from "@/app/_components/article/PaginationBar";
+import SearchInput from "@/app/_components/article/SearchInput";
 import {
   searchPublicArticles,
   countSearchArticles,
   getPublicTags,
   getBreakingHeadline,
   PUBLIC_PAGE_SIZE,
-} from "@/lib/public";
+} from "@/lib/content/public";
 import { Link } from "@/i18n/navigation";
-import styles from "@/app/search/page.module.css";
+import styles from "./page.module.css";
 
 export async function generateMetadata({
   params,

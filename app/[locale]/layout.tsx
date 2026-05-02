@@ -3,8 +3,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { getAllSettings } from "@/lib/settings";
-import HtmlLang from "@/app/_components/HtmlLang";
+import { getAllSettings } from "@/lib/cms/settings";
+import HtmlLang from "@/app/_components/layout/HtmlLang";
 
 type Props = {
   children: React.ReactNode;

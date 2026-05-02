@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { toast } from "@/lib/toast";
-import ConfirmDialog from "@/app/_components/ConfirmDialog";
-import styles from "@/app/_components/cms.module.css";
+import { toast } from "@/lib/util/toast";
+import ConfirmDialog from "@/app/_components/ui/ConfirmDialog";
+import styles from "@/app/_components/dashboard/cms.module.css";
 
 interface FeaturedArticle {
   id: string;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { pool } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { pool } from "@/lib/db/db";
+import { auth } from "@/lib/auth/auth";
 import { createHash } from "crypto";
 
 const ALLOWED_TYPES = ["article", "page", "video", "event", "live"] as const;

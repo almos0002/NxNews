@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { listMenuItems } from "@/lib/menu";
-import { listPages } from "@/lib/pages";
-import { listCategories } from "@/lib/taxonomy";
-import MenuClient from "@/app/_components/MenuClient";
+import { auth } from "@/lib/auth/auth";
+import { listMenuItems } from "@/lib/cms/menu";
+import { listPages } from "@/lib/content/pages";
+import { listCategories } from "@/lib/content/taxonomy";
+import MenuClient from "@/app/_components/dashboard/MenuClient";
 
 export const metadata: Metadata = { title: "Menu Manager — KumariHub Dashboard" };
 

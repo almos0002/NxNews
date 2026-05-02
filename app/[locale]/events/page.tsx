@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
 import { Link } from "@/i18n/navigation";
-import { listEventPhotos, countEventPhotos } from "@/lib/events";
-import { getBreakingHeadline } from "@/lib/public";
+import { listEventPhotos, countEventPhotos } from "@/lib/cms/events";
+import { getBreakingHeadline } from "@/lib/content/public";
 import styles from "./events.module.css";
 
 type Props = {

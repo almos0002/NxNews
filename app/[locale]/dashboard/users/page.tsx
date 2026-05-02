@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { pool } from "@/lib/db";
-import UsersClient from "@/app/_components/UsersClient";
-import PaginationBar from "@/app/_components/PaginationBar";
+import { auth } from "@/lib/auth/auth";
+import { pool } from "@/lib/db/db";
+import UsersClient from "@/app/_components/dashboard/UsersClient";
+import PaginationBar from "@/app/_components/article/PaginationBar";
 
 export const metadata: Metadata = { title: "User Management — KumariHub Dashboard" };
 

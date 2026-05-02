@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { updateMenuItem, deleteMenuItem } from "@/lib/menu";
+import { auth } from "@/lib/auth/auth";
+import { updateMenuItem, deleteMenuItem } from "@/lib/cms/menu";
 
 type Ctx = { params: Promise<{ id: string }> };
 

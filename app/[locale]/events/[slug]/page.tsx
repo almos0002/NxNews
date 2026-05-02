@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
 import { Link } from "@/i18n/navigation";
-import AdUnit from "@/app/_components/AdUnit";
-import ViewTracker from "@/app/_components/ViewTracker";
-import { getEventPhotoBySlug, listEventPhotos } from "@/lib/events";
-import { getBreakingHeadline } from "@/lib/public";
+import AdUnit from "@/app/_components/ads/AdUnit";
+import ViewTracker from "@/app/_components/article/ViewTracker";
+import { getEventPhotoBySlug, listEventPhotos } from "@/lib/cms/events";
+import { getBreakingHeadline } from "@/lib/content/public";
 import styles from "./gallery.module.css";
 
 type Props = {

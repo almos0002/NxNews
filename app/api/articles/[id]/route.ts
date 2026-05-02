@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { getArticleById, updateArticle, deleteArticle } from "@/lib/articles";
+import { auth } from "@/lib/auth/auth";
+import { getArticleById, updateArticle, deleteArticle } from "@/lib/content/articles";
 
 type Ctx = { params: Promise<{ id: string }> };
 

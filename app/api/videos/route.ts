@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { listVideos, createVideo, youtubeThumbnail } from "@/lib/videos";
+import { auth } from "@/lib/auth/auth";
+import { listVideos, createVideo, youtubeThumbnail } from "@/lib/content/videos";
 
 export async function GET(req: NextRequest) {
   try {

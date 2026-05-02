@@ -3,23 +3,23 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
-import CategoryBadge from "@/app/_components/CategoryBadge";
-import AdUnit from "@/app/_components/AdUnit";
-import ViewTracker from "@/app/_components/ViewTracker";
-import BookmarkButton from "@/app/_components/BookmarkButton";
-import { auth } from "@/lib/auth";
-import { isBookmarked } from "@/lib/account";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
+import CategoryBadge from "@/app/_components/article/CategoryBadge";
+import AdUnit from "@/app/_components/ads/AdUnit";
+import ViewTracker from "@/app/_components/article/ViewTracker";
+import BookmarkButton from "@/app/_components/article/BookmarkButton";
+import { auth } from "@/lib/auth/auth";
+import { isBookmarked } from "@/lib/auth/account";
 
 import {
   getPublicArticleBySlug,
   getRelatedPublicArticles,
   getBreakingHeadline,
-} from "@/lib/public";
+} from "@/lib/content/public";
 import { Link } from "@/i18n/navigation";
-import styles from "@/app/article/[id]/page.module.css";
+import styles from "./page.module.css";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
 

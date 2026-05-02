@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { listArticles, countByStatus } from "@/lib/articles";
+import { auth } from "@/lib/auth/auth";
+import { listArticles, countByStatus } from "@/lib/content/articles";
 import Link from "next/link";
-import ArticleListClient from "@/app/_components/ArticleListClient";
-import PaginationBar from "@/app/_components/PaginationBar";
+import ArticleListClient from "@/app/_components/dashboard/ArticleListClient";
+import PaginationBar from "@/app/_components/article/PaginationBar";
 import styles from "./articles.module.css";
 
 export const metadata: Metadata = { title: "Articles — KumariHub Dashboard" };

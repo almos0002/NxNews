@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { getEventPhotoById, updateEventPhoto, deleteEventPhoto } from "@/lib/events";
+import { auth } from "@/lib/auth/auth";
+import { getEventPhotoById, updateEventPhoto, deleteEventPhoto } from "@/lib/cms/events";
 
 type Ctx = { params: Promise<{ id: string }> };
 

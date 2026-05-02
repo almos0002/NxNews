@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { getAllSettings } from "@/lib/settings";
-import SeoSettingsClient from "@/app/_components/SeoSettingsClient";
+import { auth } from "@/lib/auth/auth";
+import { getAllSettings } from "@/lib/cms/settings";
+import SeoSettingsClient from "@/app/_components/dashboard/SeoSettingsClient";
 
 export const metadata: Metadata = { title: "SEO Settings — KumariHub Dashboard" };
 

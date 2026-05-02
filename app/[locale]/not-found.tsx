@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "404 — Page Not Found | KumariHub",

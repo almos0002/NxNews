@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { listCategories, listTags } from "@/lib/taxonomy";
-import TaxonomyClient from "@/app/_components/TaxonomyClient";
+import { auth } from "@/lib/auth/auth";
+import { listCategories, listTags } from "@/lib/content/taxonomy";
+import TaxonomyClient from "@/app/_components/dashboard/TaxonomyClient";
 
 export const metadata: Metadata = { title: "Categories & Tags — KumariHub Dashboard" };
 

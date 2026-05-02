@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { reorderMenuItems } from "@/lib/menu";
+import { auth } from "@/lib/auth/auth";
+import { reorderMenuItems } from "@/lib/cms/menu";
 
 export async function POST(req: NextRequest) {
   try {

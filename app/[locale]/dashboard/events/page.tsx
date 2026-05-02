@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { listEventPhotos } from "@/lib/events";
-import EventsAdminClient from "@/app/_components/EventsAdminClient";
+import { auth } from "@/lib/auth/auth";
+import { listEventPhotos } from "@/lib/cms/events";
+import EventsAdminClient from "@/app/_components/dashboard/EventsAdminClient";
 
 export const metadata: Metadata = { title: "Event Photos — KumariHub Dashboard" };
 

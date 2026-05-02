@@ -34,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# user-uploaded media (runtime; do not track)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# attached pasted snippets (workspace-only)
+/attached_assets/Pasted-*.txt

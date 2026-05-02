@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { listVideos, countVideos } from "@/lib/videos";
-import VideosClient from "@/app/_components/VideosClient";
-import PaginationBar from "@/app/_components/PaginationBar";
+import { auth } from "@/lib/auth/auth";
+import { listVideos, countVideos } from "@/lib/content/videos";
+import VideosClient from "@/app/_components/dashboard/VideosClient";
+import PaginationBar from "@/app/_components/article/PaginationBar";
 
 export const metadata: Metadata = { title: "Videos — KumariHub Dashboard" };
 

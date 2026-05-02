@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { getVideoById, updateVideo, deleteVideo, youtubeThumbnail } from "@/lib/videos";
+import { auth } from "@/lib/auth/auth";
+import { getVideoById, updateVideo, deleteVideo, youtubeThumbnail } from "@/lib/content/videos";
 
 type Ctx = { params: Promise<{ id: string }> };
 

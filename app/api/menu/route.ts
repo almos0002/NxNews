@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { listMenuItems, createMenuItem } from "@/lib/menu";
+import { auth } from "@/lib/auth/auth";
+import { listMenuItems, createMenuItem } from "@/lib/cms/menu";
 
 export async function GET(req: NextRequest) {
   try {

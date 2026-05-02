@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { getAllSettings, setSettings } from "@/lib/settings";
+import { auth } from "@/lib/auth/auth";
+import { getAllSettings, setSettings } from "@/lib/cms/settings";
 
 export async function GET(req: NextRequest) {
   try {

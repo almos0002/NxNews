@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { pool } from "@/lib/db";
+import { auth } from "@/lib/auth/auth";
+import { pool } from "@/lib/db/db";
 
 export async function GET() {
   const session = await auth.api.getSession({ headers: await headers() });

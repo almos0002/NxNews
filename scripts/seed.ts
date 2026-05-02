@@ -1,4 +1,4 @@
-import { pool } from "../lib/db";
+import { pool } from "../lib/db/db";
 
 const ADMIN_EMAIL = "admin@kumarihub.com";
 const ADMIN_NAME = "Admin User";

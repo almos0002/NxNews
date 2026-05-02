@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { getPageById, updatePage, deletePage } from "@/lib/pages";
+import { auth } from "@/lib/auth/auth";
+import { getPageById, updatePage, deletePage } from "@/lib/content/pages";
 
 type Ctx = { params: Promise<{ id: string }> };
 

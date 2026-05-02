@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { pool } from "@/lib/db";
-import { getLivePageViewCount } from "@/lib/live-views";
-import LiveAdminClient from "@/app/_components/LiveAdminClient";
+import { auth } from "@/lib/auth/auth";
+import { pool } from "@/lib/db/db";
+import { getLivePageViewCount } from "@/lib/cms/live-views";
+import LiveAdminClient from "@/app/_components/dashboard/LiveAdminClient";
 
 export const metadata: Metadata = { title: "Live Streams — KumariHub Dashboard" };
 

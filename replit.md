@@ -1,353 +1,153 @@
 # KumariHub — Multilingual News Portal
 
 ## Overview
-A modern multilingual news portal built with Next.js 16 App Router. Features a contemporary editorial design with clean card-based layouts, strong typographic hierarchy, full English + Nepali language support via next-intl, and a complete authentication system with role-based access control. Includes unique view tracking (IP + date deduplication) with geolocation and a live Recent Viewers dashboard widget.
-
-### Key Public Pages
-- `/calendar` — Interactive dual-mode calendar: English (Gregorian/AD) and Nepali (Bikram Sambat/BS) with date cross-reference and full Nepali numeral/weekday localization
-- `/live` — Live streams page showing active YouTube embeds and channel links configured via the admin dashboard
-- `/videos` — Video gallery; `/article/*` — article detail; `/[category]` — category archives
-
-### Key Dashboard Pages (admin/moderator/author)
-- `/dashboard/live` — Manage live stream links (CRUD, toggle active, display order)
-- `/dashboard/seo` — Full SEO settings: meta, canonical, OG, GA4, Google/Bing/Yandex/Baidu/Pinterest verification, sitemap viewer, robots.txt preview
-
-### SEO / Sitemap Routes
-- `/sitemap.xml` — Main sitemap via `app/sitemap.xml/route.ts` (native Response, X-Content-Type-Options: nosniff) covering all locales, categories, static pages, and published articles
-- `/article-sitemap.xml` — Full article sitemap (up to 5000 articles) via `app/article-sitemap.xml/route.ts`
-- `/news-sitemap.xml` — Google News sitemap (last 48 hours) via `app/news-sitemap.xml/route.ts`
-- `/robots.txt` — Dynamic robots.txt via `app/robots.ts` respecting `seo_robots_noindex` setting
-
-### Pagination
-- `PaginationBar` component (`app/_components/PaginationBar.tsx`) — server component, page number links, prev/next arrows, ellipsis
-- `PUBLIC_PAGE_SIZE = 20` from `lib/public.ts` — used by all public archive pages
-- All public archive pages paginated: category, tags, author, search
-- All dashboard list pages paginated: articles, users, videos, pages, moderation (20 items/page)
-
-### Role-Based Article Visibility
-- Authors can only see/edit/delete their own articles (dashboard list, edit page, API GET/PUT/DELETE)
-- Admin/Moderator see all articles
-- Enforced at: `dashboard/articles/page.tsx`, `dashboard/articles/[id]/edit/page.tsx`, `api/articles/route.ts`, `api/articles/[id]/route.ts`
+Next.js 16 (App Router, Turbopack) multilingual news portal with English + Nepali support via next-intl, Better Auth (RBAC: admin/moderator/author/user), Neon PostgreSQL, and a CMS dashboard. Includes view tracking with geolocation, dual-mode (Gregorian/Bikram Sambat) calendar, live YouTube streams, video gallery, and SEO sitemaps (main + article + Google News).
 
 ## Tech Stack
-- **Framework**: Next.js 16.2.2 (App Router, Turbopack)
-- **Runtime**: Node.js 22
-- **Language**: TypeScript
+- **Framework**: Next.js 16.2.2 (App Router, Turbopack), Node.js 22, TypeScript
 - **i18n**: next-intl with locale-prefixed URLs (`/en/*`, `/ne/*`)
-- **Auth**: Better Auth (email/password + admin plugin + rate limiting)
-- **Database**: Neon PostgreSQL (via `pg` Pool — `NEON_DATABASE_URL`)
-- **Validation**: Zod (client + server schemas)
-- **Fonts**: Noticia Text (serif, headlines) + DM Sans (sans-serif, UI/body) via `next/font`
-- **Styling**: CSS Modules + global CSS variables
+- **Auth**: Better Auth (email/password, admin plugin, rate limiting, JWE cookie cache)
+- **DB**: Neon PostgreSQL via `pg` Pool (`NEON_DATABASE_URL`, falls back to `DATABASE_URL`)
+- **Validation**: Zod
+- **Fonts**: Noticia Text (serif) + DM Sans (sans-serif)
+- **Styling**: CSS Modules + global tokens
 
 ## Project Structure
 ```
 app/
-  layout.tsx              # Root layout (pass-through; html/body in locale layout)
-  page.tsx                # Root redirect → /en
-  globals.css             # Global styles & design tokens
-  fonts.ts                # Font definitions (Noticia Text, DM Sans)
-  [locale]/               # All routes under locale prefix
-    layout.tsx            # Locale layout: <html lang>, NextIntlClientProvider
-    page.tsx              # Homepage
-    article/[id]/         # Article detail page
-    [category]/           # Category archive
-    tags/[tag]/           # Tag archive
-    search/               # Search results
-    author/[slug]/        # Author archive
-    login/                # Login page (Server Component + LoginForm client)
-    signup/               # Sign-up page (Server Component + SignupForm client)
-    dashboard/            # Protected dashboard (RBAC: admin/moderator/author/user)
-      layout.tsx          # Isolated dashboard shell (dark sidebar, no public Header/Footer)
-      layout.module.css
-  _components/            # Shared components
-    Header.tsx            # Sticky nav — auth-aware Sign In / user avatar
-    Footer.tsx
-    MobileNav.tsx
-    LanguageSwitcher.tsx
-    BreakingTicker.tsx
-    ArchiveLayout.tsx
-    ArticleCard.tsx
-    LoginForm.tsx         # Client component — Better Auth signIn.email
-    SignupForm.tsx        # Client component — Better Auth signUp.email
-    SignOutButton.tsx     # Client component — Better Auth signOut
-    *.module.css
-  _data/
-    articles.ts           # Mock article data & types
-    authors.ts
-    tags.ts
-  api/
-    auth/[...all]/        # Better Auth API handler (GET + POST)
-lib/
-  auth.ts                 # Better Auth server config (admin plugin, rate limit, JWE)
-  auth-client.ts          # Better Auth React client (adminClient plugin)
-  db.ts                   # pg Pool → Neon PostgreSQL
-  validation.ts           # Zod schemas (loginSchema, signupSchema)
-i18n/
-  routing.ts              # Locales config: ["en", "ne"], defaultLocale: "en"
-  request.ts              # next-intl server config
-  navigation.ts           # Locale-aware Link, useRouter, usePathname exports
-messages/
-  en.json                 # English translations
-  ne.json                 # Nepali translations
-proxy.ts                  # Next.js middleware: auth cookie check + next-intl routing
-next.config.ts            # Next.js config (next-intl plugin, remote images)
+  layout.tsx              # Root pass-through (html/body in [locale] layout)
+  page.tsx                # Root → /en redirect
+  globals.css, fonts.ts, icon.svg
+  sitemap.xml/, article-sitemap.xml/, news-sitemap.xml/, robots.ts
+  not-found.tsx, page.module.css
+  [locale]/               # All routes (locale-prefixed)
+    layout.tsx, page.tsx
+    article/[id]/         # Article detail
+    [category]/, tags/[tag]/, search/, author/[slug]/
+    calendar/, live/, videos/
+    login/, signup/, account/
+    dashboard/            # RBAC-protected CMS (own dark shell)
+      dashboard.module.css   # Consolidated layout + page styles
+      articles/, pages/, videos/, taxonomy/, users/, moderation/,
+      featured/, profile/, menu/, ads/, settings/, seo/, live/
+  _components/            # Grouped by domain
+    layout/    Header, Footer, MobileNav, LanguageSwitcher,
+               BreakingTicker, UserMenu, HtmlLang, DateTimeClock
+    home/      FeaturedPanel, LatestFeed, EditorsPick, CategoryLists,
+               ThreeColSection, VideoSection, WeatherSection (+ fetchWeather, weather data),
+               EntertainmentSection, EventPhotosSection, TrendingSidebar,
+               SectionHeading, RecentViewsWidget
+    article/   ArticleCard, CategoryBadge, BookmarkButton, ViewTracker,
+               ArchiveLayout, PaginationBar, SearchInput, CalendarClient
+    editor/    ArticleEditor, PageEditor, QuillEditor
+    dashboard/ DashboardSidebar, AdsClient, ArticleListClient,
+               EventsAdminClient, LiveAdminClient, MenuClient,
+               ModerationClient, PagesClient, ProfileClient,
+               SeoSettingsClient, SettingsClient, TaxonomyClient,
+               UsersClient, VideosClient, cms.module.css
+    auth/      LoginForm, SignupForm, SignOutButton
+    ads/       AdSlot, AdUnit
+    ui/        Combobox, ConfirmDialog, Toaster
+  api/                    # Route handlers (see API Routes below)
+lib/                      # Grouped by concern
+  auth/      auth.ts, auth-client.ts, account.ts
+  db/        db.ts                       # pg Pool
+  content/   articles.ts, pages.ts, public.ts, taxonomy.ts, videos.ts
+  cms/       settings.ts, menu.ts, ads.ts, events.ts, live-views.ts
+  util/      toast.ts, validation.ts, nepali-calendar.ts
+i18n/        routing.ts, request.ts, navigation.ts
+messages/    en.json, ne.json
+proxy.ts     # Next.js 16 middleware: auth cookie + next-intl
 ```
+**Import paths**: `@/app/_components/<group>/<File>`, `@/lib/<group>/<file>` (e.g. `@/lib/auth/auth`, `@/lib/content/public`).
 
-## Authentication Architecture
+## Authentication
+- Better Auth: email+password, autoSignIn on signup, admin plugin, 10 req/60s rate limit, 7-day session, 5-min JWE cache.
+- Base URL: `BETTER_AUTH_URL` → falls back to `REPLIT_DEV_DOMAIN`.
+- Cookie: `better-auth.session_token` / `__Secure-better-auth.session_token`. `proxy.ts` redirects unauth dashboard hits to `/[locale]/login?from=...`.
+- Roles: `admin`, `moderator`, `author`, `user` (reader). Authors only see their own articles in dashboard list/edit/API.
 
-### Better Auth Configuration (lib/auth.ts)
-- Email + password authentication (autoSignIn on signup)
-- Admin plugin: RBAC roles (`admin`, `moderator`, `author`, `user`)
-- Rate limiting: 10 requests/60s per IP, stored in `rateLimit` table
-- Session: 7-day expiry, daily refresh, 5-min JWE cookie cache
-- Base URL: reads `BETTER_AUTH_URL` → falls back to `REPLIT_DEV_DOMAIN`
+### Admin
+`admin@kumarihub.com` / `Admin@1234`
 
-### Database Tables (Neon PostgreSQL — `NEON_DATABASE_URL`)
-| Table          | Purpose                                  |
-|---------------|------------------------------------------|
-| `user`        | Users with `role`, `banned`, `bio` fields |
-| `session`     | Active sessions (with impersonation)     |
-| `account`     | OAuth + email providers per user         |
-| `verification`| Email verification tokens                |
-| `rateLimit`   | Per-IP rate limit tracking               |
-| `article`     | Published articles (bilingual)           |
-| `pages`       | Static CMS pages (bilingual)             |
-| `categories`  | Article categories (no color)            |
-| `tags`        | Article tags (bilingual)                 |
-| `videos`      | YouTube video entries (bilingual)        |
-| `settings`    | Key/value site settings (bilingual)      |
-| `menu_items`  | Header/footer nav menu items             |
-| `ads`         | Ad slot configs (enabled, code, dims)    |
+## Database (Neon PostgreSQL)
+| Table | Purpose |
+|---|---|
+| `user`, `session`, `account`, `verification`, `rateLimit` | Better Auth |
+| `article` | Bilingual articles |
+| `pages` | Bilingual static CMS pages |
+| `categories`, `tags` | Taxonomy (tags bilingual) |
+| `videos` | YouTube entries |
+| `settings` | Bilingual key/value site settings |
+| `menu_items` | Header/footer nav |
+| `ads` | Ad slot configs |
+| `page_views`, `reading_history` | View tracking + per-user history |
 
-Migration script: `scripts/migrate.mjs`
+Migrations: `scripts/migrate.mjs` + `scripts/schema.sql` (single source of truth).
 
-### Role-Based Dashboard (`/dashboard`)
-- **Admin**: User management, moderation queue, articles, pages, categories/tags, videos
-- **Moderator**: Moderation queue, articles, pages, categories/tags, videos
-- **Author**: Articles, pages, videos
-- **User (Reader)**: Profile only
-- Unauthenticated visitors → redirect to `/[locale]/login?from=/[locale]/dashboard`
+## Dashboard Sections
+| Route | Access |
+|---|---|
+| `/dashboard` | All roles — overview |
+| `/dashboard/articles[/new\|/[id]/edit]` | Author+ |
+| `/dashboard/pages[/new\|/[id]/edit]` | Author+ |
+| `/dashboard/videos` | Author+ |
+| `/dashboard/profile` | Author+ |
+| `/dashboard/taxonomy`, `/dashboard/moderation`, `/dashboard/featured`, `/dashboard/menu`, `/dashboard/live` | Moderator+ |
+| `/dashboard/users`, `/dashboard/ads`, `/dashboard/settings`, `/dashboard/seo` | Admin |
+| `/account[/edit]` | Reader (user role) — bookmarks, history, profile |
 
-### Dashboard Sections
-| Route | Access | Purpose |
-|-------|--------|---------|
-| `/dashboard` | All roles | Overview |
-| `/dashboard/articles` | Author+ | Article list + CRUD |
-| `/dashboard/articles/new` | Author+ | New article (Quill editor, bilingual) |
-| `/dashboard/articles/[id]/edit` | Author+ | Edit article |
-| `/dashboard/pages` | Author+ | Static pages list |
-| `/dashboard/pages/new` | Author+ | New page (Quill editor, bilingual) |
-| `/dashboard/pages/[id]/edit` | Author+ | Edit page |
-| `/dashboard/videos` | Author+ | YouTube video management |
-| `/dashboard/taxonomy` | Moderator+ | Categories & tags (tabbed inline CRUD) |
-| `/dashboard/users` | Admin | User role + ban management |
-| `/dashboard/moderation` | Moderator+ | Article review queue (approve/reject) |
-| `/dashboard/featured` | Moderator+ | Featured posts management (search + toggle star) |
-| `/dashboard/profile` | Author+ | Edit own name, bio, change password (within dashboard) |
-| `/account` | Reader (user role) | Personal account page: bookmarks + reading history |
-| `/account/edit` | Reader (user role) | Edit profile name, bio, change password (public layout) |
-| `/dashboard/menu` | Moderator+ | Navbar & footer menu manager with page/URL links and sort order |
-| `/dashboard/ads` | Admin | Ad slot enable/disable + ad code/script editor |
-| `/dashboard/settings` | Admin | Site-wide settings (title, description, social links, etc.) |
-| `/dashboard/seo` | Admin | SEO settings (meta titles, OG images, GA4, GSC, structured data, robots) |
-
-### Key Client Components (app/_components/)
-| Component | Purpose |
-|-----------|---------|
-| `ArticleEditor.tsx` | Full bilingual article editor with Quill, categories, tags, featured image |
-| `PageEditor.tsx` | Bilingual page editor (reuses ArticleEditor.module.css) |
-| `QuillEditor.tsx` | Dynamically imported Quill v2 rich text editor (SSR disabled) |
-| `TaxonomyClient.tsx` | Tabbed categories/tags CRUD client (no color field) |
-| `AdUnit.tsx` | Async server component wrapping `AdSlot` — DB-driven per-slot enable/code |
-| `AdsClient.tsx` | CMS ad slot toggle + code editor client |
-| `VideosClient.tsx` | Videos list + inline add/edit form with YouTube embed preview |
-| `UsersClient.tsx` | User table with role dropdown + ban toggle |
-| `ProfileClient.tsx` | Edit profile (name, bio) + change password via Better Auth |
-| `ModerationClient.tsx` | Review queue list with approve/reject article actions |
-| `SeoSettingsClient.tsx` | SEO settings form (meta titles, OG images, GA4, GSC, structured data, robots) |
-| `MenuClient.tsx` | Dual-menu manager (navbar/footer) with page selector, URL, and up/down sort |
-| `DashboardSidebar.tsx` | Role-aware navigation sidebar |
-| `cms.module.css` | Shared CSS module for all CMS/dashboard table pages |
-| `Toaster.tsx` | Global toast notification system (dispatched via `lib/toast.ts` CustomEvent) |
-| `ConfirmDialog.tsx` | Modal confirm dialog for destructive actions (delete, ban, etc.) |
-| `FeaturedClient.tsx` | Featured posts manager — search + feature/unfeature published articles |
-
-### API Routes
-| Route | Methods | Auth |
-|-------|---------|------|
-| `/api/articles` | GET, POST | Session |
-| `/api/articles/[id]` | GET, PUT, DELETE | Session |
-| `/api/pages` | GET, POST | Session |
-| `/api/pages/[id]` | GET, PUT, DELETE | Session |
-| `/api/categories` | GET, POST | Moderator+ |
-| `/api/categories/[id]` | PUT, DELETE | Moderator+ |
-| `/api/tags` | GET, POST | Moderator+ |
-| `/api/tags/[id]` | PUT, DELETE | Moderator+ |
-| `/api/videos` | GET, POST | Session |
-| `/api/videos/[id]` | GET, PUT, DELETE | Session |
-| `/api/users` | GET, PATCH | Admin |
-| `/api/menu` | GET, POST | Moderator+ |
-| `/api/menu/[id]` | PUT, DELETE | Moderator+ |
-| `/api/menu/reorder` | POST | Moderator+ — bulk sort_order update |
-| `/api/articles/featured` | GET, POST | Moderator+ — list/toggle featured posts |
-| `/api/bookmarks` | GET, POST | Session — list/toggle article bookmarks |
-| `/api/views` | GET, POST | View tracking + auto-logs reading history for logged-in users |
-| `/api/profile` | GET, PATCH | Session — update own name/bio |
-| `/api/upload` | POST | Session — saves to `public/uploads/`, 8MB max |
-| `/api/auth/[...all]` | GET, POST | Better Auth handler |
-
-### Route Protection
-`proxy.ts` reads `better-auth.session_token` / `__Secure-better-auth.session_token` cookie.
-Redirects to locale login with `?from=` param if missing.
+## API Routes (selected)
+`/api/articles`, `/api/articles/[id]`, `/api/articles/featured`, `/api/pages[/...]`, `/api/categories[/...]`, `/api/tags[/...]`, `/api/videos[/...]`, `/api/users`, `/api/menu[/...]`, `/api/menu/reorder`, `/api/bookmarks`, `/api/views[/recent]`, `/api/live[/...]`, `/api/events[/...]`, `/api/profile`, `/api/upload` (8MB → `public/uploads/`), `/api/auth/[...all]`.
 
 ## Environment Variables
-| Key                  | Type   | Purpose                                |
-|---------------------|--------|----------------------------------------|
-| `NEON_DATABASE_URL` | Secret | Neon PostgreSQL connection (primary — auto-provided via Neon integration) |
-| `DATABASE_URL`      | Secret | Replit Helium PostgreSQL fallback (used if NEON_DATABASE_URL not set) |
-| `BETTER_AUTH_SECRET`| Secret | Session signing key (32+ char random string) |
-| `SESSION_SECRET`    | Secret | Fallback session key if BETTER_AUTH_SECRET not set |
-| `BETTER_AUTH_URL`   | Env    | App base URL (optional, auto-detected via REPLIT_DEV_DOMAIN) |
+| Key | Purpose |
+|---|---|
+| `NEON_DATABASE_URL` | Neon Postgres (primary) |
+| `DATABASE_URL` | Replit Helium fallback |
+| `BETTER_AUTH_SECRET` | Session signing key (32+ chars) |
+| `SESSION_SECRET` | Fallback if `BETTER_AUTH_SECRET` not set |
+| `BETTER_AUTH_URL` | Base URL (auto-detected from `REPLIT_DEV_DOMAIN`) |
 
-## i18n Architecture
-- All URLs locale-prefixed: `/en/...` and `/ne/...`
-- Server components: `getTranslations(namespace)` from `"next-intl/server"`
-- Client components: `useTranslations(namespace)` from `"next-intl"`
-- All `<Link>` elements use locale-aware `Link` from `@/i18n/navigation`
-
-## Translation Namespaces
-| Namespace    | Used in                                        |
-|-------------|------------------------------------------------|
-| `site`      | Layout metadata                                |
-| `nav`       | Header, MobileNav, Footer                      |
-| `footer`    | Footer                                         |
-| `article`   | Article detail page                            |
-| `archive`   | Category/tag/author/search pages               |
-| `newsletter`| ArchiveLayout sidebar                          |
-| `search`    | Search page, SearchInput                       |
-| `login`     | Login page                                     |
-| `signup`    | Sign-up page                                   |
-| `language`  | LanguageSwitcher                               |
+## i18n
+- `getTranslations(ns)` (server) / `useTranslations(ns)` (client).
+- All `<Link>` from `@/i18n/navigation` (locale-aware).
+- Namespaces: `site`, `nav`, `footer`, `article`, `archive`, `newsletter`, `search`, `login`, `signup`, `language`, `home`, etc.
 
 ## Design System
-- **Colors**: Warm off-white bg (#f5f5f0), white surface cards, near-black text (#141414), red accent (#e63946)
-- **Typography**: Noticia Text for headlines, DM Sans for UI/body
-- **Layout**: `--max-width: 1200px`, card-based grid
+- Colors: warm off-white bg `#f5f5f0`, white cards, near-black ink `#141414`, red accent `#e63946`.
+- Typography: Noticia Text headlines, DM Sans body/UI.
+- Layout: `--max-width: 1200px`, card-based grid.
 
 ## Scripts
-- `npm run dev` — Start development server on port 5000
-- `npm run build` — Build for production
-- `npm run start` — Start production server on port 5000
-- `npm run lint` — Run ESLint
-- `npx @better-auth/cli@latest migrate` — Run DB migrations (run once after setup)
+- `npm run dev` — dev server, port 5000
+- `npm run build` / `npm run start` — production
+- `npm run lint`
+- `npx @better-auth/cli@latest migrate` — initial DB migration
 
 ## Notes
-- `proxy.ts` is this project's Next.js 16 middleware file (Next.js 16 renamed middleware to proxy)
-- `lib/db.ts` uses `NEON_DATABASE_URL` with fallback to `DATABASE_URL` (Replit's built-in Postgres)
-- SSL is only enabled for Neon databases; Replit's Helium Postgres does not use SSL
-- `lib/auth.ts` uses `BETTER_AUTH_SECRET` with fallback to `SESSION_SECRET`
-- Auth cookie cache means session reads don't hit DB on every request (5-min TTL)
-- Admin account: `admin@kumarihub.com` / `Admin@1234` (role: admin, not banned)
-- **Critical**: The app uses `NEON_DATABASE_URL` (Neon cloud PostgreSQL), NOT the Replit helium `DATABASE_URL`. Using the wrong connection shows an empty user table — always use `NEON_DATABASE_URL` for database operations.
-- Category values stored in articles use the slug (e.g. "technology"); the public query filters via `LOWER(a.category) = slug` so older articles stored as "Technology" still match
+- `proxy.ts` is the Next.js 16 middleware (renamed from `middleware.ts`).
+- SSL is only enabled for Neon URLs; Replit Helium does not use SSL.
+- Pagination: `PUBLIC_PAGE_SIZE = 20` (from `lib/content/public.ts`); all public archives + dashboard lists paginated.
+- Article `category` stored as slug; queries use `LOWER(a.category) = slug` so legacy "Technology" still matches.
+- `BreakingTicker` accepts `headline?: string` or `headlines?: Headline[]` (backwards-compatible).
+- `getPublicArticleBySlug` returns `publishedAt` + `updatedAt` ISO strings for OG `article:published_time`.
 
-## Neon Cost Optimization (Scale-to-Zero & Egress)
+## Neon Cost Optimization
+1. **Tiny client pool** for the `-pooler` endpoint: `max: 3`, `idleTimeoutMillis: 10_000`, `allowExitOnIdle: true` — short idle so Neon compute can auto-suspend.
+2. **No runtime DDL**: removed `CREATE TABLE IF NOT EXISTS` / `ALTER TABLE` from `lib/cms/events.ts`, `lib/cms/ads.ts`, `lib/cms/live-views.ts`, `app/api/views/route.ts`. All schema in `scripts/schema.sql`.
+3. **Hot reads cached** via `unstable_cache` (5-min TTL, invalidated by `revalidateTag`):
+   - `lib/cms/settings.ts::getAllSettings` → tag `settings`
+   - `lib/cms/menu.ts::listMenuItems` → tag `menu`
+   - `lib/content/taxonomy.ts::listCategories` → tag `categories`
+   - `lib/content/taxonomy.ts::listTags` → tag `tags`
+4. **`lib/cms/settings.ts`** reads bilingual `value_en`/`value_ne` columns and exposes flat `${key}`, `${key}_en`, `${key}_ne` keys.
+5. **Recommended Neon settings**: auto-suspend ≤ 5 min, 0.25 CU compute, use `-pooler` URL for app and direct URL for one-off scripts.
 
-The app is tuned to minimize Neon billing across both **compute hours** (the
-auto-suspend / scale-to-zero metric) and **egress / written-data** charges.
-
-### 1. Connection pool tuned for the Neon `-pooler` endpoint
-`NEON_DATABASE_URL` points at `…-pooler.<region>.aws.neon.tech` — Neon's
-managed PgBouncer in transaction-mode. That pool already multiplexes thousands
-of clients onto a few backends, so the **client-side** `pg.Pool` in `lib/db.ts`
-is intentionally tiny:
-
-| Setting              | Pooler URL | Direct URL |
-|----------------------|-----------:|-----------:|
-| `max`                | **3**      | 10         |
-| `idleTimeoutMillis`  | **10 000** | 30 000     |
-| `allowExitOnIdle`    | **true**   | true       |
-
-A short idle timeout is critical: every connection that stays open keeps the
-Neon compute "active" and prevents auto-suspend from kicking in (= more
-billable compute hours).
-
-### 2. Runtime DDL eliminated (was: every request)
-These files used to run `CREATE TABLE IF NOT EXISTS` / `ALTER TABLE` on every
-single query, costing one extra round-trip per request:
-
-- `lib/events.ts` (`ensureTable` — now no-op)
-- `lib/ads.ts` (`initAdsTable` — kept as one-off seeder, removed from `getAllAds`)
-- `lib/live-views.ts` (`ensureCountersTable` — removed)
-- `app/api/views/route.ts` (`ensureLiveCounter` — removed)
-
-All schema lives in `scripts/schema.sql` (single source of truth, applied once).
-
-### 3. Hot reads cached with `unstable_cache`
-Per-page queries that almost never change are wrapped in `next/cache`
-`unstable_cache` (5-minute TTL) and invalidated via `revalidateTag` on writes:
-
-| Function                          | Tag         | Where it's hit      |
-|-----------------------------------|-------------|---------------------|
-| `lib/settings.ts::getAllSettings` | `settings`  | every page (SEO)    |
-| `lib/menu.ts::listMenuItems`      | `menu`      | every page (header/footer) |
-| `lib/taxonomy.ts::listCategories` | `categories`| every page (nav)    |
-| `lib/taxonomy.ts::listTags`       | `tags`      | tag pages, editor   |
-
-This collapses ~6 DB round-trips per page render down to **0** on a cache
-hit, which directly cuts both compute time and egress.
-
-### 4. Bug fix: `lib/settings.ts` was selecting a non-existent `value` column
-The schema has `value_en` / `value_ne` (bilingual). `getAllSettings` now reads
-both columns and exposes them as flat `${key}`, `${key}_en`, `${key}_ne` keys
-to match the rest of the codebase. Previously every settings read silently
-returned an empty object (and burned a query doing it).
-
-### 5. Schema additions to match application code
-`scripts/schema.sql` and the live DB now include the columns the app actually
-reads/writes (added idempotently via `ADD COLUMN IF NOT EXISTS`):
-
-- `menu_items`: `link_type`, `page_id`, `open_new_tab`, `section_label_en/ne`
-- `page_views`: `ip`, `city`, `user_agent`, `view_hash UNIQUE`
-- `reading_history`: `read_at`
-
-### Recommended Neon project-level settings
-In the Neon console (Project → Branches → Compute settings):
-
-- **Auto-suspend after**: 5 min (free) or as low as 0 s (paid) — the lower the
-  better given the short client idle timeout above.
-- **Compute size**: 0.25 CU is plenty for this app at moderate traffic.
-- Use the **`-pooler` connection string** for the app and the **direct**
-  string only for migrations / one-off scripts.
-
-## Production Readiness (Audit Complete)
-- **Build**: Clean production build, zero TypeScript errors — 157 routes compiled (Turbopack).
-- **DB Indexes** (`scripts/` or applied via node-pg):
-  - `idx_article_status_published` on `article(status, published_at DESC NULLS LAST)` — all archive/listing queries
-  - `idx_article_slug` on `article(slug)` — single-article lookup
-  - `idx_article_status_featured` on `article(status, is_featured)` — featured hero panel
-  - `idx_article_category_status` on `article(LOWER(category), status)` — related articles, category archive
-  - `idx_article_tags_gin` GIN on `article(tags)` — tag array `ANY()` queries
-  - `idx_user_lower_name` on `"user"(LOWER(name))` — author lookup (ILIKE/LOWER queries)
-  - `idx_page_views_content` on `page_views(content_type, content_id)` — view count joins
-  - `idx_videos_status_created` on `videos(status, created_at DESC)` — videos listing
-  - `idx_article_view_count` on `article(view_count DESC)` — trending sort
-- **SEO**: All public pages now have full metadata:
-  - `metadataBase` set from `seo_canonical_base_url` setting (falls back to `https://kumarihub.com`)
-  - `openGraph` (type, title, description, images, locale, publishedTime/modifiedTime on articles, section, tags)
-  - `twitter` card (summary_large_image on article/home, summary on archives)
-  - `alternates.canonical` on every public page
-  - `robots: { index: false, follow: false }` on `/search` (prevents search result pages being indexed)
-  - `robots: { index: true, follow: true }` explicitly on all other public pages
-  - `getPublicArticleBySlug` returns `publishedAt` + `updatedAt` ISO strings for OG `article:published_time`
-- **BreakingTicker**: Now accepts both `headline?: string` (single-string legacy) and `headlines?: Headline[]` (array) — fully backwards-compatible
-- **lib/public.ts** `getPublicArticleBySlug` return type extended with `publishedAt: string | null`, `updatedAt: string | null`
-
-## Completed Features
-- **SEO Settings** (`/dashboard/seo`) — meta title templates, OG image, GA4/GSC integration, robots noindex toggle, JSON-LD toggle
-- **Dashboard overview** — real DB stats for admin/author, recent articles table, moderation queue preview
-- **Dynamic category pages** — `[category]/page.tsx` resolves from DB instead of a hardcoded allow-list; RESERVED slugs (login, signup, dashboard, etc.) short-circuit to 404
-- **Menu page** — `dashboard/menu/page.tsx` loads categories from DB via `listCategories()` instead of static data
-- **MenuClient Nepali autofill** — selecting a category in the link form auto-fills both `label_en` and `label_ne` from DB category names
-- **ArticleEditor dynamic categories** — hardcoded category array removed; editor receives categories prop from server pages (`new/page.tsx`, `[id]/edit/page.tsx`) which fetch from `listCategories()`
+## Production Audit
+- Clean Turbopack build, zero TS errors, 157 routes.
+- DB indexes on `article(status, published_at)`, `article(slug)`, `article(status, is_featured)`, `article(LOWER(category), status)`, `article(tags) GIN`, `article(view_count)`, `"user"(LOWER(name))`, `page_views(content_type, content_id)`, `videos(status, created_at)`.
+- Full SEO metadata: `metadataBase` from `seo_canonical_base_url`, OG (with `publishedTime`/`modifiedTime`/`section`/`tags` on articles), Twitter cards, `alternates.canonical`. `/search` is `noindex,nofollow`.
+- SEO settings dashboard: meta title templates, OG image, GA4/GSC, robots noindex toggle, JSON-LD toggle.
+- Dynamic categories: `[category]/page.tsx` resolves from DB; RESERVED slugs (login, signup, dashboard, …) → 404.
+- ArticleEditor + MenuClient pull categories from DB, no hardcoded lists.

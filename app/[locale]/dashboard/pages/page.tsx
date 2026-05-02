@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { listPages, countPages } from "@/lib/pages";
+import { auth } from "@/lib/auth/auth";
+import { listPages, countPages } from "@/lib/content/pages";
 import Link from "next/link";
-import PagesClient from "@/app/_components/PagesClient";
-import PaginationBar from "@/app/_components/PaginationBar";
-import styles from "@/app/_components/cms.module.css";
+import PagesClient from "@/app/_components/dashboard/PagesClient";
+import PaginationBar from "@/app/_components/article/PaginationBar";
+import styles from "@/app/_components/dashboard/cms.module.css";
 
 export const metadata: Metadata = { title: "Pages — KumariHub Dashboard" };
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { listTags, createTag } from "@/lib/taxonomy";
+import { auth } from "@/lib/auth/auth";
+import { listTags, createTag } from "@/lib/content/taxonomy";
 
 function toSlug(s: string) {
   return s.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/--+/g, "-").slice(0, 60);

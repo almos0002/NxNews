@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
-import AdUnit from "@/app/_components/AdUnit";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
+import AdUnit from "@/app/_components/ads/AdUnit";
 import { Link } from "@/i18n/navigation";
-import { getPublicVideos, getBreakingHeadline } from "@/lib/public";
+import { getPublicVideos, getBreakingHeadline } from "@/lib/content/public";
 import styles from "./videos.module.css";
 
 type Props = { params: Promise<{ locale: string }> };

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { pool } from "@/lib/db";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
-import Toaster from "@/app/_components/Toaster";
-import ProfileClient from "@/app/_components/ProfileClient";
+import { auth } from "@/lib/auth/auth";
+import { pool } from "@/lib/db/db";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
+import Toaster from "@/app/_components/ui/Toaster";
+import ProfileClient from "@/app/_components/dashboard/ProfileClient";
 import { getLocale } from "next-intl/server";
 
 export const metadata: Metadata = { title: "Edit Profile — KumariHub" };

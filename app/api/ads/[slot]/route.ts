@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { updateAd } from "@/lib/ads";
+import { auth } from "@/lib/auth/auth";
+import { updateAd } from "@/lib/cms/ads";
 
 export async function PUT(
   req: NextRequest,

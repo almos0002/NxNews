@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { listArticles, createArticle, countByStatus } from "@/lib/articles";
+import { auth } from "@/lib/auth/auth";
+import { listArticles, createArticle, countByStatus } from "@/lib/content/articles";
 
 export async function GET(req: NextRequest) {
   try {

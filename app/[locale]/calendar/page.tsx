@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
-import CalendarClient from "@/app/_components/CalendarClient";
-import { getBreakingHeadline } from "@/lib/public";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
+import CalendarClient from "@/app/_components/article/CalendarClient";
+import { getBreakingHeadline } from "@/lib/content/public";
 
 type Props = { params: Promise<{ locale: string }> };
 

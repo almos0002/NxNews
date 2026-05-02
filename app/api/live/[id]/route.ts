@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
-import { pool } from "@/lib/db";
+import { auth } from "@/lib/auth/auth";
+import { pool } from "@/lib/db/db";
 
 type Params = { params: Promise<{ id: string }> };
 

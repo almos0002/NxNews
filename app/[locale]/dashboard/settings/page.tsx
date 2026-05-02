@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { getAllSettings } from "@/lib/settings";
-import SettingsClient from "@/app/_components/SettingsClient";
+import { auth } from "@/lib/auth/auth";
+import { getAllSettings } from "@/lib/cms/settings";
+import SettingsClient from "@/app/_components/dashboard/SettingsClient";
 
 export const metadata: Metadata = { title: "Settings — KumariHub Dashboard" };
 

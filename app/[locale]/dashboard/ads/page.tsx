@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { getAllAds } from "@/lib/ads";
-import AdsClient from "@/app/_components/AdsClient";
-import styles from "@/app/_components/cms.module.css";
+import { auth } from "@/lib/auth/auth";
+import { getAllAds } from "@/lib/cms/ads";
+import AdsClient from "@/app/_components/dashboard/AdsClient";
+import styles from "@/app/_components/dashboard/cms.module.css";
 
 export const metadata = { title: "Ad Management — KumariHub CMS" };
 export const dynamic = "force-dynamic";

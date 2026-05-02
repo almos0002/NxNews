@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
-import { breakingHeadline } from "@/app/_data/articles";
-import SignupForm from "@/app/_components/SignupForm";
-import styles from "@/app/signup/page.module.css";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
+import { getBreakingHeadline } from "@/lib/content/public";
+import SignupForm from "@/app/_components/auth/SignupForm";
+import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Create Account — KumariHub",
 };
 
-export default async function LocaleSignupPage() {
+export default async function LocaleSignupPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const t = await getTranslations("signup");
+  const { locale } = await params;
+  const breakingHeadline = (await getBreakingHeadline(locale)) ?? "";
 
   return (
     <>

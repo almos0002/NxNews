@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { listEventPhotos, countEventPhotos, createEventPhoto, toEventSlug } from "@/lib/events";
+import { auth } from "@/lib/auth/auth";
+import { listEventPhotos, countEventPhotos, createEventPhoto, toEventSlug } from "@/lib/cms/events";
 
 export async function GET(req: NextRequest) {
   try {
@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
       images: Array.isArray(body.images) ? body.images : [],
       slug,
       status: body.status === "draft" ? "draft" : "published",
+      view_count: 0,
     });
     return NextResponse.json({ event }, { status: 201 });
   } catch (err: unknown) {

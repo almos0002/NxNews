@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { listArticles, countByStatus } from "@/lib/articles";
-import ModerationClient from "@/app/_components/ModerationClient";
-import PaginationBar from "@/app/_components/PaginationBar";
+import { auth } from "@/lib/auth/auth";
+import { listArticles, countByStatus } from "@/lib/content/articles";
+import ModerationClient from "@/app/_components/dashboard/ModerationClient";
+import PaginationBar from "@/app/_components/article/PaginationBar";
 
 export const metadata: Metadata = { title: "Review Queue — KumariHub Dashboard" };
 

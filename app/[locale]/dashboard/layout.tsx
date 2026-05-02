@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import DashboardSidebar from "@/app/_components/DashboardSidebar";
-import Toaster from "@/app/_components/Toaster";
-import styles from "./layout.module.css";
+import { auth } from "@/lib/auth/auth";
+import DashboardSidebar from "@/app/_components/dashboard/DashboardSidebar";
+import Toaster from "@/app/_components/ui/Toaster";
+import styles from "./dashboard.module.css";
 
 type Props = {
   children: React.ReactNode;

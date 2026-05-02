@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
-import ArchiveLayout from "@/app/_components/ArchiveLayout";
-import PaginationBar from "@/app/_components/PaginationBar";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
+import ArchiveLayout from "@/app/_components/article/ArchiveLayout";
+import PaginationBar from "@/app/_components/article/PaginationBar";
 import {
   getPublicArticlesByAuthorName,
   countPublicArticlesByAuthorName,
   getAuthorInfo,
   getBreakingHeadline,
   PUBLIC_PAGE_SIZE,
-} from "@/lib/public";
-import styles from "@/app/author/[slug]/page.module.css";
+} from "@/lib/content/public";
+import styles from "./page.module.css";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { updateCategory, deleteCategory } from "@/lib/taxonomy";
+import { auth } from "@/lib/auth/auth";
+import { updateCategory, deleteCategory } from "@/lib/content/taxonomy";
 
 type Ctx = { params: Promise<{ id: string }> };
 

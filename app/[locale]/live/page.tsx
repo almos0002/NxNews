@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import BreakingTicker from "@/app/_components/BreakingTicker";
-import Header from "@/app/_components/Header";
-import Footer from "@/app/_components/Footer";
-import AdUnit from "@/app/_components/AdUnit";
-import { getBreakingHeadline } from "@/lib/public";
-import { pool } from "@/lib/db";
-import { getLivePageViewCount } from "@/lib/live-views";
-import ViewTracker from "@/app/_components/ViewTracker";
+import BreakingTicker from "@/app/_components/layout/BreakingTicker";
+import Header from "@/app/_components/layout/Header";
+import Footer from "@/app/_components/layout/Footer";
+import AdUnit from "@/app/_components/ads/AdUnit";
+import { getBreakingHeadline } from "@/lib/content/public";
+import { pool } from "@/lib/db/db";
+import { getLivePageViewCount } from "@/lib/cms/live-views";
+import ViewTracker from "@/app/_components/article/ViewTracker";
 import styles from "./live.module.css";
 
 type Props = { params: Promise<{ locale: string }> };

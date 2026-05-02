@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { getArticleById } from "@/lib/articles";
-import { listCategories } from "@/lib/taxonomy";
-import ArticleEditor from "@/app/_components/ArticleEditor";
+import { auth } from "@/lib/auth/auth";
+import { getArticleById } from "@/lib/content/articles";
+import { listCategories } from "@/lib/content/taxonomy";
+import ArticleEditor from "@/app/_components/editor/ArticleEditor";
 
 export const metadata: Metadata = { title: "Edit Article — KumariHub Dashboard" };
 

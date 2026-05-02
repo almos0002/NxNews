@@ -1,5 +1,5 @@
-import { pool } from "@/lib/db";
-import { getAllSettings } from "@/lib/settings";
+import { pool } from "@/lib/db/db";
+import { getAllSettings } from "@/lib/cms/settings";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 900;

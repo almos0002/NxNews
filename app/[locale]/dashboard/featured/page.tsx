@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { pool } from "@/lib/db";
+import { auth } from "@/lib/auth/auth";
+import { pool } from "@/lib/db/db";
 import FeaturedClient from "./FeaturedClient";
 
 export const metadata: Metadata = { title: "Featured Posts — KumariHub" };
