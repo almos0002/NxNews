@@ -1,5 +1,6 @@
 import { pool } from "@/lib/db/db";
 import { getAllSettings } from "@/lib/cms/settings";
+import { resolveBaseUrlSync } from "@/lib/seo/site-url";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 900;
@@ -13,13 +14,14 @@ interface ArticleRow {
 }
 
 export async function GET() {
-  let baseUrl = "https://kumarihub.com";
+  let canonical: string | undefined;
   let siteName = "KumariHub";
   try {
     const s = await getAllSettings() as Record<string, string>;
-    if (s.seo_canonical_base_url) baseUrl = s.seo_canonical_base_url.replace(/\/$/, "");
+    canonical = s.seo_canonical_base_url;
     if (s.site_title_en) siteName = s.site_title_en;
   } catch { /* use defaults */ }
+  const baseUrl = resolveBaseUrlSync(canonical);
 
   let rows: ArticleRow[] = [];
   try {

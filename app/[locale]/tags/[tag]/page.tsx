@@ -13,6 +13,7 @@ import {
   getBreakingHeadline,
   PUBLIC_PAGE_SIZE,
 } from "@/lib/content/public";
+import { getDefaultOgImage } from "@/lib/seo/site-url";
 
 type Props = {
   params: Promise<{ locale: string; tag: string }>;
@@ -26,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const label = tagData?.label ?? tag.replace(/-/g, " ");
   const title = `${label} — KumariHub`;
   const description = tagData?.description || `Articles tagged with "${label}" on KumariHub.`;
+  const og = await getDefaultOgImage();
   return {
     title,
     description,
@@ -40,11 +42,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       url: `/${locale}/tags/${tag}`,
       locale: locale === "ne" ? "ne_NP" : "en_US",
+      images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [og.url],
     },
   };
 }

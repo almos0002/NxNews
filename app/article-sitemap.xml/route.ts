@@ -1,5 +1,6 @@
 import { pool } from "@/lib/db/db";
 import { getAllSettings } from "@/lib/cms/settings";
+import { resolveBaseUrlSync } from "@/lib/seo/site-url";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -7,11 +8,12 @@ export const revalidate = 3600;
 const LOCALES = ["en", "ne"] as const;
 
 export async function GET() {
-  let baseUrl = "https://kumarihub.com";
+  let canonical: string | undefined;
   try {
     const s = await getAllSettings() as Record<string, string>;
-    if (s.seo_canonical_base_url) baseUrl = s.seo_canonical_base_url.replace(/\/$/, "");
-  } catch { /* use default */ }
+    canonical = s.seo_canonical_base_url;
+  } catch { /* fall back to env / hostname resolution */ }
+  const baseUrl = resolveBaseUrlSync(canonical);
 
   let rows: Array<{ slug: string; updated_at: string }> = [];
   try {

@@ -6,6 +6,7 @@ import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
 import AdUnit from "@/app/_components/ads/AdUnit";
 import JsonLd from "@/app/_components/seo/JsonLd";
+import { getDefaultOgImage } from "@/lib/seo/site-url";
 import { Link } from "@/i18n/navigation";
 import { getPublicVideos, getBreakingHeadline } from "@/lib/content/public";
 import { getAllSettings } from "@/lib/cms/settings";
@@ -20,6 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = locale === "ne"
     ? "KumariHub मा नेपाल र विश्वका समाचार भिडियोहरू हेर्नुहोस्।"
     : "Watch the latest news videos from Nepal and around the world on KumariHub.";
+  const og = await getDefaultOgImage();
   return {
     title,
     description,
@@ -38,11 +40,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       url: `/${locale}/videos`,
       locale: locale === "ne" ? "ne_NP" : "en_US",
+      images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [og.url],
     },
   };
 }

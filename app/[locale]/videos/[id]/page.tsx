@@ -8,6 +8,7 @@ import Footer from "@/app/_components/layout/Footer";
 import AdUnit from "@/app/_components/ads/AdUnit";
 import { Link } from "@/i18n/navigation";
 import { getPublicVideos, getPublicVideoById, getBreakingHeadline } from "@/lib/content/public";
+import { resolveBaseUrl, getDefaultOgImage } from "@/lib/seo/site-url";
 import ViewTracker from "@/app/_components/article/ViewTracker";
 import styles from "./video.module.css";
 
@@ -17,7 +18,56 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, locale } = await params;
   const video = await getPublicVideoById(id, locale);
   if (!video) return {};
-  return { title: `${video.title} — KumariHub` };
+  const title = `${video.title} — KumariHub`;
+  const isNe = locale === "ne";
+  const description = video.excerpt
+    || (isNe
+      ? `${video.title} — KumariHub मा भिडियो हेर्नुहोस्।`
+      : `Watch "${video.title}" on KumariHub — Nepal's multilingual news portal.`);
+  const baseUrl = await resolveBaseUrl();
+  const og = await getDefaultOgImage();
+  // Prefer the video's own thumbnail; fall back to the shipped default.
+  // Treat anything with a scheme (http/https) or protocol-relative (//) as
+  // already absolute; otherwise prepend baseUrl. We don't know the
+  // dimensions of an external thumbnail, so we omit width/height for it.
+  const thumb = video.thumbnailUrl
+    ? (/^(https?:)?\/\//i.test(video.thumbnailUrl)
+        ? video.thumbnailUrl
+        : `${baseUrl}${video.thumbnailUrl.startsWith("/") ? "" : "/"}${video.thumbnailUrl}`)
+    : og.url;
+  const isThumb = thumb !== og.url;
+
+  return {
+    metadataBase: new URL(baseUrl),
+    title,
+    description,
+    robots: { index: true, follow: true },
+    alternates: {
+      canonical: `/${locale}/videos/${id}`,
+      languages: {
+        en: `/en/videos/${id}`,
+        ne: `/ne/videos/${id}`,
+        "x-default": `/en/videos/${id}`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      type: "video.other",
+      url: `${baseUrl}/${locale}/videos/${id}`,
+      siteName: "KumariHub",
+      locale: isNe ? "ne_NP" : "en_US",
+      images: isThumb
+        ? [{ url: thumb, alt: video.title }]
+        : [{ url: og.url, width: og.width, height: og.height, alt: video.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [thumb],
+    },
+  };
 }
 
 export default async function VideoDetailPage({ params }: Props) {

@@ -14,6 +14,7 @@ import JsonLd from "@/app/_components/seo/JsonLd";
 import { auth } from "@/lib/auth/auth";
 import { isBookmarked } from "@/lib/auth/account";
 import { getAllSettings } from "@/lib/cms/settings";
+import { resolveBaseUrl, resolveBaseUrlSync, OG_DEFAULT_IMAGE } from "@/lib/seo/site-url";
 
 import {
   getPublicArticleBySlug,
@@ -30,12 +31,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = await getPublicArticleBySlug(id, locale);
   if (!article) return { title: "Article — KumariHub", robots: { index: false, follow: false } };
 
+  const baseUrl = await resolveBaseUrl();
   const title = `${article.title} — KumariHub`;
-  const description = article.excerpt || undefined;
-  const image = article.imageUrl || undefined;
+  const description = article.excerpt || `${article.title} — KumariHub`;
+  // Always provide an og:image — fall back to the site default if the article
+  // has no cover image. Without og:image, WhatsApp / iMessage / Slack show no
+  // link preview at all.
+  const ogImageUrl = article.imageUrl || `${baseUrl}${OG_DEFAULT_IMAGE.path}`;
   const canonicalPath = `/${locale}/article/${id}`;
 
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     robots: { index: true, follow: true },
@@ -51,8 +57,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: "article",
-      url: canonicalPath,
-      images: image ? [{ url: image, width: 1200, height: 630, alt: article.title }] : undefined,
+      url: `${baseUrl}${canonicalPath}`,
+      images: [
+        {
+          url: ogImageUrl,
+          width: OG_DEFAULT_IMAGE.width,
+          height: OG_DEFAULT_IMAGE.height,
+          alt: article.title,
+        },
+      ],
       publishedTime: article.publishedAt || undefined,
       modifiedTime:  article.updatedAt   || undefined,
       section: article.category || undefined,
@@ -64,7 +77,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: image ? [image] : undefined,
+      images: [ogImageUrl],
     },
   };
 }
@@ -94,7 +107,7 @@ export default async function ArticlePage({ params }: Props) {
   const hasHtml = content.includes("<");
 
   // ── Structured data ────────────────────────────────────────────────
-  const baseUrl = settings.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
+  const baseUrl = resolveBaseUrlSync(settings.seo_canonical_base_url);
   const orgName = settings.site_title_en || "KumariHub";
   const orgLogo = settings.logo_url || `${baseUrl}/logo.png`;
   const articleUrl = `${baseUrl}/${locale}/article/${id}`;

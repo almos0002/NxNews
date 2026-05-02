@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { getAllSettings } from "@/lib/cms/settings";
+import { resolveBaseUrlSync, getDefaultOgImage } from "@/lib/seo/site-url";
 import BreakingTicker from "@/app/_components/layout/BreakingTicker";
 import Header from "@/app/_components/layout/Header";
 import ArticleCard from "@/app/_components/article/ArticleCard";
@@ -31,14 +32,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isNe = locale === "ne";
   const siteName  = isNe ? (s.site_title_ne   || s.site_title_en   || "KumariHub") : (s.site_title_en   || "KumariHub");
   const tagline   = isNe ? (s.site_tagline_ne  || s.site_tagline_en  || "")          : (s.site_tagline_en  || "");
-  const description = isNe ? (s.site_description_ne || s.site_description_en || "") : (s.site_description_en || "");
+  const fallbackDesc = isNe
+    ? "नेपालको ताजा समाचार — राजनीति, खेलकुद, मनोरञ्जन, अर्थतन्त्र र थप।"
+    : "Latest news from Nepal — politics, sports, entertainment, business, and more.";
+  const description = isNe
+    ? (s.site_description_ne || s.site_description_en || fallbackDesc)
+    : (s.site_description_en || fallbackDesc);
 
   const title = tagline ? `${siteName} — ${tagline}` : siteName;
-  const ogImage = s.logo_url || undefined;
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const og = await getDefaultOgImage();
+  // Article cover (logo) > shipped default OG. Always emit `images` —
+  // see comment in lib/seo/site-url.ts re: page-level openGraph replacing
+  // the layout's. Without this, WhatsApp shows no preview.
+  const customOgImage = s.seo_og_image_url || s.logo_url || null;
+  // Only stamp width/height when we know them — i.e. the shipped default.
+  // Lying about dimensions of a custom logo/cover degrades preview cards.
+  const ogImage = customOgImage
+    ? { url: customOgImage, alt: siteName }
+    : { url: og.url, width: og.width, height: og.height, alt: siteName };
+  const twitterImageUrl = customOgImage || og.url;
 
   return {
+    metadataBase: new URL(baseUrl),
     title,
-    description: description || undefined,
+    description,
     robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}`,
@@ -50,18 +68,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     openGraph: {
       title,
-      description: description || undefined,
+      description,
       type: "website",
-      url: `/${locale}`,
+      url: `${baseUrl}/${locale}`,
       siteName: s.site_title_en || "KumariHub",
-      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: siteName }] : undefined,
+      images: [ogImage],
       locale: locale === "ne" ? "ne_NP" : "en_US",
+      alternateLocale: locale === "ne" ? ["en_US"] : ["ne_NP"],
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description: description || undefined,
-      images: ogImage ? [ogImage] : undefined,
+      description,
+      images: [twitterImageUrl],
     },
   };
 }

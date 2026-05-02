@@ -7,6 +7,7 @@ import AdUnit from "@/app/_components/ads/AdUnit";
 import { getBreakingHeadline } from "@/lib/content/public";
 import { pool } from "@/lib/db/db";
 import { getLivePageViewCount } from "@/lib/cms/live-views";
+import { getDefaultOgImage } from "@/lib/seo/site-url";
 import ViewTracker from "@/app/_components/article/ViewTracker";
 import styles from "./live.module.css";
 
@@ -53,6 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = isNe
     ? "KumariHub को सिधा प्रसारण हेर्नुहोस् — नेपाल र विश्वका ताजा घटनाहरू।"
     : "Watch KumariHub live streams and broadcasts — breaking news and events from Nepal and beyond.";
+  const og = await getDefaultOgImage();
   return {
     title,
     description,
@@ -71,11 +73,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       url: `/${locale}/live`,
       locale: isNe ? "ne_NP" : "en_US",
+      images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [og.url],
     },
   };
 }

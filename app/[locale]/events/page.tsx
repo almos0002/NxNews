@@ -5,6 +5,7 @@ import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 import JsonLd from "@/app/_components/seo/JsonLd";
+import { getDefaultOgImage } from "@/lib/seo/site-url";
 import { Link } from "@/i18n/navigation";
 import { listEventPhotos, countEventPhotos } from "@/lib/cms/events";
 import { getBreakingHeadline } from "@/lib/content/public";
@@ -23,6 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = isNe
     ? "KumariHub द्वारा कभर गरिएका कार्यक्रम र समारोहका फोटो ग्यालेरीहरू।"
     : "Photo galleries from events and occasions covered by KumariHub.";
+  const og = await getDefaultOgImage();
   return {
     title,
     description,
@@ -35,8 +37,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "x-default": "/en/events",
       },
     },
-    openGraph: { title, description, type: "website", url: `/${locale}/events`, locale: isNe ? "ne_NP" : "en_US" },
-    twitter: { card: "summary", title, description },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `/${locale}/events`,
+      locale: isNe ? "ne_NP" : "en_US",
+      images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [og.url],
+    },
   };
 }
 

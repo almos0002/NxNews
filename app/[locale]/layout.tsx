@@ -4,6 +4,7 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getAllSettings } from "@/lib/cms/settings";
+import { resolveBaseUrlSync, OG_DEFAULT_IMAGE } from "@/lib/seo/site-url";
 import JsonLd from "@/app/_components/seo/JsonLd";
 
 type Props = {
@@ -26,7 +27,9 @@ export async function generateMetadata({
 
   const isNe = locale === "ne";
   const title       = isNe ? (s.site_title_ne       || s.site_title_en       || "KumariHub") : (s.site_title_en       || "KumariHub");
-  const description = isNe ? (s.site_description_ne || s.site_description_en || "")          : (s.site_description_en || "");
+  const description = isNe
+    ? (s.site_description_ne || s.site_description_en || "Latest news from Nepal — politics, sports, entertainment, business, and more.")
+    : (s.site_description_en || "Latest news from Nepal — politics, sports, entertainment, business, and more.");
   // Fall back to the bundled logo.png so the icon link never 404s in
   // browsers / Slack / etc. when the admin has not yet uploaded a favicon.
   const favicon     = s.favicon_url || "/logo.png";
@@ -36,10 +39,13 @@ export async function generateMetadata({
   if (s.seo_baidu_verification)     verificationOther["baidu-site-verification"] = s.seo_baidu_verification;
   if (s.seo_pinterest_verification) verificationOther["p:domain_verify"]        = s.seo_pinterest_verification;
 
-  const baseUrl = s.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
-  // og-default.png is shipped under /public; falls back to /logo.png if a
-  // dedicated 1200×630 OG image is not present yet.
-  const ogLogoUrl = s.seo_og_image_url || s.logo_url || `${baseUrl}/og-default.png`;
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  // OG image: prefer admin-set URL, then site logo, then bundled default.
+  // We always emit an absolute URL — WhatsApp / Slack / Twitter all REQUIRE
+  // og:image to be a fully-qualified URL they can fetch from the public
+  // internet, so passing a string (not the {url, width, height} object) is
+  // the most reliable form across Next.js metadata API versions.
+  const ogImageUrl = s.seo_og_image_url || s.logo_url || `${baseUrl}${OG_DEFAULT_IMAGE.path}`;
 
   return {
     metadataBase: new URL(baseUrl),
@@ -62,18 +68,25 @@ export async function generateMetadata({
     openGraph: {
       siteName: s.site_title_en || "KumariHub",
       title,
-      description: description || undefined,
+      description,
       url: `${baseUrl}/${locale}`,
       type: "website",
-      images: ogLogoUrl ? [{ url: ogLogoUrl, width: 1200, height: 630, alt: title }] : undefined,
+      images: [
+        {
+          url: ogImageUrl,
+          width: OG_DEFAULT_IMAGE.width,
+          height: OG_DEFAULT_IMAGE.height,
+          alt: title,
+        },
+      ],
       locale: locale === "ne" ? "ne_NP" : "en_US",
       alternateLocale: locale === "ne" ? ["en_US"] : ["ne_NP"],
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description: description || undefined,
-      images: ogLogoUrl ? [ogLogoUrl] : undefined,
+      description,
+      images: [ogImageUrl],
     },
   };
 }
@@ -91,7 +104,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   // Settings-driven so editors can update logo / social links without code.
   let s: Record<string, string> = {};
   try { s = await getAllSettings() as Record<string, string>; } catch { /* use defaults */ }
-  const baseUrl = s.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
   const orgName = s.site_title_en || "KumariHub";
   const orgLogo = s.logo_url || `${baseUrl}/logo.png`;
   const sameAs = [

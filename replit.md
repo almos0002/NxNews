@@ -157,6 +157,7 @@ Next 16 made the second argument of `revalidateTag(tag, profile)` **required**. 
 - Clean Turbopack build, zero TS errors, 157 routes.
 - DB indexes on `article(status, published_at)`, `article(slug)`, `article(status, is_featured)`, `article(LOWER(category), status)`, `article(tags) GIN`, `article(view_count)`, `"user"(LOWER(name))`, `page_views(content_type, content_id)`, `videos(status, created_at)`.
 - Full SEO metadata: `metadataBase` from `seo_canonical_base_url`, OG (with `publishedTime`/`modifiedTime`/`section`/`tags` on articles), Twitter cards, `alternates.canonical`. `/search` is `noindex,nofollow`.
+- **OG image fallback** (`lib/seo/site-url.ts`): every `generateMetadata` MUST emit `openGraph.images` because Next.js App Router replaces (not merges) page-level `openGraph` over the layout's. `getDefaultOgImage()` returns `/og-default.png` (871×286) absolutized against `resolveBaseUrl()` (CMS setting → `NEXT_PUBLIC_SITE_URL` → `REPLIT_DEV_DOMAIN` → `https://kumarihub.com`). Article/event/video detail pages prefer their own cover image and fall back to the default. Sitemap routes + `robots.ts` use `resolveBaseUrlSync()` so dev environments never leak `kumarihub.com` URLs.
 - SEO settings dashboard: meta title templates, OG image, GA4/GSC, robots noindex toggle, JSON-LD toggle.
 - Dynamic categories: `[category]/page.tsx` resolves from DB; RESERVED slugs (login, signup, dashboard, …) → 404.
 - ArticleEditor + MenuClient pull categories from DB, no hardcoded lists.

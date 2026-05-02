@@ -13,6 +13,7 @@ import {
   getBreakingHeadline,
   PUBLIC_PAGE_SIZE,
 } from "@/lib/content/public";
+import { getDefaultOgImage } from "@/lib/seo/site-url";
 import styles from "./page.module.css";
 
 type Props = {
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const name = slugToName(slug);
   const title = `${name} — KumariHub`;
   const description = `Read articles by ${name} on KumariHub — Nepal's multilingual news portal.`;
+  const og = await getDefaultOgImage();
   return {
     title,
     description,
@@ -48,11 +50,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "profile",
       url: `/${locale}/author/${slug}`,
       locale: locale === "ne" ? "ne_NP" : "en_US",
+      images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [og.url],
     },
   };
 }

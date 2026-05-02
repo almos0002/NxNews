@@ -11,6 +11,7 @@ import JsonLd from "@/app/_components/seo/JsonLd";
 import { getEventPhotoBySlug, listEventPhotos } from "@/lib/cms/events";
 import { getBreakingHeadline } from "@/lib/content/public";
 import { getAllSettings } from "@/lib/cms/settings";
+import { resolveBaseUrl, resolveBaseUrlSync, OG_DEFAULT_IMAGE } from "@/lib/seo/site-url";
 import styles from "./gallery.module.css";
 
 type Props = {
@@ -22,12 +23,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const event = await getEventPhotoBySlug(slug);
   if (!event) return { title: "Not Found" };
 
+  const baseUrl = await resolveBaseUrl();
   const isNe = locale === "ne";
   const title = isNe && event.title_ne ? event.title_ne : event.title_en;
-  const description = (isNe ? event.description_ne : event.description_en) ?? undefined;
-  const images = event.cover_image ? [{ url: event.cover_image, width: 1200, height: 628, alt: title }] : undefined;
+  const description = (isNe ? event.description_ne : event.description_en) || `${title} — KumariHub`;
+  // Always provide an og:image, even when the event has no cover, so social
+  // platforms (WhatsApp / Slack / Twitter) can still render a link preview.
+  const ogImageUrl = event.cover_image || `${baseUrl}${OG_DEFAULT_IMAGE.path}`;
 
   return {
+    metadataBase: new URL(baseUrl),
     title: `${title} — KumariHub`,
     description,
     robots: { index: true, follow: true },
@@ -43,11 +48,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${title} — KumariHub`,
       description,
       type: "website",
-      url: `/${locale}/events/${slug}`,
+      url: `${baseUrl}/${locale}/events/${slug}`,
       locale: isNe ? "ne_NP" : "en_US",
-      images,
+      images: [{ url: ogImageUrl, width: OG_DEFAULT_IMAGE.width, height: OG_DEFAULT_IMAGE.height, alt: title }],
     },
-    twitter: { card: "summary_large_image", title, description, images: event.cover_image ? [event.cover_image] : undefined },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
+    },
   };
 }
 
@@ -72,7 +82,7 @@ export default async function EventGalleryPage({ params }: Props) {
 
   // Absolute URLs in JSON-LD play best with Schema.org validators / Google
   // Rich Results — relative URLs require the parser to know the page origin.
-  const baseUrl = settings.seo_canonical_base_url?.replace(/\/$/, "") || "https://kumarihub.com";
+  const baseUrl = resolveBaseUrlSync(settings.seo_canonical_base_url);
 
   const jsonLd = {
     "@context": "https://schema.org",

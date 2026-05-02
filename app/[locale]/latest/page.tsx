@@ -6,6 +6,7 @@ import Footer from "@/app/_components/layout/Footer";
 import ArchiveLayout from "@/app/_components/article/ArchiveLayout";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 import JsonLd from "@/app/_components/seo/JsonLd";
+import { getDefaultOgImage } from "@/lib/seo/site-url";
 import {
   getPublicArticles,
   countPublicArticles,
@@ -26,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = isNe
     ? "KumariHub का सबैभन्दा ताजा र नयाँ समाचारहरू।"
     : "The most recent stories from KumariHub — updated continuously.";
+  const og = await getDefaultOgImage();
   return {
     title,
     description,
@@ -44,11 +46,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       url: `/${locale}/latest`,
       locale: isNe ? "ne_NP" : "en_US",
+      images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [og.url],
     },
   };
 }

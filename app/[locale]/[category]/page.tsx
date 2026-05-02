@@ -7,6 +7,7 @@ import Footer from "@/app/_components/layout/Footer";
 import ArchiveLayout from "@/app/_components/article/ArchiveLayout";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 import JsonLd from "@/app/_components/seo/JsonLd";
+import { getDefaultOgImage } from "@/lib/seo/site-url";
 import {
   getPublicArticles,
   countPublicArticles,
@@ -55,8 +56,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? (locale === "ne" ? cat.name_ne || cat.name_en : cat.name_en)
     : category.charAt(0).toUpperCase() + category.slice(1);
   const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
-  const description = descriptions[category as keyof typeof descriptions];
+  const description = descriptions[category as keyof typeof descriptions]
+    || (locale === "ne" ? `${label} — KumariHub का समाचारहरू।` : `Latest ${label} news from KumariHub.`);
   const title = `${label} — KumariHub`;
+  const og = await getDefaultOgImage();
   return {
     title,
     description,
@@ -75,11 +78,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       url: `/${locale}/${category}`,
       locale: locale === "ne" ? "ne_NP" : "en_US",
+      images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [og.url],
     },
   };
 }

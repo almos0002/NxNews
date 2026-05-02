@@ -5,6 +5,7 @@ import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
 import CalendarClient from "@/app/_components/article/CalendarClient";
 import { getBreakingHeadline } from "@/lib/content/public";
+import { getDefaultOgImage } from "@/lib/seo/site-url";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -15,6 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = isNe
     ? "नेपाली बिक्रम संवत र अंग्रेजी ग्रेगोरियन पात्रो। मिति रूपान्तरण र आजको तिथि।"
     : "View the Bikram Sambat (BS) and Gregorian (AD) calendar with date conversion. Today's date in both systems.";
+  const og = await getDefaultOgImage();
   return {
     title,
     description,
@@ -33,11 +35,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       url: `/${locale}/calendar`,
       locale: isNe ? "ne_NP" : "en_US",
+      images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
+      images: [og.url],
     },
   };
 }
