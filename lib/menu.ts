@@ -1,4 +1,7 @@
+import { unstable_cache, revalidateTag } from "next/cache";
 import { pool } from "./db";
+
+const MENU_TAG = "menu";
 
 export interface MenuItem {
   id: string;
@@ -23,18 +26,30 @@ export interface FooterSection {
   items: MenuItem[];
 }
 
+// Menu items are read on every page (header + footer) and change rarely.
+// Cache for 5 minutes; mutations below invalidate via revalidateTag.
+// IMPORTANT: include menu_type in the cache key so navbar / footer / bottom
+// each get their own cache entry (otherwise the first call's result gets
+// served for every subsequent menu_type).
 export async function listMenuItems(menu_type?: string): Promise<MenuItem[]> {
-  const where = menu_type ? "WHERE m.menu_type=$1" : "";
-  const params = menu_type ? [menu_type] : [];
-  const { rows } = await pool.query(
-    `SELECT m.*, p.slug AS page_slug, p.title_en AS page_title_en
-     FROM menu_items m
-     LEFT JOIN pages p ON m.page_id = p.id
-     ${where}
-     ORDER BY m.sort_order, m.created_at`,
-    params
-  );
-  return rows;
+  const key = `menu:list:${menu_type ?? "all"}`;
+  return unstable_cache(
+    async (): Promise<MenuItem[]> => {
+      const where = menu_type ? "WHERE m.menu_type=$1" : "";
+      const params = menu_type ? [menu_type] : [];
+      const { rows } = await pool.query(
+        `SELECT m.*, p.slug AS page_slug, p.title_en AS page_title_en
+         FROM menu_items m
+         LEFT JOIN pages p ON m.page_id = p.id
+         ${where}
+         ORDER BY m.sort_order, m.created_at`,
+        params
+      );
+      return rows;
+    },
+    [key],
+    { tags: [MENU_TAG], revalidate: 300 },
+  )();
 }
 
 export async function getFooterSections(): Promise<FooterSection[]> {
@@ -66,6 +81,7 @@ export async function createMenuItem(data: Omit<MenuItem, "id" | "created_at" | 
     [data.menu_type, data.label_en, data.label_ne, data.link_type, data.page_id ?? null, data.url,
      data.sort_order, data.open_new_tab, data.section_label_en ?? "", data.section_label_ne ?? ""]
   );
+  revalidateTag(MENU_TAG);
   return rows[0];
 }
 
@@ -83,11 +99,13 @@ export async function updateMenuItem(
     [id, data.label_en, data.label_ne, data.link_type, data.page_id ?? null, data.url,
      data.sort_order, data.open_new_tab, data.section_label_en, data.section_label_ne]
   );
+  revalidateTag(MENU_TAG);
   return rows[0] ?? null;
 }
 
 export async function deleteMenuItem(id: string): Promise<boolean> {
   const { rowCount } = await pool.query("DELETE FROM menu_items WHERE id=$1", [id]);
+  revalidateTag(MENU_TAG);
   return (rowCount ?? 0) > 0;
 }
 
@@ -101,4 +119,5 @@ export async function reorderMenuItems(items: { id: string; sort_order: number }
      WHERE m.id = v.id`,
     params
   );
+  revalidateTag(MENU_TAG);
 }

@@ -176,14 +176,24 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 CREATE TABLE IF NOT EXISTS menu_items (
-  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  label_en   TEXT        NOT NULL,
-  label_ne   TEXT        NOT NULL DEFAULT '',
-  url        TEXT        NOT NULL,
-  menu_type  TEXT        NOT NULL DEFAULT 'navbar',           -- navbar | footer
-  sort_order INTEGER     NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  label_en         TEXT        NOT NULL,
+  label_ne         TEXT        NOT NULL DEFAULT '',
+  url              TEXT        NOT NULL,
+  menu_type        TEXT        NOT NULL DEFAULT 'navbar',     -- navbar | footer | bottom
+  sort_order       INTEGER     NOT NULL DEFAULT 0,
+  link_type        TEXT        NOT NULL DEFAULT 'external',   -- page | external | category
+  page_id          UUID        REFERENCES pages(id) ON DELETE SET NULL,
+  open_new_tab     BOOLEAN     NOT NULL DEFAULT false,
+  section_label_en TEXT        NOT NULL DEFAULT '',
+  section_label_ne TEXT        NOT NULL DEFAULT '',
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS link_type        TEXT    NOT NULL DEFAULT 'external';
+ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS page_id          UUID    REFERENCES pages(id) ON DELETE SET NULL;
+ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS open_new_tab     BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS section_label_en TEXT    NOT NULL DEFAULT '';
+ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS section_label_ne TEXT    NOT NULL DEFAULT '';
 
 -- Canonical ads table (matches live DB).
 CREATE TABLE IF NOT EXISTS ads (
@@ -240,14 +250,22 @@ ALTER TABLE event_photos ADD COLUMN IF NOT EXISTS view_count INT NOT NULL DEFAUL
 
 CREATE TABLE IF NOT EXISTS page_views (
   id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  content_type TEXT        NOT NULL,                        -- article | video | page | live | ...
+  content_type TEXT        NOT NULL,                        -- article | video | page | live | event
   content_id   TEXT        NOT NULL,
-  ip_address   TEXT        NOT NULL,
+  ip_address   TEXT,
+  ip           TEXT,                                        -- used by app/api/views/route.ts
   viewed_date  DATE        NOT NULL DEFAULT CURRENT_DATE,
   country      TEXT,
+  city         TEXT,
+  user_agent   TEXT,
+  view_hash    TEXT        UNIQUE,                          -- sha256(ip|type|id|YYYY-MM-DD)
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (content_type, content_id, ip_address, viewed_date)
 );
+ALTER TABLE page_views ADD COLUMN IF NOT EXISTS ip         TEXT;
+ALTER TABLE page_views ADD COLUMN IF NOT EXISTS city       TEXT;
+ALTER TABLE page_views ADD COLUMN IF NOT EXISTS user_agent TEXT;
+ALTER TABLE page_views ADD COLUMN IF NOT EXISTS view_hash  TEXT UNIQUE;
 
 CREATE TABLE IF NOT EXISTS global_view_counters (
   id         TEXT PRIMARY KEY,                              -- e.g. 'live-page'
@@ -276,8 +294,10 @@ CREATE TABLE IF NOT EXISTS reading_history (
   user_id    TEXT        NOT NULL REFERENCES "user"(id)  ON DELETE CASCADE,
   article_id UUID        NOT NULL REFERENCES article(id) ON DELETE CASCADE,
   viewed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  read_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),           -- used by app/api/views/route.ts
   UNIQUE (user_id, article_id)
 );
+ALTER TABLE reading_history ADD COLUMN IF NOT EXISTS read_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
 
 -- ============================================================================

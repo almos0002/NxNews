@@ -43,20 +43,10 @@ function tableForType(type: ViewType): string | null {
   }
 }
 
-async function ensureLiveCounter() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS global_view_counters (
-      id TEXT PRIMARY KEY,
-      view_count INT NOT NULL DEFAULT 0
-    );
-    INSERT INTO global_view_counters (id, view_count)
-    VALUES ('live-page', 0) ON CONFLICT (id) DO NOTHING;
-  `);
-}
+// Schema (global_view_counters + seed row) is managed by scripts/schema.sql.
 
 async function getCurrentViewCount(type: ViewType, id: string): Promise<number> {
   if (type === "live") {
-    await ensureLiveCounter();
     const { rows } = await pool.query("SELECT view_count FROM global_view_counters WHERE id = 'live-page'");
     return rows[0]?.view_count ?? 0;
   }
@@ -67,7 +57,6 @@ async function getCurrentViewCount(type: ViewType, id: string): Promise<number> 
 
 async function incrementViewCount(type: ViewType, id: string): Promise<number> {
   if (type === "live") {
-    await ensureLiveCounter();
     const { rows } = await pool.query(
       `INSERT INTO global_view_counters (id, view_count) VALUES ('live-page', 1)
        ON CONFLICT (id) DO UPDATE SET view_count = global_view_counters.view_count + 1

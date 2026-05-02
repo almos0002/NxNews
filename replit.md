@@ -252,6 +252,75 @@ Redirects to locale login with `?from=` param if missing.
 - **Critical**: The app uses `NEON_DATABASE_URL` (Neon cloud PostgreSQL), NOT the Replit helium `DATABASE_URL`. Using the wrong connection shows an empty user table — always use `NEON_DATABASE_URL` for database operations.
 - Category values stored in articles use the slug (e.g. "technology"); the public query filters via `LOWER(a.category) = slug` so older articles stored as "Technology" still match
 
+## Neon Cost Optimization (Scale-to-Zero & Egress)
+
+The app is tuned to minimize Neon billing across both **compute hours** (the
+auto-suspend / scale-to-zero metric) and **egress / written-data** charges.
+
+### 1. Connection pool tuned for the Neon `-pooler` endpoint
+`NEON_DATABASE_URL` points at `…-pooler.<region>.aws.neon.tech` — Neon's
+managed PgBouncer in transaction-mode. That pool already multiplexes thousands
+of clients onto a few backends, so the **client-side** `pg.Pool` in `lib/db.ts`
+is intentionally tiny:
+
+| Setting              | Pooler URL | Direct URL |
+|----------------------|-----------:|-----------:|
+| `max`                | **3**      | 10         |
+| `idleTimeoutMillis`  | **10 000** | 30 000     |
+| `allowExitOnIdle`    | **true**   | true       |
+
+A short idle timeout is critical: every connection that stays open keeps the
+Neon compute "active" and prevents auto-suspend from kicking in (= more
+billable compute hours).
+
+### 2. Runtime DDL eliminated (was: every request)
+These files used to run `CREATE TABLE IF NOT EXISTS` / `ALTER TABLE` on every
+single query, costing one extra round-trip per request:
+
+- `lib/events.ts` (`ensureTable` — now no-op)
+- `lib/ads.ts` (`initAdsTable` — kept as one-off seeder, removed from `getAllAds`)
+- `lib/live-views.ts` (`ensureCountersTable` — removed)
+- `app/api/views/route.ts` (`ensureLiveCounter` — removed)
+
+All schema lives in `scripts/schema.sql` (single source of truth, applied once).
+
+### 3. Hot reads cached with `unstable_cache`
+Per-page queries that almost never change are wrapped in `next/cache`
+`unstable_cache` (5-minute TTL) and invalidated via `revalidateTag` on writes:
+
+| Function                          | Tag         | Where it's hit      |
+|-----------------------------------|-------------|---------------------|
+| `lib/settings.ts::getAllSettings` | `settings`  | every page (SEO)    |
+| `lib/menu.ts::listMenuItems`      | `menu`      | every page (header/footer) |
+| `lib/taxonomy.ts::listCategories` | `categories`| every page (nav)    |
+| `lib/taxonomy.ts::listTags`       | `tags`      | tag pages, editor   |
+
+This collapses ~6 DB round-trips per page render down to **0** on a cache
+hit, which directly cuts both compute time and egress.
+
+### 4. Bug fix: `lib/settings.ts` was selecting a non-existent `value` column
+The schema has `value_en` / `value_ne` (bilingual). `getAllSettings` now reads
+both columns and exposes them as flat `${key}`, `${key}_en`, `${key}_ne` keys
+to match the rest of the codebase. Previously every settings read silently
+returned an empty object (and burned a query doing it).
+
+### 5. Schema additions to match application code
+`scripts/schema.sql` and the live DB now include the columns the app actually
+reads/writes (added idempotently via `ADD COLUMN IF NOT EXISTS`):
+
+- `menu_items`: `link_type`, `page_id`, `open_new_tab`, `section_label_en/ne`
+- `page_views`: `ip`, `city`, `user_agent`, `view_hash UNIQUE`
+- `reading_history`: `read_at`
+
+### Recommended Neon project-level settings
+In the Neon console (Project → Branches → Compute settings):
+
+- **Auto-suspend after**: 5 min (free) or as low as 0 s (paid) — the lower the
+  better given the short client idle timeout above.
+- **Compute size**: 0.25 CU is plenty for this app at moderate traffic.
+- Use the **`-pooler` connection string** for the app and the **direct**
+  string only for migrations / one-off scripts.
+
 ## Production Readiness (Audit Complete)
 - **Build**: Clean production build, zero TypeScript errors — 157 routes compiled (Turbopack).
 - **DB Indexes** (`scripts/` or applied via node-pg):

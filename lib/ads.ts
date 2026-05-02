@@ -18,30 +18,23 @@ const DEFAULT_SLOTS: Omit<AdSlotConfig, "updated_at">[] = [
   { slot: "fluid",       label: "Fluid / Sponsored",      width: 0,   height: 0,   enabled: true, code: "" },
 ];
 
+// Schema is managed by scripts/schema.sql. This function now only seeds
+// the default ad slot rows. It should be called explicitly from a one-off
+// setup step (e.g. dashboard "reset ads" button), NOT on every request.
 export async function initAdsTable(): Promise<void> {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS ads (
-      slot        VARCHAR(50)  PRIMARY KEY,
-      label       VARCHAR(100) NOT NULL,
-      width       INTEGER      NOT NULL DEFAULT 0,
-      height      INTEGER      NOT NULL DEFAULT 0,
-      enabled     BOOLEAN      DEFAULT true,
-      code        TEXT         DEFAULT '',
-      updated_at  TIMESTAMPTZ  DEFAULT NOW()
-    )
-  `);
   for (const s of DEFAULT_SLOTS) {
     await pool.query(
-      `INSERT INTO ads (slot, label, width, height, enabled, code)
-       VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (slot) DO NOTHING`,
-      [s.slot, s.label, s.width, s.height, s.enabled, s.code]
+      `INSERT INTO ads (slot, enabled, code, width, height)
+       VALUES ($1,$2,$3,$4,$5) ON CONFLICT (slot) DO NOTHING`,
+      [s.slot, s.enabled, s.code, s.width, s.height]
     );
   }
 }
 
 export async function getAllAds(): Promise<AdSlotConfig[]> {
-  await initAdsTable();
-  const { rows } = await pool.query("SELECT * FROM ads ORDER BY slot");
+  const { rows } = await pool.query(
+    "SELECT slot, enabled, code, width, height, updated_at FROM ads ORDER BY slot"
+  );
   return rows;
 }
 

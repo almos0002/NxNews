@@ -24,32 +24,8 @@ export interface EventPhoto {
   updated_at: string;
 }
 
-async function ensureTable() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS event_photos (
-      id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-      title_en    TEXT        NOT NULL,
-      title_ne    TEXT,
-      description_en TEXT,
-      description_ne TEXT,
-      location_en TEXT,
-      location_ne TEXT,
-      event_date  DATE,
-      cover_image TEXT,
-      images      JSONB       NOT NULL DEFAULT '[]'::jsonb,
-      slug        TEXT        UNIQUE NOT NULL,
-      status      TEXT        NOT NULL DEFAULT 'published'
-                              CHECK (status IN ('published','draft')),
-      view_count  INT         NOT NULL DEFAULT 0,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-    ALTER TABLE event_photos ADD COLUMN IF NOT EXISTS view_count INT NOT NULL DEFAULT 0;
-    CREATE INDEX IF NOT EXISTS event_photos_status_idx ON event_photos(status);
-    CREATE INDEX IF NOT EXISTS event_photos_slug_idx   ON event_photos(slug);
-    CREATE INDEX IF NOT EXISTS event_photos_date_idx   ON event_photos(event_date DESC NULLS LAST);
-  `);
-}
+// Schema is now managed by scripts/schema.sql — no runtime DDL.
+async function ensureTable(): Promise<void> { /* no-op */ }
 
 function row(r: Record<string, unknown>): EventPhoto {
   return {
