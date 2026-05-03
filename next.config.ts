@@ -43,6 +43,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.repl.co",
       },
+      {
+        protocol: "https",
+        hostname: "**",
+      },
     ],
   },
 };
