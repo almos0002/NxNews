@@ -75,6 +75,9 @@ export default function TranslateAllButton({ getFields, disabled, className }: P
         if (!firstError) firstError = `${f.label}: ${msg}`;
       }
       setProgress({ done: i + 1, total: pending.length });
+      if (i < pending.length - 1) {
+        await new Promise((r) => setTimeout(r, 600));
+      }
     }
     setLoading(false);
     setProgress(null);

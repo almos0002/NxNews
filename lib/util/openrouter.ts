@@ -1,6 +1,37 @@
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "qwen/qwen3-next-80b-a3b-instruct:free";
 
+const CACHE_MAX = 500;
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+type CacheEntry = { value: string; expires: number };
+const translationCache = new Map<string, CacheEntry>();
+
+function cacheKey(text: string, source: string, target: string, format: string): string {
+  return `${source}>${target}|${format}|${text}`;
+}
+function cacheGet(key: string): string | null {
+  const hit = translationCache.get(key);
+  if (!hit) return null;
+  if (hit.expires < Date.now()) {
+    translationCache.delete(key);
+    return null;
+  }
+  translationCache.delete(key);
+  translationCache.set(key, hit);
+  return hit.value;
+}
+function cacheSet(key: string, value: string): void {
+  if (translationCache.size >= CACHE_MAX) {
+    const oldest = translationCache.keys().next().value;
+    if (oldest !== undefined) translationCache.delete(oldest);
+  }
+  translationCache.set(key, { value, expires: Date.now() + CACHE_TTL_MS });
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
 export type TranslateLang = "en" | "ne";
 export type TranslateFormat = "plain" | "html";
 
@@ -73,48 +104,69 @@ export async function translateText(opts: {
     throw new TranslateError("Source and target languages must differ.", 400);
   }
 
+  const key = cacheKey(text, opts.sourceLang, opts.targetLang, opts.format);
+  const cached = cacheGet(key);
+  if (cached) return cached;
+
   const prompt = buildPrompt(text, opts.sourceLang, opts.targetLang, opts.format);
 
-  let res: Response;
-  try {
-    res = await fetch(OPENROUTER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.2,
-      }),
-    });
-  } catch {
-    throw new TranslateError("Could not reach the translation service. Please try again.", 502);
-  }
+  const maxAttempts = 3;
+  let lastErr: TranslateError | null = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    let res: Response;
+    try {
+      res = await fetch(OPENROUTER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.2,
+        }),
+      });
+    } catch {
+      lastErr = new TranslateError("Could not reach the translation service. Please try again.", 502);
+      if (attempt < maxAttempts) { await sleep(500 * attempt); continue; }
+      throw lastErr;
+    }
 
-  if (!res.ok) {
+    if (res.ok) {
+      let data: { choices?: Array<{ message?: { content?: string } }> };
+      try {
+        data = await res.json();
+      } catch {
+        throw new TranslateError("Translation service returned an invalid response.", 502);
+      }
+      const content = data.choices?.[0]?.message?.content;
+      if (!content || !content.trim()) {
+        throw new TranslateError("Translation service returned an empty response.", 502);
+      }
+      const out = stripCodeFences(content);
+      cacheSet(key, out);
+      return out;
+    }
+
     const body = await res.text().catch(() => "");
     if (res.status === 401 || res.status === 403) {
       throw new TranslateError("OpenRouter rejected the API key. Please update OPENROUTER_API_KEY.", res.status);
     }
     if (res.status === 429) {
-      throw new TranslateError("Translation rate-limited by OpenRouter. Try again in a moment.", 429);
+      lastErr = new TranslateError("Translation rate-limited by OpenRouter. Try again in a moment.", 429);
+      if (attempt < maxAttempts) {
+        const retryAfter = Number(res.headers.get("retry-after")) || 0;
+        const waitMs = retryAfter > 0 ? retryAfter * 1000 : 1500 * attempt;
+        await sleep(Math.min(waitMs, 8000));
+        continue;
+      }
+      throw lastErr;
     }
     console.error("[openrouter] upstream error", res.status, body.slice(0, 300));
-    throw new TranslateError(`Translation service error (${res.status}).`, 502);
+    lastErr = new TranslateError(`Translation service error (${res.status}).`, 502);
+    if (attempt < maxAttempts && res.status >= 500) { await sleep(500 * attempt); continue; }
+    throw lastErr;
   }
-
-  let data: { choices?: Array<{ message?: { content?: string } }> };
-  try {
-    data = await res.json();
-  } catch {
-    throw new TranslateError("Translation service returned an invalid response.", 502);
-  }
-
-  const content = data.choices?.[0]?.message?.content;
-  if (!content || !content.trim()) {
-    throw new TranslateError("Translation service returned an empty response.", 502);
-  }
-  return stripCodeFences(content);
+  throw lastErr ?? new TranslateError("Translation failed.", 502);
 }
