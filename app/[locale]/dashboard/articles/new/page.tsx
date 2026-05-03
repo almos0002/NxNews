@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { listCategories } from "@/lib/content/taxonomy";
 import ArticleEditor from "@/app/_components/editor/ArticleEditor";
 
-export const metadata: Metadata = { title: "New Article — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "New Article" };
 
 export default async function NewArticlePage() {
   const session = await auth.api.getSession({ headers: await headers() });

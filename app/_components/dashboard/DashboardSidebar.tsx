@@ -22,6 +22,7 @@ interface Props {
   name: string;
   email: string;
   role: string;
+  siteName?: string;
 }
 
 function IconGrid() {
@@ -181,7 +182,7 @@ function IconCamera() {
   );
 }
 
-export default function DashboardSidebar({ name, email, role }: Props) {
+export default function DashboardSidebar({ name, email, role, siteName }: Props) {
   const pathname = usePathname();
   const params = useParams();
   const locale = (params.locale as string) ?? "en";
@@ -212,9 +213,9 @@ export default function DashboardSidebar({ name, email, role }: Props) {
     <aside className={styles.sidebar}>
       {/* Brand */}
       <div className={styles.brand}>
-        <div className={styles.brandMark}>K</div>
+        <div className={styles.brandMark}>{(siteName || "KumariHub").trim().charAt(0).toUpperCase()}</div>
         <div className={styles.brandText}>
-          <span className={styles.brandName}>KumariHub</span>
+          <span className={styles.brandName}>{siteName || "KumariHub"}</span>
           <span className={styles.brandSub}>CMS</span>
         </div>
       </div>

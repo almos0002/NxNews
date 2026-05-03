@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { listEventPhotos } from "@/lib/cms/events";
 import EventsAdminClient from "@/app/_components/dashboard/EventsAdminClient";
 
-export const metadata: Metadata = { title: "Event Photos — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Event Photos" };
 
 export default async function EventsAdminPage() {
   const session = await auth.api.getSession({ headers: await headers() });

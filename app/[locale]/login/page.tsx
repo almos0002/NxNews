@@ -14,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const isNe = locale === "ne";
-  const title = isNe ? "साइन इन — KumariHub" : "Sign In — KumariHub";
+  const title = isNe ? "साइन इन" : "Sign In";
   return {
     title,
     // Auth pages have no public content worth indexing and create

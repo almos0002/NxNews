@@ -20,10 +20,12 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const isNe = locale === "ne";
-  const title = isNe ? "कार्यक्रम फोटोहरू — KumariHub" : "Event Photos — KumariHub";
+  const { getSiteName } = await import("@/lib/cms/site-name");
+  const siteName = await getSiteName(locale);
+  const title = isNe ? "कार्यक्रम फोटोहरू" : "Event Photos";
   const description = isNe
-    ? "KumariHub द्वारा कभर गरिएका कार्यक्रम र समारोहका फोटो ग्यालेरीहरू।"
-    : "Photo galleries from events and occasions covered by KumariHub.";
+    ? `${siteName} द्वारा कभर गरिएका कार्यक्रम र समारोहका फोटो ग्यालेरीहरू।`
+    : `Photo galleries from events and occasions covered by ${siteName}.`;
   const og = await getDefaultOgImage();
   return {
     title,
@@ -97,7 +99,7 @@ export default async function EventsPage({ params, searchParams }: Props) {
           <h1 className={styles.heroTitle}>{isNe ? "कार्यक्रम फोटोहरू" : "Event Photos"}</h1>
           <p className={styles.heroDesc}>
             {isNe
-              ? "KumariHub द्वारा कभर गरिएका कार्यक्रम र समारोहका फोटोहरू हेर्नुहोस्।"
+              ? "हाम्रो टोलीद्वारा कभर गरिएका कार्यक्रम र समारोहका फोटोहरू हेर्नुहोस्।"
               : "Browse photo galleries from events and occasions covered by our team."}
           </p>
         </div>

@@ -6,7 +6,7 @@ import { getArticleById } from "@/lib/content/articles";
 import { listCategories } from "@/lib/content/taxonomy";
 import ArticleEditor from "@/app/_components/editor/ArticleEditor";
 
-export const metadata: Metadata = { title: "Edit Article — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Edit Article" };
 
 type Ctx = { params: Promise<{ id: string }> };
 

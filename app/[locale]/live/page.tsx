@@ -50,10 +50,12 @@ function isYoutubeUrl(url: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const isNe = locale === "ne";
-  const title = isNe ? "सिधा प्रसारण — KumariHub" : "Live — KumariHub";
+  const { getSiteName } = await import("@/lib/cms/site-name");
+  const siteName = await getSiteName(locale);
+  const title = isNe ? "सिधा प्रसारण" : "Live";
   const description = isNe
-    ? "KumariHub को सिधा प्रसारण हेर्नुहोस् — नेपाल र विश्वका ताजा घटनाहरू।"
-    : "Watch KumariHub live streams and broadcasts — breaking news and events from Nepal and beyond.";
+    ? `${siteName} को सिधा प्रसारण हेर्नुहोस् — नेपाल र विश्वका ताजा घटनाहरू।`
+    : `Watch ${siteName} live streams and broadcasts — breaking news and events from Nepal and beyond.`;
   const og = await getDefaultOgImage();
   return {
     title,
@@ -111,7 +113,7 @@ export default async function LivePage({ params }: Props) {
           </h1>
           <p className={styles.heroDesc}>
             {isNe
-              ? "KumariHub का सिधा कार्यक्रमहरू यहाँ हेर्नुहोस्"
+              ? "हाम्रा सिधा कार्यक्रमहरू यहाँ हेर्नुहोस्"
               : "Watch our live programs, news broadcasts, and special coverage"}
           </p>
           {livePageViews > 0 && (

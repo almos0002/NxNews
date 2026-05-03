@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { getPageById } from "@/lib/content/pages";
 import PageEditor from "@/app/_components/editor/PageEditor";
 
-export const metadata: Metadata = { title: "Edit Page — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Edit Page" };
 
 type Props = { params: Promise<{ id: string }> };
 

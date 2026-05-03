@@ -7,7 +7,7 @@ import { listPages } from "@/lib/content/pages";
 import { listCategories } from "@/lib/content/taxonomy";
 import MenuClient from "@/app/_components/dashboard/MenuClient";
 
-export const metadata: Metadata = { title: "Menu Manager — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Menu Manager" };
 
 export default async function MenuPage() {
   const session = await auth.api.getSession({ headers: await headers() });

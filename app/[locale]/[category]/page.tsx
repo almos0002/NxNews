@@ -57,8 +57,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : category.charAt(0).toUpperCase() + category.slice(1);
   const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
   const description = descriptions[category as keyof typeof descriptions]
-    || (locale === "ne" ? `${label} — KumariHub का समाचारहरू।` : `Latest ${label} news from KumariHub.`);
-  const title = `${label} — KumariHub`;
+    || (locale === "ne" ? `${label} समाचारहरू।` : `Latest ${label} news.`);
+  const title = label;
   const og = await getDefaultOgImage();
   return {
     title,

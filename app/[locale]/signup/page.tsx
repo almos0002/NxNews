@@ -14,7 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const isNe = locale === "ne";
-  const title = isNe ? "खाता बनाउनुहोस् — KumariHub" : "Create Account — KumariHub";
+  const title = isNe ? "खाता बनाउनुहोस्" : "Create Account";
   return {
     title,
     // Sign-up screens are gated user flows — keep them out of search results.

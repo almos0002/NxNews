@@ -23,10 +23,12 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const isNe = locale === "ne";
-  const title = isNe ? "ताजा समाचार — KumariHub" : "Latest News — KumariHub";
+  const { getSiteName } = await import("@/lib/cms/site-name");
+  const siteName = await getSiteName(locale);
+  const title = isNe ? "ताजा समाचार" : "Latest News";
   const description = isNe
-    ? "KumariHub का सबैभन्दा ताजा र नयाँ समाचारहरू।"
-    : "The most recent stories from KumariHub — updated continuously.";
+    ? `${siteName} का सबैभन्दा ताजा र नयाँ समाचारहरू।`
+    : `The most recent stories from ${siteName} — updated continuously.`;
   const og = await getDefaultOgImage();
   return {
     title,
@@ -99,8 +101,8 @@ export default async function LatestPage({ params, searchParams }: Props) {
         title={isNe ? "ताजा समाचारहरू" : "Latest News"}
         description={
           isNe
-            ? "KumariHub का सबैभन्दा ताजा र नयाँ समाचारहरू — निरन्तर अद्यावधिक।"
-            : "The most recent stories from KumariHub — updated continuously."
+            ? "सबैभन्दा ताजा र नयाँ समाचारहरू — निरन्तर अद्यावधिक।"
+            : "The most recent stories — updated continuously."
         }
         count={total}
         articles={articles}

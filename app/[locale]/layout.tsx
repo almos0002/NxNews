@@ -49,7 +49,7 @@ export async function generateMetadata({
 
   return {
     metadataBase: new URL(baseUrl),
-    title,
+    title: { default: title, template: `%s — ${title}` },
     description,
     icons: { icon: favicon },
     verification: {

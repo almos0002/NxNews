@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/auth";
 import PageEditor from "@/app/_components/editor/PageEditor";
 
-export const metadata: Metadata = { title: "New Page — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "New Page" };
 
 export default async function NewPagePage() {
   const session = await auth.api.getSession({ headers: await headers() });

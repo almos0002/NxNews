@@ -29,11 +29,11 @@ type Props = { params: Promise<{ locale: string; id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, locale } = await params;
   const article = await getPublicArticleBySlug(id, locale);
-  if (!article) return { title: "Article — KumariHub", robots: { index: false, follow: false } };
+  if (!article) return { title: "Article", robots: { index: false, follow: false } };
 
   const baseUrl = await resolveBaseUrl();
-  const title = `${article.title} — KumariHub`;
-  const description = article.excerpt || `${article.title} — KumariHub`;
+  const title = article.title;
+  const description = article.excerpt || article.title;
   // Always provide an og:image — fall back to the site default if the article
   // has no cover image. Without og:image, WhatsApp / iMessage / Slack show no
   // link preview at all.

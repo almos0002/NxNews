@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/auth";
 import DashboardSidebar from "@/app/_components/dashboard/DashboardSidebar";
 import Toaster from "@/app/_components/ui/Toaster";
+import { getSiteName } from "@/lib/cms/site-name";
 import styles from "./dashboard.module.css";
 
 // Cascades noindex to every route inside /dashboard/* — no need to repeat it
@@ -29,12 +30,15 @@ export default async function DashboardLayout({ children, params }: Props) {
     redirect(`/${locale}/account`);
   }
 
+  const siteName = await getSiteName(locale);
+
   return (
     <div className={styles.shell}>
       <DashboardSidebar
         name={user.name ?? ""}
         email={user.email}
         role={role}
+        siteName={siteName}
       />
       <div className={styles.mainWrap}>
         {children}

@@ -25,8 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tags = await getPublicTags();
   const tagData = tags.find((t) => t.slug === tag);
   const label = tagData?.label ?? tag.replace(/-/g, " ");
-  const title = `${label} — KumariHub`;
-  const description = tagData?.description || `Articles tagged with "${label}" on KumariHub.`;
+  const { getSiteName } = await import("@/lib/cms/site-name");
+  const siteName = await getSiteName(locale);
+  const title = label;
+  const description = tagData?.description || `Articles tagged with "${label}" on ${siteName}.`;
   const og = await getDefaultOgImage();
   return {
     title,

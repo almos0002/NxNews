@@ -5,7 +5,7 @@ import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "404 — Page Not Found | KumariHub",
+  title: "404 — Page Not Found",
   robots: { index: false, follow: false },
 };
 

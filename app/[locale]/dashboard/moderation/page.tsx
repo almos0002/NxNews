@@ -6,7 +6,7 @@ import { listArticles, countByStatus } from "@/lib/content/articles";
 import ModerationClient from "@/app/_components/dashboard/ModerationClient";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 
-export const metadata: Metadata = { title: "Review Queue — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Review Queue" };
 
 const PER_PAGE = 20;
 

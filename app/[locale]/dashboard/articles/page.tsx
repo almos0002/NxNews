@@ -8,7 +8,7 @@ import ArticleListClient from "@/app/_components/dashboard/ArticleListClient";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 import styles from "./articles.module.css";
 
-export const metadata: Metadata = { title: "Articles — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Articles" };
 
 const PER_PAGE = 20;
 

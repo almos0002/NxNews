@@ -142,7 +142,7 @@ export default function AdsClient({ initialAds }: Props) {
       </div>
 
       <div className={styles.tableCard} style={{ marginTop: 24, padding: 16, background: "var(--color-bg-alt, #f8f8f4)" }}>
-        <h3 style={{ fontWeight: 600, fontSize: "0.9rem", marginBottom: 8 }}>How ads work on KumariHub</h3>
+        <h3 style={{ fontWeight: 600, fontSize: "0.9rem", marginBottom: 8 }}>How ads work</h3>
         <ul style={{ fontSize: "0.82rem", color: "var(--color-ink-muted)", lineHeight: 1.7, paddingLeft: 18 }}>
           <li>Each slot corresponds to an ad placement on the site (article pages, homepage, video pages, sidebars).</li>
           <li>If a slot is <strong>disabled</strong>, that placement shows nothing (no empty space).</li>

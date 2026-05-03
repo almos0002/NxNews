@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { pool } from "@/lib/db/db";
 import ProfileClient from "@/app/_components/dashboard/ProfileClient";
 
-export const metadata: Metadata = { title: "My Profile — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "My Profile" };
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({ headers: await headers() });

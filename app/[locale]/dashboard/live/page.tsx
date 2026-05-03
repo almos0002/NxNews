@@ -6,7 +6,7 @@ import { pool } from "@/lib/db/db";
 import { getLivePageViewCount } from "@/lib/cms/live-views";
 import LiveAdminClient from "@/app/_components/dashboard/LiveAdminClient";
 
-export const metadata: Metadata = { title: "Live Streams — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Live Streams" };
 
 async function getStreams() {
   try {

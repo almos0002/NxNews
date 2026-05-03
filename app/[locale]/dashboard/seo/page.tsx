@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { getAllSettings } from "@/lib/cms/settings";
 import SeoSettingsClient from "@/app/_components/dashboard/SeoSettingsClient";
 
-export const metadata: Metadata = { title: "SEO Settings — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "SEO Settings" };
 
 export default async function SeoSettingsPage() {
   const session = await auth.api.getSession({ headers: await headers() });

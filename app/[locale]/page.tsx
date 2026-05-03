@@ -55,7 +55,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     metadataBase: new URL(baseUrl),
-    title,
+    // Home page is the brand itself — bypass the layout's `%s — siteName`
+    // template so we don't end up with "siteName — siteName".
+    title: { absolute: title },
     description,
     robots: { index: true, follow: true },
     alternates: {

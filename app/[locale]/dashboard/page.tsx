@@ -7,7 +7,7 @@ import { countByStatus, listArticles } from "@/lib/content/articles";
 import styles from "./dashboard.module.css";
 import RecentViewsWidget from "@/app/_components/home/RecentViewsWidget";
 
-export const metadata: Metadata = { title: "Dashboard — KumariHub" };
+export const metadata: Metadata = { title: "Dashboard" };
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "Admin",

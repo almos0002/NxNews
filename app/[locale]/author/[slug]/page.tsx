@@ -33,8 +33,10 @@ function slugToName(slug: string): string {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
   const name = slugToName(slug);
-  const title = `${name} — KumariHub`;
-  const description = `Read articles by ${name} on KumariHub — Nepal's multilingual news portal.`;
+  const { getSiteName } = await import("@/lib/cms/site-name");
+  const siteName = await getSiteName(locale);
+  const title = name;
+  const description = `Read articles by ${name} on ${siteName} — Nepal's multilingual news portal.`;
   const og = await getDefaultOgImage();
   return {
     title,
@@ -145,7 +147,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
           <AuthorProfile
             name={displayName}
             role={authorInfo?.role ?? "Contributor"}
-            bio={authorInfo?.bio ?? `${displayName} is a contributor to KumariHub.`}
+            bio={authorInfo?.bio ?? `${displayName} is a contributor.`}
             articleCount={total}
             twitter={authorInfo?.twitter}
             linkedin={authorInfo?.linkedin}

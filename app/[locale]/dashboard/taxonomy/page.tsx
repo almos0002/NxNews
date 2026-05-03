@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { listCategories, listTags } from "@/lib/content/taxonomy";
 import TaxonomyClient from "@/app/_components/dashboard/TaxonomyClient";
 
-export const metadata: Metadata = { title: "Categories & Tags — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Categories & Tags" };
 
 export default async function TaxonomyPage() {
   const session = await auth.api.getSession({ headers: await headers() });

@@ -22,12 +22,14 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const title = locale === "ne" ? "खोज्नुहोस् — KumariHub" : "Search — KumariHub";
+  const { getSiteName } = await import("@/lib/cms/site-name");
+  const siteName = await getSiteName(locale);
+  const title = locale === "ne" ? "खोज्नुहोस्" : "Search";
   return {
     title,
     description: locale === "ne"
-      ? "KumariHub मा समाचार, लेख र विषयहरू खोज्नुहोस्।"
-      : "Search news articles, topics and more on KumariHub.",
+      ? `${siteName} मा समाचार, लेख र विषयहरू खोज्नुहोस्।`
+      : `Search news articles, topics and more on ${siteName}.`,
     robots: { index: false, follow: false },
   };
 }

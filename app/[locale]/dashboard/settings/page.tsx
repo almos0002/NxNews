@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { getAllSettings } from "@/lib/cms/settings";
 import SettingsClient from "@/app/_components/dashboard/SettingsClient";
 
-export const metadata: Metadata = { title: "Settings — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
   const session = await auth.api.getSession({ headers: await headers() });

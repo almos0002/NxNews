@@ -11,7 +11,7 @@ import { getLocale } from "next-intl/server";
 import styles from "./account.module.css";
 
 export const metadata: Metadata = {
-  title: "My Account — KumariHub",
+  title: "My Account",
   // Per-user account screens are noindex by definition.
   robots: { index: false, follow: false, nocache: true },
 };

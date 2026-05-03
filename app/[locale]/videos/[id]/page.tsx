@@ -18,12 +18,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, locale } = await params;
   const video = await getPublicVideoById(id, locale);
   if (!video) return {};
-  const title = `${video.title} — KumariHub`;
+  const { getSiteName } = await import("@/lib/cms/site-name");
+  const siteName = await getSiteName(locale);
+  const title = video.title;
   const isNe = locale === "ne";
   const description = video.excerpt
     || (isNe
-      ? `${video.title} — KumariHub मा भिडियो हेर्नुहोस्।`
-      : `Watch "${video.title}" on KumariHub — Nepal's multilingual news portal.`);
+      ? `${video.title} — ${siteName} मा भिडियो हेर्नुहोस्।`
+      : `Watch "${video.title}" on ${siteName} — Nepal's multilingual news portal.`);
   const baseUrl = await resolveBaseUrl();
   const og = await getDefaultOgImage();
   // Prefer the video's own thumbnail; fall back to the shipped default.
@@ -55,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: "video.other",
       url: `${baseUrl}/${locale}/videos/${id}`,
-      siteName: "KumariHub",
+      siteName,
       locale: isNe ? "ne_NP" : "en_US",
       images: isThumb
         ? [{ url: thumb, alt: video.title }]

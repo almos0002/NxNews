@@ -5,7 +5,7 @@ import { getAllAds } from "@/lib/cms/ads";
 import AdsClient from "@/app/_components/dashboard/AdsClient";
 import styles from "@/app/_components/dashboard/cms.module.css";
 
-export const metadata = { title: "Ad Management — KumariHub CMS" };
+export const metadata = { title: "Ad Management" };
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ locale: string }> };

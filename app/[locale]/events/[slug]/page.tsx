@@ -26,14 +26,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const baseUrl = await resolveBaseUrl();
   const isNe = locale === "ne";
   const title = isNe && event.title_ne ? event.title_ne : event.title_en;
-  const description = (isNe ? event.description_ne : event.description_en) || `${title} — KumariHub`;
+  const description = (isNe ? event.description_ne : event.description_en) || title;
   // Always provide an og:image, even when the event has no cover, so social
   // platforms (WhatsApp / Slack / Twitter) can still render a link preview.
   const ogImageUrl = event.cover_image || `${baseUrl}${OG_DEFAULT_IMAGE.path}`;
 
   return {
     metadataBase: new URL(baseUrl),
-    title: `${title} — KumariHub`,
+    title,
     description,
     robots: { index: true, follow: true },
     alternates: {
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: `${title} — KumariHub`,
+      title,
       description,
       type: "website",
       url: `${baseUrl}/${locale}/events/${slug}`,

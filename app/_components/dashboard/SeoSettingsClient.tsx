@@ -52,7 +52,7 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
           <Link href="/en/dashboard/settings" className={styles.breadcrumb}>← Site Settings</Link>
           <h1 className={styles.pageTitle}>SEO Settings</h1>
           <p className={styles.pageSubtitle}>
-            Control how KumariHub appears in search engines, social previews, and analytics.
+            Control how the site appears in search engines, social previews, and analytics.
           </p>
         </div>
         <div className={styles.pageHeaderRight}>

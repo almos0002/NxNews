@@ -8,7 +8,7 @@ import PagesClient from "@/app/_components/dashboard/PagesClient";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 import styles from "@/app/_components/dashboard/cms.module.css";
 
-export const metadata: Metadata = { title: "Pages — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Pages" };
 
 const PER_PAGE = 20;
 

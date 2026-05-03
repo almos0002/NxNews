@@ -6,7 +6,7 @@ import { listVideos, countVideos } from "@/lib/content/videos";
 import VideosClient from "@/app/_components/dashboard/VideosClient";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 
-export const metadata: Metadata = { title: "Videos — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "Videos" };
 
 const PER_PAGE = 20;
 

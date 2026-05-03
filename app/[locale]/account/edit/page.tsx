@@ -10,7 +10,7 @@ import ProfileClient from "@/app/_components/dashboard/ProfileClient";
 import { getLocale } from "next-intl/server";
 
 export const metadata: Metadata = {
-  title: "Edit Profile — KumariHub",
+  title: "Edit Profile",
   robots: { index: false, follow: false, nocache: true },
 };
 

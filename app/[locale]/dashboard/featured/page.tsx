@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { pool } from "@/lib/db/db";
 import FeaturedClient from "./FeaturedClient";
 
-export const metadata: Metadata = { title: "Featured Posts — KumariHub" };
+export const metadata: Metadata = { title: "Featured Posts" };
 
 async function getFeaturedArticles() {
   const res = await pool.query<{

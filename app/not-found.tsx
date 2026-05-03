@@ -1,17 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { headers } from "next/headers";
+import { getSiteName, FALLBACK_SITE_NAME } from "@/lib/cms/site-name";
 
-export const metadata: Metadata = {
-  title: "Page not found — KumariHub",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const h = await headers();
+  const locale =
+    h.get("x-locale") ||
+    (h.get("x-pathname")?.startsWith("/ne") ? "ne" : "en");
+  const siteName = await getSiteName(locale).catch(() => FALLBACK_SITE_NAME);
+  return {
+    title: `Page not found — ${siteName}`,
+    robots: { index: false, follow: false },
+  };
+}
 
-export default function RootNotFound() {
+export default async function RootNotFound() {
+  const h = await headers();
+  const locale =
+    h.get("x-locale") ||
+    (h.get("x-pathname")?.startsWith("/ne") ? "ne" : "en");
+  const siteName = await getSiteName(locale).catch(() => FALLBACK_SITE_NAME);
+
   return (
     <div style={{ margin: 0, fontFamily: "Georgia, serif", background: "#f5f5f0", color: "#141414", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
       <div style={{ textAlign: "center", maxWidth: 560 }}>
         <div style={{ fontSize: "0.72rem", fontFamily: "system-ui, sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#e63946", marginBottom: 16 }}>
-          KumariHub
+          {siteName}
         </div>
         <h1 style={{ fontSize: "7rem", fontWeight: 900, lineHeight: 1, color: "#e63946", margin: "0 0 8px", letterSpacing: "-0.04em" }}>
           404

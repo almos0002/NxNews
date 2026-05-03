@@ -6,7 +6,7 @@ import { pool } from "@/lib/db/db";
 import UsersClient from "@/app/_components/dashboard/UsersClient";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 
-export const metadata: Metadata = { title: "User Management — KumariHub Dashboard" };
+export const metadata: Metadata = { title: "User Management" };
 
 const PER_PAGE = 20;
 

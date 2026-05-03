@@ -17,10 +17,12 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "nav" });
-  const title = `${t("videos")} — KumariHub`;
+  const { getSiteName } = await import("@/lib/cms/site-name");
+  const siteName = await getSiteName(locale);
+  const title = t("videos");
   const description = locale === "ne"
-    ? "KumariHub मा नेपाल र विश्वका समाचार भिडियोहरू हेर्नुहोस्।"
-    : "Watch the latest news videos from Nepal and around the world on KumariHub.";
+    ? `${siteName} मा नेपाल र विश्वका समाचार भिडियोहरू हेर्नुहोस्।`
+    : `Watch the latest news videos from Nepal and around the world on ${siteName}.`;
   const og = await getDefaultOgImage();
   return {
     title,
