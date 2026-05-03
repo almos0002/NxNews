@@ -5,6 +5,9 @@ import Link from "next/link";
 import { toast } from "@/lib/util/toast";
 import styles from "./cms.module.css";
 import sStyles from "./SettingsClient.module.css";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateAllButton, { type TranslateFieldDescriptor } from "../ui/TranslateAllButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
 
 interface Props {
   initialSettings: Record<string, string>;
@@ -55,7 +58,13 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
             Control how the site appears in search engines, social previews, and analytics.
           </p>
         </div>
-        <div className={styles.pageHeaderRight}>
+        <div className={styles.pageHeaderRight} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <TranslateAllButton getFields={(): TranslateFieldDescriptor[] => [
+            { id: "seo-desc-en", label: "Default Meta Description (EN)", source: s.seo_default_description_ne ?? "", target: s.seo_default_description_en ?? "",
+              sourceLang: "ne", targetLang: "en", setter: (v) => set("seo_default_description_en", v) },
+            { id: "seo-desc-ne", label: "Default Meta Description (NE)", source: s.seo_default_description_en ?? "", target: s.seo_default_description_ne ?? "",
+              sourceLang: "en", targetLang: "ne", setter: (v) => set("seo_default_description_ne", v) },
+          ]} />
           <button className={styles.submitBtn} onClick={save} disabled={saving}>
             {saving ? "Saving…" : "Save SEO Settings"}
           </button>
@@ -95,6 +104,10 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
                   onChange={(e) => set("seo_default_description_en", e.target.value)}
                   placeholder="Nepal's leading multilingual news portal — independent, in-depth journalism for a complex world."
                 />
+                <TranslateButton source={s.seo_default_description_ne ?? ""} sourceLang="ne" targetLang="en"
+                  currentTarget={s.seo_default_description_en ?? ""}
+                  onTranslated={(v) => set("seo_default_description_en", v)} compact />
+                <TranslateFilledHint id="seo-desc-en" />
                 <p className={styles.hint}>Shown in search results when a page has no custom description. Aim for 120–160 characters.</p>
               </div>
               <div className={`${styles.field} ${styles.formGridFull}`}>
@@ -106,6 +119,10 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
                   onChange={(e) => set("seo_default_description_ne", e.target.value)}
                   placeholder="नेपालको अग्रणी बहुभाषी समाचार पोर्टल — जटिल संसारका लागि स्वतन्त्र, गहन पत्रकारिता।"
                 />
+                <TranslateButton source={s.seo_default_description_en ?? ""} sourceLang="en" targetLang="ne"
+                  currentTarget={s.seo_default_description_ne ?? ""}
+                  onTranslated={(v) => set("seo_default_description_ne", v)} compact />
+                <TranslateFilledHint id="seo-desc-ne" />
               </div>
             </div>
           </div>

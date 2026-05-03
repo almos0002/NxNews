@@ -7,6 +7,9 @@ import ConfirmDialog from "../ui/ConfirmDialog";
 import styles from "./cms.module.css";
 import type { Video } from "@/lib/content/videos";
 import Combobox from "../ui/Combobox";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateAllButton from "../ui/TranslateAllButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
 
 function extractYoutubeId(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
@@ -111,15 +114,29 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
       {/* Form */}
       {showForm && (
         <div className={styles.formCard}>
-          <p className={styles.formTitle}>{editId ? "Edit Video" : "Add Video"}</p>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <p className={styles.formTitle} style={{ margin: 0 }}>{editId ? "Edit Video" : "Add Video"}</p>
+            <TranslateAllButton getFields={() => [
+              { id: "video-title-ne", label: "Title", source: form.title_en, target: form.title_ne, sourceLang: "en", targetLang: "ne", setter: (v) => setF("title_ne", v) },
+              { id: "video-title-en", label: "Title", source: form.title_ne, target: form.title_en, sourceLang: "ne", targetLang: "en", setter: (v) => setF("title_en", v) },
+              { id: "video-desc-ne", label: "Description", source: form.description_en, target: form.description_ne, sourceLang: "en", targetLang: "ne", setter: (v) => setF("description_ne", v) },
+              { id: "video-desc-en", label: "Description", source: form.description_ne, target: form.description_en, sourceLang: "ne", targetLang: "en", setter: (v) => setF("description_en", v) },
+            ]} />
+          </div>
           <div className={styles.formGrid}>
             <div className={styles.field}>
               <label className={styles.label}>Title (English) *</label>
               <input className={styles.input} value={form.title_en} onChange={(e) => setF("title_en", e.target.value)} placeholder="Video title…" />
+              <TranslateButton source={form.title_ne} sourceLang="ne" targetLang="en"
+                currentTarget={form.title_en} onTranslated={(v) => setF("title_en", v)} compact />
+              <TranslateFilledHint id="video-title-en" />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Title (Nepali)</label>
               <input className={styles.input} value={form.title_ne} onChange={(e) => setF("title_ne", e.target.value)} placeholder="भिडियो शीर्षक…" />
+              <TranslateButton source={form.title_en} sourceLang="en" targetLang="ne"
+                currentTarget={form.title_ne} onTranslated={(v) => setF("title_ne", v)} compact />
+              <TranslateFilledHint id="video-title-ne" />
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label className={styles.label}>YouTube URL *</label>
@@ -139,10 +156,16 @@ export default function VideosClient({ initialVideos, authorId }: Props) {
             <div className={styles.field}>
               <label className={styles.label}>Description (English)</label>
               <textarea className={styles.textarea} value={form.description_en} onChange={(e) => setF("description_en", e.target.value)} placeholder="Brief description…" rows={3} />
+              <TranslateButton source={form.description_ne} sourceLang="ne" targetLang="en"
+                currentTarget={form.description_en} onTranslated={(v) => setF("description_en", v)} compact />
+              <TranslateFilledHint id="video-desc-en" />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Description (Nepali)</label>
               <textarea className={styles.textarea} value={form.description_ne} onChange={(e) => setF("description_ne", e.target.value)} placeholder="संक्षिप्त विवरण…" rows={3} />
+              <TranslateButton source={form.description_en} sourceLang="en" targetLang="ne"
+                currentTarget={form.description_ne} onTranslated={(v) => setF("description_ne", v)} compact />
+              <TranslateFilledHint id="video-desc-ne" />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Status</label>

@@ -4,6 +4,9 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import styles from "./ArticleEditor.module.css";
+import TranslateAllButton from "../ui/TranslateAllButton";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
 
 const QuillEditor = dynamic(() => import("./QuillEditor"), {
   ssr: false,
@@ -51,6 +54,8 @@ export default function PageEditor({ initial, backHref }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [contentEnVer, setContentEnVer] = useState(0);
+  const [contentNeVer, setContentNeVer] = useState(0);
 
   const set = useCallback(<K extends keyof PageFormValues>(k: K, v: PageFormValues[K]) => {
     setValues((p) => ({ ...p, [k]: v }));
@@ -69,6 +74,16 @@ export default function PageEditor({ initial, backHref }: Props) {
   }
 
   function resetSlug() { setSlugManual(false); set("slug", toSlug(values.title_en)); }
+
+  function setContent(targetLang: Lang, html: string) {
+    if (targetLang === "en") {
+      setValues((p) => ({ ...p, content_en: html }));
+      setContentEnVer((v) => v + 1);
+    } else {
+      setValues((p) => ({ ...p, content_ne: html }));
+      setContentNeVer((v) => v + 1);
+    }
+  }
 
   async function submit(targetStatus: Status) {
     setError(""); setSuccess("");
@@ -115,12 +130,17 @@ export default function PageEditor({ initial, backHref }: Props) {
           <button className={styles.btnGhost} onClick={() => submit("draft")} disabled={saving}>
             {saving ? "Saving…" : "Save Draft"}
           </button>
+          <TranslateAllButton getFields={() => [
+            { id: "page-title-ne", label: "Title", source: values.title_en, target: values.title_ne, sourceLang: "en", targetLang: "ne", setter: (v) => set("title_ne", v) },
+            { id: "page-title-en", label: "Title", source: values.title_ne, target: values.title_en, sourceLang: "ne", targetLang: "en", setter: (v) => set("title_en", v) },
+            { id: "page-content-ne", label: "Content", source: values.content_en, target: values.content_ne, sourceLang: "en", targetLang: "ne", format: "html", setter: (v) => setContent("ne", v) },
+            { id: "page-content-en", label: "Content", source: values.content_ne, target: values.content_en, sourceLang: "ne", targetLang: "en", format: "html", setter: (v) => setContent("en", v) },
+          ]} />
           <button className={styles.btnPrimary} onClick={() => submit("published")} disabled={saving}>
             {saving ? "Publishing…" : values.status === "published" ? "Update" : "Publish"}
           </button>
         </div>
       </div>
-
       {/* Body */}
       <div className={styles.body}>
         <div className={styles.editor}>
@@ -142,6 +162,17 @@ export default function PageEditor({ initial, backHref }: Props) {
             ) : (
               <input type="text" className={`${styles.titleInput} ${styles.devanagari}`} placeholder="पृष्ठ शीर्षक…" value={values.title_ne} onChange={(e) => set("title_ne", e.target.value)} lang="ne" />
             )}
+            <div style={{ marginTop: 6 }}>
+              <TranslateButton
+                source={lang === "en" ? values.title_ne : values.title_en}
+                sourceLang={lang === "en" ? "ne" : "en"}
+                targetLang={lang}
+                currentTarget={lang === "en" ? values.title_en : values.title_ne}
+                onTranslated={(v) => set(lang === "en" ? "title_en" : "title_ne", v)}
+                label={`Translate title to ${lang === "en" ? "English" : "Nepali"}`}
+              />
+              <TranslateFilledHint id={lang === "en" ? "page-title-en" : "page-title-ne"} />
+            </div>
           </div>
 
           {/* Content */}
@@ -150,10 +181,22 @@ export default function PageEditor({ initial, backHref }: Props) {
               <label className={styles.label}>{lang === "en" ? "Content" : "सामग्री"}</label>
               <span className={styles.wordCount}>{lang === "en" ? `${wordCountEn} words` : `${wordCountNe} शब्द`}</span>
             </div>
+            <div style={{ marginBottom: 6 }}>
+              <TranslateButton
+                source={lang === "en" ? values.content_ne : values.content_en}
+                sourceLang={lang === "en" ? "ne" : "en"}
+                targetLang={lang}
+                format="html"
+                currentTarget={lang === "en" ? values.content_en : values.content_ne}
+                onTranslated={(v) => setContent(lang, v)}
+                label={`Translate content to ${lang === "en" ? "English" : "Nepali"}`}
+              />
+              <TranslateFilledHint id={lang === "en" ? "page-content-en" : "page-content-ne"} />
+            </div>
             {lang === "en" ? (
-              <QuillEditor key="page-en" initialContent={values.content_en} placeholder="Write page content here…" onUpdate={(html) => set("content_en", html)} />
+              <QuillEditor key="page-en" initialContent={values.content_en} contentVersion={contentEnVer} placeholder="Write page content here…" onUpdate={(html) => set("content_en", html)} />
             ) : (
-              <QuillEditor key="page-ne" initialContent={values.content_ne} placeholder="पृष्ठ सामग्री यहाँ लेख्नुहोस्…" onUpdate={(html) => set("content_ne", html)} isNepali />
+              <QuillEditor key="page-ne" initialContent={values.content_ne} contentVersion={contentNeVer} placeholder="पृष्ठ सामग्री यहाँ लेख्नुहोस्…" onUpdate={(html) => set("content_ne", html)} isNepali />
             )}
           </div>
         </div>

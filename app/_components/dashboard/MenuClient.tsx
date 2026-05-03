@@ -5,6 +5,9 @@ import Link from "next/link";
 import { toast } from "@/lib/util/toast";
 import Combobox from "../ui/Combobox";
 import type { ComboboxOption } from "../ui/Combobox";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
+import TranslateAllButton, { type TranslateFieldDescriptor } from "../ui/TranslateAllButton";
 import styles from "./cms.module.css";
 import type { MenuItem } from "@/lib/cms/menu";
 
@@ -369,11 +372,15 @@ export default function MenuClient({ initialNavbar, initialFooter, initialBottom
                 <label className={styles.label}>Heading (English) *</label>
                 <input className={styles.input} placeholder="e.g. Company" value={newSectionEn}
                   onChange={(e) => setNewSectionEn(e.target.value)} />
+                <TranslateButton source={newSectionNe} sourceLang="ne" targetLang="en"
+                  currentTarget={newSectionEn} onTranslated={setNewSectionEn} compact />
               </div>
               <div className={styles.field} style={{ marginBottom: 12 }}>
                 <label className={styles.label}>Heading (Nepali)</label>
                 <input className={styles.input} placeholder="e.g. कम्पनी" value={newSectionNe}
                   onChange={(e) => setNewSectionNe(e.target.value)} />
+                <TranslateButton source={newSectionEn} sourceLang="en" targetLang="ne"
+                  currentTarget={newSectionNe} onTranslated={setNewSectionNe} compact />
               </div>
               <button className={styles.submitBtn} disabled={!newSectionEn.trim()}
                 onClick={() => {
@@ -484,8 +491,29 @@ function LinkForm({ form, setF, pageOpts, catOpts, categories, saving, onSave, o
   onSave: () => void; onCancel?: () => void;
   showSectionPicker: boolean; sectionOptions?: string[]; isEdit?: boolean;
 }) {
+  const hasSection = isEdit && (form.section_label_en.trim() !== "" || form.section_label_ne.trim() !== "");
+  const idPrefix = isEdit ? "menu-edit" : "menu-add";
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <TranslateAllButton getFields={(): TranslateFieldDescriptor[] => {
+          const base: TranslateFieldDescriptor[] = [
+            { id: `${idPrefix}-label-en`, label: "Label (EN)", source: form.label_ne, target: form.label_en, sourceLang: "ne", targetLang: "en",
+              setter: (v) => setF("label_en", v) },
+            { id: `${idPrefix}-label-ne`, label: "Label (NE)", source: form.label_en, target: form.label_ne, sourceLang: "en", targetLang: "ne",
+              setter: (v) => setF("label_ne", v) },
+          ];
+          if (hasSection) {
+            base.push(
+              { id: `${idPrefix}-section-en`, label: "Section heading (EN)", source: form.section_label_ne, target: form.section_label_en, sourceLang: "ne", targetLang: "en",
+                setter: (v) => setF("section_label_en", v) },
+              { id: `${idPrefix}-section-ne`, label: "Section heading (NE)", source: form.section_label_en, target: form.section_label_ne, sourceLang: "en", targetLang: "ne",
+                setter: (v) => setF("section_label_ne", v) },
+            );
+          }
+          return base;
+        }} />
+      </div>
       {showSectionPicker && sectionOptions.length > 0 && (
         <div className={styles.field}>
           <label className={styles.label}>Move to Section</label>
@@ -497,16 +525,47 @@ function LinkForm({ form, setF, pageOpts, catOpts, categories, saving, onSave, o
           />
         </div>
       )}
+      {hasSection && (
+        <div className={styles.formGrid} style={{ background: "#faf9f6", padding: 10, borderRadius: 6, border: "1px solid var(--color-border)" }}>
+          <div className={styles.field}>
+            <label className={styles.label}>Section Heading (English)</label>
+            <input className={styles.input} value={form.section_label_en}
+              onChange={(e) => setF("section_label_en", e.target.value)}
+              placeholder="e.g. Company" />
+            <TranslateButton source={form.section_label_ne} sourceLang="ne" targetLang="en"
+              currentTarget={form.section_label_en} onTranslated={(v) => setF("section_label_en", v)} compact />
+            <TranslateFilledHint id={`${idPrefix}-section-en`} />
+            <p className={styles.hint} style={{ fontSize: "0.7rem", marginTop: 4 }}>
+              Updates the section heading stored on this link. To rename the column for all links, edit the same heading on each one (or use Translate all).
+            </p>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Section Heading (Nepali)</label>
+            <input className={styles.input} value={form.section_label_ne}
+              onChange={(e) => setF("section_label_ne", e.target.value)}
+              placeholder="e.g. कम्पनी" />
+            <TranslateButton source={form.section_label_en} sourceLang="en" targetLang="ne"
+              currentTarget={form.section_label_ne} onTranslated={(v) => setF("section_label_ne", v)} compact />
+            <TranslateFilledHint id={`${idPrefix}-section-ne`} />
+          </div>
+        </div>
+      )}
       <div className={styles.formGrid}>
         <div className={styles.field}>
           <label className={styles.label}>Label (English) *</label>
           <input className={styles.input} placeholder="e.g. About Us" value={form.label_en}
             onChange={(e) => setF("label_en", e.target.value)} />
+          <TranslateButton source={form.label_ne} sourceLang="ne" targetLang="en"
+            currentTarget={form.label_en} onTranslated={(v) => setF("label_en", v)} compact />
+          <TranslateFilledHint id={`${idPrefix}-label-en`} />
         </div>
         <div className={styles.field}>
           <label className={styles.label}>Label (Nepali)</label>
           <input className={styles.input} placeholder="e.g. हाम्रो बारेमा" value={form.label_ne}
             onChange={(e) => setF("label_ne", e.target.value)} />
+          <TranslateButton source={form.label_en} sourceLang="en" targetLang="ne"
+            currentTarget={form.label_ne} onTranslated={(v) => setF("label_ne", v)} compact />
+          <TranslateFilledHint id={`${idPrefix}-label-ne`} />
         </div>
         <div className={styles.field}>
           <label className={styles.label}>Link Type</label>

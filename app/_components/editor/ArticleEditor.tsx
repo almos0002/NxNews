@@ -7,6 +7,9 @@ import { toast } from "@/lib/util/toast";
 import styles from "./ArticleEditor.module.css";
 import Combobox from "../ui/Combobox";
 import type { ComboboxOption } from "../ui/Combobox";
+import TranslateAllButton from "../ui/TranslateAllButton";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
 
 const QuillEditor = dynamic(() => import("./QuillEditor"), {
   ssr: false,
@@ -91,6 +94,18 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
   const [imgMode, setImgMode] = useState<ImgMode>("url");
   const [uploading, setUploading] = useState(false);
 
+  const [contentEnVer, setContentEnVer] = useState(0);
+  const [contentNeVer, setContentNeVer] = useState(0);
+
+  function setContentHtml(targetLang: Lang, html: string) {
+    if (targetLang === "en") {
+      setValues((p) => ({ ...p, content_en: html }));
+      setContentEnVer((v) => v + 1);
+    } else {
+      setValues((p) => ({ ...p, content_ne: html }));
+      setContentNeVer((v) => v + 1);
+    }
+  }
 
   const set = useCallback(<K extends keyof ArticleFormValues>(k: K, v: ArticleFormValues[K]) => {
     setValues((prev) => ({ ...prev, [k]: v }));
@@ -222,6 +237,14 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
           >
             {saving ? "Saving…" : "Save Draft"}
           </button>
+          <TranslateAllButton getFields={() => [
+            { id: "art-title-ne", label: "Title", source: values.title_en, target: values.title_ne, sourceLang: "en", targetLang: "ne", setter: (v) => set("title_ne", v) },
+            { id: "art-title-en", label: "Title", source: values.title_ne, target: values.title_en, sourceLang: "ne", targetLang: "en", setter: (v) => set("title_en", v) },
+            { id: "art-excerpt-ne", label: "Excerpt", source: values.excerpt_en, target: values.excerpt_ne, sourceLang: "en", targetLang: "ne", setter: (v) => set("excerpt_ne", v) },
+            { id: "art-excerpt-en", label: "Excerpt", source: values.excerpt_ne, target: values.excerpt_en, sourceLang: "ne", targetLang: "en", setter: (v) => set("excerpt_en", v) },
+            { id: "art-content-ne", label: "Content", source: values.content_en, target: values.content_ne, sourceLang: "en", targetLang: "ne", format: "html", setter: (v) => setContentHtml("ne", v) },
+            { id: "art-content-en", label: "Content", source: values.content_ne, target: values.content_en, sourceLang: "ne", targetLang: "en", format: "html", setter: (v) => setContentHtml("en", v) },
+          ]} />
           <button
             className={styles.btnPrimary}
             onClick={() => submit("published")}
@@ -231,7 +254,6 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
           </button>
         </div>
       </div>
-
       {/* ── Body ── */}
       <div className={styles.body}>
         {/* Left: content editor */}
@@ -281,6 +303,17 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
                 lang="ne"
               />
             )}
+            <div style={{ marginTop: 6 }}>
+              <TranslateButton
+                source={lang === "en" ? values.title_ne : values.title_en}
+                sourceLang={lang === "en" ? "ne" : "en"}
+                targetLang={lang}
+                currentTarget={lang === "en" ? values.title_en : values.title_ne}
+                onTranslated={(v) => set(lang === "en" ? "title_en" : "title_ne", v)}
+                label={`Translate title to ${lang === "en" ? "English" : "Nepali"}`}
+              />
+              <TranslateFilledHint id={lang === "en" ? "art-title-en" : "art-title-ne"} />
+            </div>
           </div>
 
           {/* Excerpt */}
@@ -306,6 +339,17 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
                 lang="ne"
               />
             )}
+            <div style={{ marginTop: 6 }}>
+              <TranslateButton
+                source={lang === "en" ? values.excerpt_ne : values.excerpt_en}
+                sourceLang={lang === "en" ? "ne" : "en"}
+                targetLang={lang}
+                currentTarget={lang === "en" ? values.excerpt_en : values.excerpt_ne}
+                onTranslated={(v) => set(lang === "en" ? "excerpt_en" : "excerpt_ne", v)}
+                label={`Translate excerpt to ${lang === "en" ? "English" : "Nepali"}`}
+              />
+              <TranslateFilledHint id={lang === "en" ? "art-excerpt-en" : "art-excerpt-ne"} />
+            </div>
           </div>
 
           {/* Content */}
@@ -320,11 +364,24 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
                   : `${wordCountNe} शब्द`}
               </span>
             </div>
+            <div style={{ marginBottom: 6 }}>
+              <TranslateButton
+                source={lang === "en" ? values.content_ne : values.content_en}
+                sourceLang={lang === "en" ? "ne" : "en"}
+                targetLang={lang}
+                format="html"
+                currentTarget={lang === "en" ? values.content_en : values.content_ne}
+                onTranslated={(v) => setContentHtml(lang, v)}
+                label={`Translate content to ${lang === "en" ? "English" : "Nepali"}`}
+              />
+              <TranslateFilledHint id={lang === "en" ? "art-content-en" : "art-content-ne"} />
+            </div>
 
             {lang === "en" ? (
               <QuillEditor
                 key="editor-en"
                 initialContent={values.content_en}
+                contentVersion={contentEnVer}
                 placeholder="Write your article here…"
                 onUpdate={(html) => set("content_en", html)}
               />
@@ -332,6 +389,7 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
               <QuillEditor
                 key="editor-ne"
                 initialContent={values.content_ne}
+                contentVersion={contentNeVer}
                 placeholder="यहाँ आफ्नो लेख लेख्नुहोस्…"
                 onUpdate={(html) => set("content_ne", html)}
                 isNepali

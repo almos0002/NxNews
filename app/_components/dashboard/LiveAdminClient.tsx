@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/lib/util/toast";
 import ConfirmDialog from "../ui/ConfirmDialog";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateAllButton from "../ui/TranslateAllButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
 import styles from "./cms.module.css";
 
 interface LiveStream {
@@ -135,15 +138,29 @@ export default function LiveAdminClient({ initialStreams, livePageViews }: Props
 
       {showForm && (
         <div className={styles.formCard}>
-          <h2 className={styles.formCardTitle}>{editId ? "Edit Stream" : "Add New Stream"}</h2>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <h2 className={styles.formCardTitle} style={{ margin: 0 }}>{editId ? "Edit Stream" : "Add New Stream"}</h2>
+            <TranslateAllButton getFields={() => [
+              { id: "live-title-ne", label: "Title", source: form.title_en, target: form.title_ne ?? "", sourceLang: "en", targetLang: "ne", setter: (v) => setF("title_ne", v) },
+              { id: "live-title-en", label: "Title", source: form.title_ne ?? "", target: form.title_en, sourceLang: "ne", targetLang: "en", setter: (v) => setF("title_en", v) },
+              { id: "live-desc-ne", label: "Description", source: form.description_en ?? "", target: form.description_ne ?? "", sourceLang: "en", targetLang: "ne", setter: (v) => setF("description_ne", v) },
+              { id: "live-desc-en", label: "Description", source: form.description_ne ?? "", target: form.description_en ?? "", sourceLang: "ne", targetLang: "en", setter: (v) => setF("description_en", v) },
+            ]} />
+          </div>
           <div className={styles.formGrid}>
             <div className={styles.field}>
               <label className={styles.label}>Title (English) *</label>
               <input className={styles.input} value={form.title_en} onChange={(e) => setF("title_en", e.target.value)} placeholder="KumariHub News Live" />
+              <TranslateButton source={form.title_ne ?? ""} sourceLang="ne" targetLang="en"
+                currentTarget={form.title_en} onTranslated={(v) => setF("title_en", v)} compact />
+              <TranslateFilledHint id="live-title-en" />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Title (Nepali)</label>
               <input className={styles.input} value={form.title_ne ?? ""} onChange={(e) => setF("title_ne", e.target.value)} placeholder="कुमारी हब समाचार" />
+              <TranslateButton source={form.title_en} sourceLang="en" targetLang="ne"
+                currentTarget={form.title_ne ?? ""} onTranslated={(v) => setF("title_ne", v)} compact />
+              <TranslateFilledHint id="live-title-ne" />
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label className={styles.label}>Stream URL *</label>
@@ -187,10 +204,16 @@ export default function LiveAdminClient({ initialStreams, livePageViews }: Props
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label className={styles.label}>Description (English)</label>
               <textarea className={styles.textarea} rows={2} value={form.description_en ?? ""} onChange={(e) => setF("description_en", e.target.value)} placeholder="Brief description of this stream..." />
+              <TranslateButton source={form.description_ne ?? ""} sourceLang="ne" targetLang="en"
+                currentTarget={form.description_en ?? ""} onTranslated={(v) => setF("description_en", v)} compact />
+              <TranslateFilledHint id="live-desc-en" />
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label className={styles.label}>Description (Nepali)</label>
               <textarea className={styles.textarea} rows={2} value={form.description_ne ?? ""} onChange={(e) => setF("description_ne", e.target.value)} placeholder="यस प्रसारणको संक्षिप्त विवरण..." />
+              <TranslateButton source={form.description_en ?? ""} sourceLang="en" targetLang="ne"
+                currentTarget={form.description_ne ?? ""} onTranslated={(v) => setF("description_ne", v)} compact />
+              <TranslateFilledHint id="live-desc-ne" />
             </div>
             <div className={`${styles.field} ${styles.formGridFull}`}>
               <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>

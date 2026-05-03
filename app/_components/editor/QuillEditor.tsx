@@ -9,6 +9,12 @@ interface QuillEditorProps {
   onUpdate: (html: string) => void;
   className?: string;
   isNepali?: boolean;
+  /**
+   * When this number increments, the editor's content is replaced with
+   * the latest `initialContent`. Used by features like AI translation
+   * that need to push new HTML into an already-mounted editor.
+   */
+  contentVersion?: number;
 }
 
 const TOOLBAR_OPTIONS = [
@@ -26,15 +32,22 @@ export default function QuillEditor({
   onUpdate,
   className,
   isNepali,
+  contentVersion,
 }: QuillEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isInitialized = useRef(false);
   const onUpdateRef = useRef(onUpdate);
   const initialContentRef = useRef(initialContent);
+  const quillRef = useRef<unknown>(null);
+  const lastVersionRef = useRef<number | undefined>(contentVersion);
 
   useEffect(() => {
     onUpdateRef.current = onUpdate;
   });
+
+  useEffect(() => {
+    initialContentRef.current = initialContent;
+  }, [initialContent]);
 
   useEffect(() => {
     if (isInitialized.current || !containerRef.current) return;
@@ -48,6 +61,7 @@ export default function QuillEditor({
         placeholder: placeholder ?? "Write here…",
         modules: { toolbar: TOOLBAR_OPTIONS },
       });
+      quillRef.current = q;
 
       if (initialContentRef.current) {
         q.root.innerHTML = initialContentRef.current;
@@ -60,6 +74,16 @@ export default function QuillEditor({
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (contentVersion === undefined) return;
+    if (lastVersionRef.current === contentVersion) return;
+    lastVersionRef.current = contentVersion;
+    const q = quillRef.current as { root: HTMLElement } | null;
+    if (!q) return;
+    q.root.innerHTML = initialContent || "";
+    onUpdateRef.current(initialContent || "");
+  }, [contentVersion, initialContent]);
 
   return (
     <div

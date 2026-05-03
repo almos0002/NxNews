@@ -5,6 +5,9 @@ import Link from "next/link";
 import { toast } from "@/lib/util/toast";
 import styles from "./cms.module.css";
 import sStyles from "./SettingsClient.module.css";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateAllButton from "../ui/TranslateAllButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
 
 interface Props {
   initialSettings: Record<string, string>;
@@ -54,7 +57,15 @@ export default function SettingsClient({ initialSettings }: Props) {
           <Link href="/en/dashboard" className={styles.breadcrumb}>← Dashboard</Link>
           <h1 className={styles.pageTitle}>Site Settings</h1>
         </div>
-        <div className={styles.pageHeaderRight}>
+        <div className={styles.pageHeaderRight} style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <TranslateAllButton getFields={() => [
+            { id: "settings-title-ne", label: "Site Title", source: s.site_title_en ?? "", target: s.site_title_ne ?? "", sourceLang: "en", targetLang: "ne", setter: (v) => set("site_title_ne", v) },
+            { id: "settings-title-en", label: "Site Title", source: s.site_title_ne ?? "", target: s.site_title_en ?? "", sourceLang: "ne", targetLang: "en", setter: (v) => set("site_title_en", v) },
+            { id: "settings-tagline-ne", label: "Tagline", source: s.site_tagline_en ?? "", target: s.site_tagline_ne ?? "", sourceLang: "en", targetLang: "ne", setter: (v) => set("site_tagline_ne", v) },
+            { id: "settings-tagline-en", label: "Tagline", source: s.site_tagline_ne ?? "", target: s.site_tagline_en ?? "", sourceLang: "ne", targetLang: "en", setter: (v) => set("site_tagline_en", v) },
+            { id: "settings-desc-ne", label: "Description", source: s.site_description_en ?? "", target: s.site_description_ne ?? "", sourceLang: "en", targetLang: "ne", setter: (v) => set("site_description_ne", v) },
+            { id: "settings-desc-en", label: "Description", source: s.site_description_ne ?? "", target: s.site_description_en ?? "", sourceLang: "ne", targetLang: "en", setter: (v) => set("site_description_en", v) },
+          ]} />
           <button className={styles.submitBtn} onClick={save} disabled={saving}>
             {saving ? "Saving…" : "Save All Settings"}
           </button>
@@ -74,26 +85,44 @@ export default function SettingsClient({ initialSettings }: Props) {
               <div className={styles.field}>
                 <label className={styles.label}>Site Title (English)</label>
                 <input className={styles.input} value={s.site_title_en ?? ""} onChange={(e) => set("site_title_en", e.target.value)} placeholder="KumariHub" />
+                <TranslateButton source={s.site_title_ne ?? ""} sourceLang="ne" targetLang="en"
+                  currentTarget={s.site_title_en ?? ""} onTranslated={(v) => set("site_title_en", v)} compact />
+                <TranslateFilledHint id="settings-title-en" />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Site Title (Nepali)</label>
                 <input className={styles.input} value={s.site_title_ne ?? ""} onChange={(e) => set("site_title_ne", e.target.value)} placeholder="कुमारीहब" />
+                <TranslateButton source={s.site_title_en ?? ""} sourceLang="en" targetLang="ne"
+                  currentTarget={s.site_title_ne ?? ""} onTranslated={(v) => set("site_title_ne", v)} compact />
+                <TranslateFilledHint id="settings-title-ne" />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Site Tagline (English)</label>
                 <input className={styles.input} value={s.site_tagline_en ?? ""} onChange={(e) => set("site_tagline_en", e.target.value)} placeholder="Independent, in-depth journalism for a complex world." />
+                <TranslateButton source={s.site_tagline_ne ?? ""} sourceLang="ne" targetLang="en"
+                  currentTarget={s.site_tagline_en ?? ""} onTranslated={(v) => set("site_tagline_en", v)} compact />
+                <TranslateFilledHint id="settings-tagline-en" />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Site Tagline (Nepali)</label>
                 <input className={styles.input} value={s.site_tagline_ne ?? ""} onChange={(e) => set("site_tagline_ne", e.target.value)} placeholder="जटिल संसारका लागि स्वतन्त्र, गहन पत्रकारिता।" />
+                <TranslateButton source={s.site_tagline_en ?? ""} sourceLang="en" targetLang="ne"
+                  currentTarget={s.site_tagline_ne ?? ""} onTranslated={(v) => set("site_tagline_ne", v)} compact />
+                <TranslateFilledHint id="settings-tagline-ne" />
               </div>
               <div className={`${styles.field} ${styles.formGridFull}`}>
                 <label className={styles.label}>Site Description (English)</label>
                 <textarea className={styles.textarea} rows={2} value={s.site_description_en ?? ""} onChange={(e) => set("site_description_en", e.target.value)} placeholder="Nepal's leading multilingual news portal…" />
+                <TranslateButton source={s.site_description_ne ?? ""} sourceLang="ne" targetLang="en"
+                  currentTarget={s.site_description_en ?? ""} onTranslated={(v) => set("site_description_en", v)} compact />
+                <TranslateFilledHint id="settings-desc-en" />
               </div>
               <div className={`${styles.field} ${styles.formGridFull}`}>
                 <label className={styles.label}>Site Description (Nepali)</label>
                 <textarea className={styles.textarea} rows={2} value={s.site_description_ne ?? ""} onChange={(e) => set("site_description_ne", e.target.value)} placeholder="नेपालको अग्रणी बहुभाषी समाचार पोर्टल…" />
+                <TranslateButton source={s.site_description_en ?? ""} sourceLang="en" targetLang="ne"
+                  currentTarget={s.site_description_ne ?? ""} onTranslated={(v) => set("site_description_ne", v)} compact />
+                <TranslateFilledHint id="settings-desc-ne" />
               </div>
             </div>
 

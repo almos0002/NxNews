@@ -4,6 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { toast } from "@/lib/util/toast";
 import ConfirmDialog from "../ui/ConfirmDialog";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateAllButton, { type TranslateFieldDescriptor } from "../ui/TranslateAllButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
 import styles from "./cms.module.css";
 import type { Category, Tag } from "@/lib/content/taxonomy";
 
@@ -162,17 +165,43 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
       {tab === "categories" && (
         <div className={styles.twoCol}>
           <div className={styles.formCard}>
-            <p className={styles.formTitle}>Add Category</p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <p className={styles.formTitle} style={{ margin: 0 }}>Add Category</p>
+              <TranslateAllButton getFields={(): TranslateFieldDescriptor[] => [
+                { id: "newcat-en", label: "Name (EN)", source: newCat.name_ne, target: newCat.name_en, sourceLang: "ne", targetLang: "en",
+                  setter: (v) => setNewCat((p) => ({ ...p, name_en: v })) },
+                { id: "newcat-ne", label: "Name (NE)", source: newCat.name_en, target: newCat.name_ne, sourceLang: "en", targetLang: "ne",
+                  setter: (v) => setNewCat((p) => ({ ...p, name_ne: v })) },
+              ]} />
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div className={styles.field}>
                 <label className={styles.label}>Name (English) *</label>
                 <input className={styles.input} placeholder="e.g. Politics" value={newCat.name_en}
                   onChange={(e) => setNewCat((p) => ({ ...p, name_en: e.target.value }))} />
+                <TranslateButton
+                  source={newCat.name_ne}
+                  sourceLang="ne"
+                  targetLang="en"
+                  currentTarget={newCat.name_en}
+                  onTranslated={(v) => setNewCat((p) => ({ ...p, name_en: v }))}
+                  compact
+                />
+                <TranslateFilledHint id="newcat-en" />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Name (Nepali)</label>
                 <input className={styles.input} placeholder="e.g. राजनीति" value={newCat.name_ne}
                   onChange={(e) => setNewCat((p) => ({ ...p, name_ne: e.target.value }))} />
+                <TranslateButton
+                  source={newCat.name_en}
+                  sourceLang="en"
+                  targetLang="ne"
+                  currentTarget={newCat.name_ne}
+                  onTranslated={(v) => setNewCat((p) => ({ ...p, name_ne: v }))}
+                  compact
+                />
+                <TranslateFilledHint id="newcat-ne" />
               </div>
               <button className={styles.submitBtn} onClick={addCategory} disabled={savingCat}>
                 {savingCat ? "Adding…" : "Add Category"}
@@ -193,10 +222,20 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
                     {editCatId === c.id ? (
                       <td colSpan={3}>
                         <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "4px 0" }}>
-                          <input className={styles.input} value={editCat.name_en}
-                            onChange={(e) => setEditCat((p) => ({ ...p, name_en: e.target.value }))} placeholder="English name" />
-                          <input className={styles.input} value={editCat.name_ne}
-                            onChange={(e) => setEditCat((p) => ({ ...p, name_ne: e.target.value }))} placeholder="Nepali name" />
+                          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <input className={styles.input} value={editCat.name_en}
+                              onChange={(e) => setEditCat((p) => ({ ...p, name_en: e.target.value }))} placeholder="English name" />
+                            <TranslateButton source={editCat.name_ne} sourceLang="ne" targetLang="en"
+                              currentTarget={editCat.name_en}
+                              onTranslated={(v) => setEditCat((p) => ({ ...p, name_en: v }))} compact />
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <input className={styles.input} value={editCat.name_ne}
+                              onChange={(e) => setEditCat((p) => ({ ...p, name_ne: e.target.value }))} placeholder="Nepali name" />
+                            <TranslateButton source={editCat.name_en} sourceLang="en" targetLang="ne"
+                              currentTarget={editCat.name_ne}
+                              onTranslated={(v) => setEditCat((p) => ({ ...p, name_ne: v }))} compact />
+                          </div>
                           <div className={styles.actionRow}>
                             <button className={styles.submitBtn} onClick={saveCategory} disabled={savingCat}>{savingCat ? "Saving…" : "Save"}</button>
                             <button className={styles.cancelBtn} onClick={() => setEditCatId(null)}>Cancel</button>
@@ -229,18 +268,34 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
       {tab === "tags" && (
         <div className={styles.twoCol}>
           <div className={styles.formCard}>
-            <p className={styles.formTitle}>Add Tag</p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <p className={styles.formTitle} style={{ margin: 0 }}>Add Tag</p>
+              <TranslateAllButton getFields={(): TranslateFieldDescriptor[] => [
+                { id: "newtag-en", label: "Name (EN)", source: newTag.name_ne, target: newTag.name_en, sourceLang: "ne", targetLang: "en",
+                  setter: (v) => setNewTag((p) => ({ ...p, name_en: v })) },
+                { id: "newtag-ne", label: "Name (NE)", source: newTag.name_en, target: newTag.name_ne, sourceLang: "en", targetLang: "ne",
+                  setter: (v) => setNewTag((p) => ({ ...p, name_ne: v })) },
+              ]} />
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <div className={styles.field}>
                 <label className={styles.label}>Name (English) *</label>
                 <input className={styles.input} placeholder="e.g. Climate" value={newTag.name_en}
                   onChange={(e) => setNewTag((p) => ({ ...p, name_en: e.target.value }))}
                   onKeyDown={(e) => e.key === "Enter" && addTag()} />
+                <TranslateButton source={newTag.name_ne} sourceLang="ne" targetLang="en"
+                  currentTarget={newTag.name_en}
+                  onTranslated={(v) => setNewTag((p) => ({ ...p, name_en: v }))} compact />
+                <TranslateFilledHint id="newtag-en" />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Name (Nepali)</label>
                 <input className={styles.input} placeholder="e.g. जलवायु" value={newTag.name_ne}
                   onChange={(e) => setNewTag((p) => ({ ...p, name_ne: e.target.value }))} />
+                <TranslateButton source={newTag.name_en} sourceLang="en" targetLang="ne"
+                  currentTarget={newTag.name_ne}
+                  onTranslated={(v) => setNewTag((p) => ({ ...p, name_ne: v }))} compact />
+                <TranslateFilledHint id="newtag-ne" />
               </div>
               <button className={styles.submitBtn} onClick={addTag} disabled={savingTag}>
                 {savingTag ? "Adding…" : "Add Tag"}
@@ -261,10 +316,20 @@ export default function TaxonomyClient({ initialCategories, initialTags }: Props
                     {editTagId === t.id ? (
                       <td colSpan={3}>
                         <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "4px 0" }}>
-                          <input className={styles.input} value={editTag.name_en}
-                            onChange={(e) => setEditTag((p) => ({ ...p, name_en: e.target.value }))} placeholder="English name" />
-                          <input className={styles.input} value={editTag.name_ne}
-                            onChange={(e) => setEditTag((p) => ({ ...p, name_ne: e.target.value }))} placeholder="Nepali name" />
+                          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <input className={styles.input} value={editTag.name_en}
+                              onChange={(e) => setEditTag((p) => ({ ...p, name_en: e.target.value }))} placeholder="English name" />
+                            <TranslateButton source={editTag.name_ne} sourceLang="ne" targetLang="en"
+                              currentTarget={editTag.name_en}
+                              onTranslated={(v) => setEditTag((p) => ({ ...p, name_en: v }))} compact />
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <input className={styles.input} value={editTag.name_ne}
+                              onChange={(e) => setEditTag((p) => ({ ...p, name_ne: e.target.value }))} placeholder="Nepali name" />
+                            <TranslateButton source={editTag.name_en} sourceLang="en" targetLang="ne"
+                              currentTarget={editTag.name_ne}
+                              onTranslated={(v) => setEditTag((p) => ({ ...p, name_ne: v }))} compact />
+                          </div>
                           <div className={styles.actionRow}>
                             <button className={styles.submitBtn} onClick={saveTag} disabled={savingTag}>{savingTag ? "Saving…" : "Save"}</button>
                             <button className={styles.cancelBtn} onClick={() => setEditTagId(null)}>Cancel</button>

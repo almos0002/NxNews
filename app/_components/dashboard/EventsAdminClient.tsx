@@ -4,6 +4,9 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { toast } from "@/lib/util/toast";
 import ConfirmDialog from "../ui/ConfirmDialog";
+import TranslateButton from "../ui/TranslateButton";
+import TranslateAllButton, { type TranslateFieldDescriptor } from "../ui/TranslateAllButton";
+import TranslateFilledHint from "../ui/TranslateFilledHint";
 import styles from "./cms.module.css";
 import type { EventPhoto, EventPhotoImage } from "@/lib/cms/events";
 
@@ -125,6 +128,22 @@ export default function EventsAdminClient({ initialEvents }: Props) {
     }));
   }
 
+  function buildTranslateAllFields(): TranslateFieldDescriptor[] {
+    const fields: TranslateFieldDescriptor[] = [
+      { id: "ev-title-ne", label: "Title", source: form.title_en, target: form.title_ne, sourceLang: "en", targetLang: "ne", setter: (v) => setF("title_ne", v) },
+      { id: "ev-title-en", label: "Title", source: form.title_ne, target: form.title_en, sourceLang: "ne", targetLang: "en", setter: (v) => setF("title_en", v) },
+      { id: "ev-desc-ne", label: "Description", source: form.description_en, target: form.description_ne, sourceLang: "en", targetLang: "ne", setter: (v) => setF("description_ne", v) },
+      { id: "ev-desc-en", label: "Description", source: form.description_ne, target: form.description_en, sourceLang: "ne", targetLang: "en", setter: (v) => setF("description_en", v) },
+      { id: "ev-loc-ne", label: "Location", source: form.location_en, target: form.location_ne, sourceLang: "en", targetLang: "ne", setter: (v) => setF("location_ne", v) },
+      { id: "ev-loc-en", label: "Location", source: form.location_ne, target: form.location_en, sourceLang: "ne", targetLang: "en", setter: (v) => setF("location_en", v) },
+    ];
+    form.images.forEach((img, idx) => {
+      fields.push({ id: `ev-cap-${idx}-ne`, label: `Photo ${idx + 1} caption`, source: img.caption_en, target: img.caption_ne, sourceLang: "en", targetLang: "ne", setter: (v) => updateCaption(idx, "caption_ne", v) });
+      fields.push({ id: `ev-cap-${idx}-en`, label: `Photo ${idx + 1} caption`, source: img.caption_ne, target: img.caption_en, sourceLang: "ne", targetLang: "en", setter: (v) => updateCaption(idx, "caption_en", v) });
+    });
+    return fields;
+  }
+
   async function submit() {
     if (!form.title_en.trim()) { toast("English title is required", "error"); return; }
     if (!form.slug.trim()) { toast("Slug is required", "error"); return; }
@@ -191,7 +210,10 @@ export default function EventsAdminClient({ initialEvents }: Props) {
       {/* Form */}
       {showForm && (
         <div className={styles.formCard}>
-          <h2 className={styles.formCardTitle}>{editId ? "Edit Event" : "New Event Gallery"}</h2>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <h2 className={styles.formCardTitle} style={{ margin: 0 }}>{editId ? "Edit Event" : "New Event Gallery"}</h2>
+            <TranslateAllButton getFields={buildTranslateAllFields} />
+          </div>
 
           <div className={styles.formGrid}>
             {/* Titles */}
@@ -200,12 +222,18 @@ export default function EventsAdminClient({ initialEvents }: Props) {
               <input className={styles.input} value={form.title_en}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Dashain Celebration 2081" />
+              <TranslateButton source={form.title_ne} sourceLang="ne" targetLang="en"
+                currentTarget={form.title_en} onTranslated={(v) => setF("title_en", v)} compact />
+              <TranslateFilledHint id="ev-title-en" />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Title (Nepali)</label>
               <input className={styles.input} value={form.title_ne}
                 onChange={(e) => setF("title_ne", e.target.value)}
                 placeholder="दशैं उत्सव २०८१" />
+              <TranslateButton source={form.title_en} sourceLang="en" targetLang="ne"
+                currentTarget={form.title_ne} onTranslated={(v) => setF("title_ne", v)} compact />
+              <TranslateFilledHint id="ev-title-ne" />
             </div>
 
             {/* Slug */}
@@ -223,12 +251,18 @@ export default function EventsAdminClient({ initialEvents }: Props) {
               <textarea className={styles.textarea} rows={3} value={form.description_en}
                 onChange={(e) => setF("description_en", e.target.value)}
                 placeholder="Brief description of the event…" />
+              <TranslateButton source={form.description_ne} sourceLang="ne" targetLang="en"
+                currentTarget={form.description_en} onTranslated={(v) => setF("description_en", v)} compact />
+              <TranslateFilledHint id="ev-desc-en" />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Description (Nepali)</label>
               <textarea className={styles.textarea} rows={3} value={form.description_ne}
                 onChange={(e) => setF("description_ne", e.target.value)}
                 placeholder="कार्यक्रमको संक्षिप्त विवरण…" />
+              <TranslateButton source={form.description_en} sourceLang="en" targetLang="ne"
+                currentTarget={form.description_ne} onTranslated={(v) => setF("description_ne", v)} compact />
+              <TranslateFilledHint id="ev-desc-ne" />
             </div>
 
             {/* Location */}
@@ -237,12 +271,18 @@ export default function EventsAdminClient({ initialEvents }: Props) {
               <input className={styles.input} value={form.location_en}
                 onChange={(e) => setF("location_en", e.target.value)}
                 placeholder="Tudikhel, Kathmandu" />
+              <TranslateButton source={form.location_ne} sourceLang="ne" targetLang="en"
+                currentTarget={form.location_en} onTranslated={(v) => setF("location_en", v)} compact />
+              <TranslateFilledHint id="ev-loc-en" />
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Location (Nepali)</label>
               <input className={styles.input} value={form.location_ne}
                 onChange={(e) => setF("location_ne", e.target.value)}
                 placeholder="टुँडिखेल, काठमाडौं" />
+              <TranslateButton source={form.location_en} sourceLang="en" targetLang="ne"
+                currentTarget={form.location_ne} onTranslated={(v) => setF("location_ne", v)} compact />
+              <TranslateFilledHint id="ev-loc-ne" />
             </div>
 
             {/* Date & Status */}
@@ -327,6 +367,13 @@ export default function EventsAdminClient({ initialEvents }: Props) {
                           value={img.caption_en}
                           onChange={(e) => updateCaption(idx, "caption_en", e.target.value)}
                         />
+                        <TranslateButton
+                          source={img.caption_ne} sourceLang="ne" targetLang="en"
+                          currentTarget={img.caption_en}
+                          onTranslated={(v) => updateCaption(idx, "caption_en", v)}
+                          label="EN" compact
+                        />
+                        <TranslateFilledHint id={`ev-cap-${idx}-en`} />
                         <input
                           className={styles.input}
                           style={{ fontSize: "0.75rem", padding: "4px 8px" }}
@@ -334,6 +381,13 @@ export default function EventsAdminClient({ initialEvents }: Props) {
                           value={img.caption_ne}
                           onChange={(e) => updateCaption(idx, "caption_ne", e.target.value)}
                         />
+                        <TranslateButton
+                          source={img.caption_en} sourceLang="en" targetLang="ne"
+                          currentTarget={img.caption_ne}
+                          onTranslated={(v) => updateCaption(idx, "caption_ne", v)}
+                          label="NE" compact
+                        />
+                        <TranslateFilledHint id={`ev-cap-${idx}-ne`} />
                       </div>
                     </div>
                   ))}
