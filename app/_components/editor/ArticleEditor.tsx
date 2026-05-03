@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import dynamic from "next/dynamic";
 import { toast } from "@/lib/util/toast";
 import styles from "./ArticleEditor.module.css";
@@ -17,11 +18,6 @@ const QuillEditor = dynamic(() => import("./QuillEditor"), {
     <div className={styles.editorPlaceholder}>Loading editor…</div>
   ),
 });
-
-const DEFAULT_CATEGORIES = [
-  "World", "Politics", "Business", "Technology", "Science",
-  "Culture", "Opinion", "Sports", "Entertainment",
-];
 
 type Status = "draft" | "review" | "published" | "archived";
 type Lang = "en" | "ne";
@@ -68,9 +64,9 @@ function countWordsFromHtml(html: string): number {
 }
 
 export default function ArticleEditor({ initial, backHref, categories: categoriesProp }: Props) {
-  const categoryOpts: ComboboxOption[] = categoriesProp && categoriesProp.length > 0
-    ? categoriesProp.map((c) => ({ value: c.value, label: c.label }))
-    : DEFAULT_CATEGORIES.map((c) => ({ value: c, label: c }));
+  const locale = useLocale();
+  const categoryOpts: ComboboxOption[] = (categoriesProp ?? []).map((c) => ({ value: c.value, label: c.label }));
+  const noCategories = categoryOpts.length === 0;
   const router = useRouter();
   const isEdit = !!initial?.id;
 
@@ -447,12 +443,21 @@ export default function ArticleEditor({ initial, backHref, categories: categorie
           {/* Category combobox */}
           <div className={styles.sideCard}>
             <h3 className={styles.sideTitle}>Category</h3>
-            <Combobox
-              options={categoryOpts}
-              value={values.category}
-              placeholder="Select category…"
-              onChange={(v) => set("category", v)}
-            />
+            {noCategories ? (
+              <p className={styles.hint}>
+                No categories yet.{" "}
+                <a href={`/${locale}/dashboard/taxonomy`} className={styles.backLink}>
+                  Add one in Categories &amp; Tags →
+                </a>
+              </p>
+            ) : (
+              <Combobox
+                options={categoryOpts}
+                value={values.category}
+                placeholder="Select category…"
+                onChange={(v) => set("category", v)}
+              />
+            )}
           </div>
 
           {/* Tags */}

@@ -25,7 +25,7 @@ async function ArchiveSidebar() {
 
   const [trending, tags] = await Promise.all([
     getTrendingArticles(locale, 8),
-    getPublicTags(),
+    getPublicTags(locale),
   ]);
 
   return (

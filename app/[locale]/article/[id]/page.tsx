@@ -21,6 +21,7 @@ import {
   getRelatedPublicArticles,
   getBreakingHeadline,
 } from "@/lib/content/public";
+import { listCategories, listTags } from "@/lib/content/taxonomy";
 import { Link } from "@/i18n/navigation";
 import styles from "./page.module.css";
 
@@ -94,12 +95,43 @@ export default async function ArticlePage({ params }: Props) {
 
   if (!article) notFound();
 
-  const [related, bookmarked] = await Promise.all([
+  const [related, bookmarked, allCategories, allTags] = await Promise.all([
     getRelatedPublicArticles(id, article.category, locale, 4),
     session?.user?.id && article.rawId
       ? isBookmarked(session.user.id, article.rawId)
       : Promise.resolve(false),
+    listCategories().catch(() => []),
+    listTags().catch(() => []),
   ]);
+
+  // Resolve stored category/tag strings against the live taxonomy. Unknown
+  // values are rendered as plain text instead of links so visitors don't
+  // land on `notFound()` pages.
+  const categoryNeedle = article.category.toLowerCase();
+  const categoryMatch = allCategories.find(
+    (c) =>
+      c.slug.toLowerCase() === categoryNeedle ||
+      c.name_en.toLowerCase() === categoryNeedle ||
+      (c.name_ne && c.name_ne.toLowerCase() === categoryNeedle),
+  );
+  const tagEntries = (article.tags ?? []).map((tag) => {
+    const needle = tag.toLowerCase();
+    // Match against slug or either localized name — article.tags is a
+    // free-form text[] so historic rows may have stored any of those.
+    const match = allTags.find(
+      (t) =>
+        t.slug.toLowerCase() === needle ||
+        t.name_en.toLowerCase() === needle ||
+        (t.name_ne && t.name_ne.toLowerCase() === needle),
+    );
+    return {
+      raw: tag,
+      label: match
+        ? (locale === "ne" && match.name_ne ? match.name_ne : match.name_en)
+        : tag.replace(/-/g, " "),
+      slug: match?.slug,
+    };
+  });
 
   const t = await getTranslations("article");
 
@@ -170,7 +202,16 @@ export default async function ArticlePage({ params }: Props) {
       <main className={styles.main}>
         <div className={styles.articleHeader}>
           <div className={styles.categoryRow}>
-            <CategoryBadge category={article.category} />
+            {categoryMatch ? (
+              <Link href={`/${categoryMatch.slug}`} className={styles.categoryLink}>
+                <CategoryBadge
+                  category={categoryMatch.slug}
+                  label={locale === "ne" && categoryMatch.name_ne ? categoryMatch.name_ne : categoryMatch.name_en}
+                />
+              </Link>
+            ) : article.category ? (
+              <span className={styles.plainCategory}>{article.category}</span>
+            ) : null}
           </div>
           <h1 className={styles.title}>{article.title}</h1>
           {article.excerpt && <p className={styles.excerpt}>{article.excerpt}</p>}
@@ -260,14 +301,20 @@ export default async function ArticlePage({ params }: Props) {
               ))
             )}
 
-            {article.tags && article.tags.length > 0 && (
+            {tagEntries.length > 0 && (
               <div className={styles.tagRow}>
                 <span className={styles.tagLabel}>{t("topics")}</span>
-                {article.tags.map((tag) => (
-                  <Link key={tag} href={`/tags/${tag}`} className={styles.tag}>
-                    {tag.replace(/-/g, " ")}
-                  </Link>
-                ))}
+                {tagEntries.map((tag) =>
+                  tag.slug ? (
+                    <Link key={tag.raw} href={`/tags/${tag.slug}`} className={styles.tag}>
+                      {tag.label}
+                    </Link>
+                  ) : (
+                    <span key={tag.raw} className={styles.tag} aria-label="Unlinked tag">
+                      {tag.label}
+                    </span>
+                  ),
+                )}
               </div>
             )}
           </article>

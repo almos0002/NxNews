@@ -1,4 +1,5 @@
 import { pool } from "../db/db";
+import { listTags } from "./taxonomy";
 
 const FALLBACK_IMAGE = "/og-default.png";
 
@@ -183,6 +184,17 @@ export async function getRelatedPublicArticles(
   return rows.map((r) => mapArticle(r, locale));
 }
 
+async function tagAliases(tagSlug: string): Promise<string[]> {
+  // article.tags is a free-form text[] of slugs/names, so look up every
+  // historical form (slug + localized names) for the given tag slug.
+  const tags = await listTags();
+  const match = tags.find((t) => t.slug.toLowerCase() === tagSlug.toLowerCase());
+  if (!match) return [tagSlug];
+  return Array.from(new Set(
+    [match.slug, match.name_en, match.name_ne].filter(Boolean) as string[],
+  ));
+}
+
 export async function getPublicArticlesByTag(
   tag: string,
   locale: string,
@@ -190,14 +202,19 @@ export async function getPublicArticlesByTag(
 ): Promise<PublicArticle[]> {
   const limit = opts?.limit ?? 1000;
   const offset = opts?.offset ?? 0;
+  const aliases = await tagAliases(tag);
   const { rows } = await pool.query(
     `SELECT a.*, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
-     WHERE a.status = 'published' AND $1 = ANY(a.tags)
+     WHERE a.status = 'published'
+       AND EXISTS (
+         SELECT 1 FROM unnest(a.tags) AS t
+         WHERE LOWER(t) = ANY($1::text[])
+       )
      ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
      LIMIT $2 OFFSET $3`,
-    [tag, limit, offset]
+    [aliases.map((a) => a.toLowerCase()), limit, offset]
   );
   return rows.map((r) => mapArticle(r, locale));
 }
@@ -312,13 +329,18 @@ export async function getBreakingHeadlines(
   }
 }
 
-export async function getPublicTags(): Promise<
-  { slug: string; label: string; description: string }[]
-> {
-  const { rows } = await pool.query(
-    `SELECT slug, name_en AS label, '' AS description FROM tags ORDER BY name_en`
-  );
-  return rows;
+export async function getPublicTags(
+  locale: string = "en",
+): Promise<{ slug: string; label: string; description: string }[]> {
+  // Read through the same cached helper the admin uses so both surfaces
+  // see the same data and revalidate together.
+  const tags = await listTags();
+  const isNe = locale === "ne";
+  return tags.map((t) => ({
+    slug: t.slug,
+    label: isNe && t.name_ne ? t.name_ne : t.name_en,
+    description: "",
+  }));
 }
 
 export async function getPublicVideos(locale: string): Promise<PublicVideo[]> {
@@ -390,9 +412,15 @@ export async function countPublicArticles(opts?: { category?: string }): Promise
 }
 
 export async function countPublicArticlesByTag(tag: string): Promise<number> {
+  const aliases = await tagAliases(tag);
   const { rows } = await pool.query(
-    `SELECT COUNT(*)::int AS cnt FROM article WHERE status = 'published' AND $1 = ANY(tags)`,
-    [tag]
+    `SELECT COUNT(*)::int AS cnt FROM article
+     WHERE status = 'published'
+       AND EXISTS (
+         SELECT 1 FROM unnest(tags) AS t
+         WHERE LOWER(t) = ANY($1::text[])
+       )`,
+    [aliases.map((a) => a.toLowerCase())]
   );
   return rows[0]?.cnt ?? 0;
 }

@@ -15,13 +15,15 @@ const categoryKeyMap: Record<string, string> = {
 export default async function CategoryBadge({
   category,
   variant = "default",
+  label: labelOverride,
 }: {
   category: string;
   variant?: "default" | "accent" | "light";
+  label?: string;
 }) {
   const t = await getTranslations("nav");
   const key = categoryKeyMap[category.toLowerCase()];
-  const label = key ? t(key as Parameters<typeof t>[0]) : category;
+  const label = labelOverride ?? (key ? t(key as Parameters<typeof t>[0]) : category);
 
   return (
     <span className={`${styles.badge} ${styles[variant]}`}>

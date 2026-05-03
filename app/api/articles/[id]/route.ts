@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { getArticleById, updateArticle, deleteArticle } from "@/lib/content/articles";
+import { revalidateArticleSurfaces } from "@/lib/content/revalidation";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -55,6 +56,17 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       ...(featured_image !== undefined && { featured_image: featured_image.trim() }),
     });
 
+    if (updated) {
+      await revalidateArticleSurfaces({
+        slugs: Array.from(new Set([existing.slug, updated.slug])),
+        categories: Array.from(new Set([existing.category, updated.category])),
+        tags: Array.from(new Set([
+          ...(Array.isArray(existing.tags) ? existing.tags : []),
+          ...(Array.isArray(updated.tags) ? updated.tags : []),
+        ])),
+      });
+    }
+
     return NextResponse.json({ article: updated });
   } catch (err: unknown) {
     console.error("[PUT /api/articles/[id]]", err);
@@ -73,17 +85,23 @@ export async function DELETE(req: NextRequest, { params }: Ctx) {
 
     const { id } = await params;
 
+    const existing = await getArticleById(id);
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
     const role = (session.user as { role?: string }).role ?? "user";
-    if (role === "author") {
-      const existing = await getArticleById(id);
-      if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
-      if (existing.author_id !== session.user.id) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-      }
+    if (role === "author" && existing.author_id !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const deleted = await deleteArticle(id);
     if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    await revalidateArticleSurfaces({
+      slugs: [existing.slug],
+      categories: [existing.category],
+      tags: Array.isArray(existing.tags) ? existing.tags : [],
+    });
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[DELETE /api/articles/[id]]", err);

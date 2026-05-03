@@ -49,7 +49,7 @@ export default async function LocaleSearchPage({ params, searchParams }: Props) 
   const [results, total, tags, headline] = await Promise.all([
     query ? searchPublicArticles(query, locale, { limit: PUBLIC_PAGE_SIZE, offset }) : Promise.resolve([]),
     query ? countSearchArticles(query) : Promise.resolve(0),
-    getPublicTags(),
+    getPublicTags(locale),
     getBreakingHeadline(locale),
   ]);
 

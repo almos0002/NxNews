@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { listArticles, createArticle, countByStatus } from "@/lib/content/articles";
+import { revalidateArticleSurfaces } from "@/lib/content/revalidation";
 
 export async function GET(req: NextRequest) {
   try {
@@ -60,6 +61,12 @@ export async function POST(req: NextRequest) {
       author_id: session.user.id,
     });
 
+    await revalidateArticleSurfaces({
+      slugs: [article.slug],
+      categories: [article.category],
+      tags: Array.isArray(article.tags) ? article.tags : [],
+    });
+
     return NextResponse.json({ article }, { status: 201 });
   } catch (err: unknown) {
     console.error("[POST /api/articles]", err);
@@ -70,3 +77,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+

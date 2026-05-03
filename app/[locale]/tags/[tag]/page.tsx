@@ -22,7 +22,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { tag, locale } = await params;
-  const tags = await getPublicTags();
+  const tags = await getPublicTags(locale);
   const tagData = tags.find((t) => t.slug === tag);
   const label = tagData?.label ?? tag.replace(/-/g, " ");
   const { getSiteName } = await import("@/lib/cms/site-name");
@@ -62,14 +62,17 @@ export default async function TagPage({ params, searchParams }: Props) {
   const offset = (page - 1) * PUBLIC_PAGE_SIZE;
 
   const [tags, articles, total, headline] = await Promise.all([
-    getPublicTags(),
+    getPublicTags(locale),
     getPublicArticlesByTag(tag, locale, { limit: PUBLIC_PAGE_SIZE, offset }),
     countPublicArticlesByTag(tag),
     getBreakingHeadline(locale),
   ]);
 
   const tagData = tags.find((t) => t.slug === tag);
-  if (!tagData && total === 0) notFound();
+  // The admin Taxonomy page is the single source of truth: only render a
+  // tag page if the slug exists in the tags table, regardless of whether
+  // any articles still have the string in their `tags` column.
+  if (!tagData) notFound();
 
   const t = await getTranslations("archive");
   const label = tagData?.label ?? tag.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
