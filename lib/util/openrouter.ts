@@ -1,5 +1,5 @@
 const NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
-const MODEL = "z-ai/glm4.7";
+const MODEL = "meta/llama-3.3-70b-instruct";
 
 const CACHE_MAX = 500;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -132,7 +132,6 @@ export async function translateText(opts: {
           top_p: 1,
           max_tokens: 4096,
           stream: false,
-          chat_template_kwargs: { enable_thinking: false },
         }),
       });
     } catch {
