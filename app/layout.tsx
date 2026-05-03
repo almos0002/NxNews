@@ -36,6 +36,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${noticiaText.variable} ${dmSans.variable}`}
     >
       <body suppressHydrationWarning>{children}</body>

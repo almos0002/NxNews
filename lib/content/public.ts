@@ -1,7 +1,9 @@
 import { pool } from "../db/db";
 
+const FALLBACK_IMAGE = "/og-default.png";
+
 function sanitizeImageUrl(raw: string): string {
-  if (!raw) return "";
+  if (!raw || !raw.trim()) return FALLBACK_IMAGE;
   try {
     const u = new URL(raw);
     if (u.pathname.startsWith("/_next/image")) {
