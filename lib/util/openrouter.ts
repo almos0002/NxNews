@@ -1,5 +1,5 @@
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "qwen/qwen3-next-80b-a3b-instruct:free";
+const NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
+const MODEL = "z-ai/glm4.7";
 
 const CACHE_MAX = 500;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -83,16 +83,20 @@ function stripCodeFences(s: string): string {
   return out.trim();
 }
 
+function stripThinking(s: string): string {
+  return s.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+}
+
 export async function translateText(opts: {
   text: string;
   sourceLang: TranslateLang;
   targetLang: TranslateLang;
   format: TranslateFormat;
 }): Promise<string> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.NVIDIA_API_KEY;
   if (!apiKey) {
     throw new TranslateError(
-      "Translation is not configured — the OPENROUTER_API_KEY environment variable is missing.",
+      "Translation is not configured — the NVIDIA_API_KEY environment variable is missing.",
       503
     );
   }
@@ -115,7 +119,7 @@ export async function translateText(opts: {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     let res: Response;
     try {
-      res = await fetch(OPENROUTER_URL, {
+      res = await fetch(NVIDIA_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -125,6 +129,10 @@ export async function translateText(opts: {
           model: MODEL,
           messages: [{ role: "user", content: prompt }],
           temperature: 0.2,
+          top_p: 1,
+          max_tokens: 4096,
+          stream: false,
+          chat_template_kwargs: { enable_thinking: false },
         }),
       });
     } catch {
@@ -144,17 +152,17 @@ export async function translateText(opts: {
       if (!content || !content.trim()) {
         throw new TranslateError("Translation service returned an empty response.", 502);
       }
-      const out = stripCodeFences(content);
+      const out = stripCodeFences(stripThinking(content));
       cacheSet(key, out);
       return out;
     }
 
     const body = await res.text().catch(() => "");
     if (res.status === 401 || res.status === 403) {
-      throw new TranslateError("OpenRouter rejected the API key. Please update OPENROUTER_API_KEY.", res.status);
+      throw new TranslateError("NVIDIA rejected the API key. Please update NVIDIA_API_KEY.", res.status);
     }
     if (res.status === 429) {
-      lastErr = new TranslateError("Translation rate-limited by OpenRouter. Try again in a moment.", 429);
+      lastErr = new TranslateError("Translation rate-limited by NVIDIA. Try again in a moment.", 429);
       if (attempt < maxAttempts) {
         const retryAfter = Number(res.headers.get("retry-after")) || 0;
         const waitMs = retryAfter > 0 ? retryAfter * 1000 : 1500 * attempt;
@@ -163,7 +171,7 @@ export async function translateText(opts: {
       }
       throw lastErr;
     }
-    console.error("[openrouter] upstream error", res.status, body.slice(0, 300));
+    console.error("[nvidia] upstream error", res.status, body.slice(0, 300));
     lastErr = new TranslateError(`Translation service error (${res.status}).`, 502);
     if (attempt < maxAttempts && res.status >= 500) { await sleep(500 * attempt); continue; }
     throw lastErr;
