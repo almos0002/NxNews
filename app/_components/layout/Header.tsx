@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth/auth";
 import { getNavbarItems } from "@/lib/cms/menu";
 import type { MenuItem } from "@/lib/cms/menu";
 import { getActiveLiveCount } from "@/lib/content/public";
+import { getSiteSettingsForLocale } from "@/lib/cms/settings";
 import LanguageSwitcher from "./LanguageSwitcher";
 import MobileNav from "./MobileNav";
 import DateTimeClock from "./DateTimeClock";
@@ -14,14 +15,18 @@ import styles from "./Header.module.css";
 
 export default async function Header() {
   const hdrs = await headers();
-  const [t, locale, navItems, sessionResult, liveCount] = await Promise.all([
+  const locale = await getLocale();
+  const [t, navItems, sessionResult, liveCount, siteSettings] = await Promise.all([
     getTranslations("nav"),
-    getLocale(),
     getNavbarItems().catch(() => []),
     auth.api.getSession({ headers: hdrs }).catch(() => null),
     getActiveLiveCount().catch(() => 0),
+    getSiteSettingsForLocale(locale).catch(() => null),
   ]);
   const session = sessionResult;
+  const siteTitle = siteSettings?.siteTitle || "KumariHub";
+  const logoUrl = siteSettings?.logoUrl || "/logo.png";
+  const isExternalLogo = logoUrl.startsWith("/uploads/") || /^https?:\/\//.test(logoUrl) || logoUrl.startsWith("//");
 
   function label(item: MenuItem): string {
     return (locale === "ne" && item.label_ne) ? item.label_ne : item.label_en;
@@ -37,18 +42,19 @@ export default async function Header() {
     <header className={styles.header}>
       {/* ── Row 1: logo centred, actions right ── */}
       <div className={styles.logoRow}>
-        <MobileNav navItems={navItems} locale={locale} />
+        <MobileNav navItems={navItems} locale={locale} logoUrl={logoUrl} siteTitle={siteTitle} />
 
         <div className={styles.logoWrap}>
           <Link href="/" className={styles.logo}>
             <Image
-              src="/logo.png"
-              alt="KumariHub"
+              src={logoUrl}
+              alt={siteTitle}
               width={300}
               height={90}
               className={styles.logoImg}
               style={{ objectFit: "contain", width: "auto" }}
               priority
+              unoptimized={isExternalLogo}
             />
           </Link>
           <span className={styles.clockWrap}>

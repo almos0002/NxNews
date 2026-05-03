@@ -11,9 +11,11 @@ import styles from "./MobileNav.module.css";
 interface Props {
   navItems: MenuItem[];
   locale: string;
+  logoUrl?: string;
+  siteTitle?: string;
 }
 
-export default function MobileNav({ navItems, locale }: Props) {
+export default function MobileNav({ navItems, locale, logoUrl = "/logo.png", siteTitle = "KumariHub" }: Props) {
   const [open, setOpen] = useState(false);
   const t = useTranslations("nav");
 
@@ -57,12 +59,13 @@ export default function MobileNav({ navItems, locale }: Props) {
         <div className={styles.drawerHeader}>
           <Link href="/" className={styles.drawerLogoLink} onClick={() => setOpen(false)}>
             <Image
-              src="/logo.png"
-              alt="KumariHub"
+              src={logoUrl}
+              alt={siteTitle}
               width={140}
               height={40}
               className={styles.drawerLogoImg}
               priority={false}
+              unoptimized={logoUrl.startsWith("/uploads/") || /^https?:\/\//.test(logoUrl) || logoUrl.startsWith("//")}
             />
           </Link>
           <button
