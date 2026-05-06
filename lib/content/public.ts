@@ -45,7 +45,7 @@ export interface PublicVideo {
 function estimateReadTime(html: string): string {
   const text = html.replace(/<[^>]+>/g, " ");
   const words = text.split(/\s+/).filter(Boolean).length;
-  return `${Math.max(1, Math.ceil(words / 200))} min`;
+  return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }
 
 function formatDate(d: Date | string): string {

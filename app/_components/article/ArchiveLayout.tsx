@@ -151,7 +151,7 @@ export default async function ArchiveLayout({
                       <div className={styles.cardMeta}>
                         <span className={styles.cardAuthor}>{article.author}</span>
                         <span className={styles.cardDot} />
-                        <span>{article.readTime} read</span>
+                        <span>{article.readTime}</span>
                         {article.date && (
                           <>
                             <span className={styles.cardDot} />

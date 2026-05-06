@@ -41,7 +41,7 @@ export default async function EntertainmentSection({
               <div className={styles.meta}>
                 <span className={styles.author}>{article.author}</span>
                 <span className={styles.dot} />
-                <span>{article.readTime} {t("readMin")}</span>
+                <span>{article.readTime}</span>
                 {article.viewCount != null && article.viewCount > 0 && (
                   <>
                     <span className={styles.dot} />

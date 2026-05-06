@@ -226,7 +226,7 @@ export default async function ArticlePage({ params }: Props) {
               </>
             )}
             <span className={styles.metaDot} />
-            <span>{article.readTime} {t("minRead")}</span>
+            <span>{article.readTime}</span>
             {typeof article.viewCount === "number" && article.viewCount > 0 && (
               <>
                 <span className={styles.metaDot} />

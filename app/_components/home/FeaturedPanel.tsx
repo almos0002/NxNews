@@ -34,7 +34,7 @@ export default async function FeaturedPanel({
               <span className={styles.dot}>·</span>
               <span>{primary.time}</span>
               <span className={styles.dot}>·</span>
-              <span>{primary.readTime} {t("readMin")}</span>
+              <span>{primary.readTime}</span>
               {primary.viewCount != null && primary.viewCount > 0 && (
                 <>
                   <span className={styles.dot}>·</span>
