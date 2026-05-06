@@ -26,7 +26,7 @@ export default async function Header() {
   const session = sessionResult;
   const siteTitle = siteSettings?.siteTitle || "KumariHub";
   const logoUrl = siteSettings?.logoUrl || "/logo.png";
-  const isExternalLogo = logoUrl.startsWith("/uploads/") || /^https?:\/\//.test(logoUrl) || logoUrl.startsWith("//");
+  const isExternalLogo = /^https?:\/\//.test(logoUrl) || logoUrl.startsWith("//");
 
   function label(item: MenuItem): string {
     return (locale === "ne" && item.label_ne) ? item.label_ne : item.label_en;

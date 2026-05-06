@@ -65,7 +65,7 @@ export default function MobileNav({ navItems, locale, logoUrl = "/logo.png", sit
               height={40}
               className={styles.drawerLogoImg}
               priority={false}
-              unoptimized={logoUrl.startsWith("/uploads/") || /^https?:\/\//.test(logoUrl) || logoUrl.startsWith("//")}
+              unoptimized={/^https?:\/\//.test(logoUrl) || logoUrl.startsWith("//")}
             />
           </Link>
           <button
