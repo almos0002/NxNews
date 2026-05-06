@@ -17,7 +17,6 @@
     "@uppy/dashboard": "^5.1.1",
     "@uppy/react": "^5.2.0",
     "better-auth": "^1.6.2",
-    "cloudinary": "^2.10.0",
     "google-auth-library": "^10.6.2",
     "nepali-date-converter": "^3.4.0",
     "next": "^16.2.3",
