@@ -18,10 +18,14 @@ const DEFAULT_SLOTS: Omit<AdSlotConfig, "updated_at">[] = [
   { slot: "fluid",       label: "Fluid / Sponsored",      width: 0,   height: 0,   enabled: true, code: "" },
 ];
 
-// Schema is managed by scripts/schema.sql. This function now only seeds
-// the default ad slot rows. It should be called explicitly from a one-off
-// setup step (e.g. dashboard "reset ads" button), NOT on every request.
-export async function initAdsTable(): Promise<void> {
+const LABEL_MAP: Record<string, string> = Object.fromEntries(
+  DEFAULT_SLOTS.map((s) => [s.slot, s.label])
+);
+const DIMS_MAP: Record<string, { width: number; height: number }> = Object.fromEntries(
+  DEFAULT_SLOTS.map((s) => [s.slot, { width: s.width, height: s.height }])
+);
+
+async function seedDefaultSlots(): Promise<void> {
   for (const s of DEFAULT_SLOTS) {
     await pool.query(
       `INSERT INTO ads (slot, enabled, code, width, height)
@@ -31,11 +35,28 @@ export async function initAdsTable(): Promise<void> {
   }
 }
 
+export async function initAdsTable(): Promise<void> {
+  await seedDefaultSlots();
+}
+
 export async function getAllAds(): Promise<AdSlotConfig[]> {
-  const { rows } = await pool.query(
+  let { rows } = await pool.query(
     "SELECT slot, enabled, code, width, height, updated_at FROM ads ORDER BY slot"
   );
-  return rows;
+
+  if (rows.length === 0) {
+    await seedDefaultSlots();
+    ({ rows } = await pool.query(
+      "SELECT slot, enabled, code, width, height, updated_at FROM ads ORDER BY slot"
+    ));
+  }
+
+  return rows.map((r) => ({
+    ...r,
+    label: LABEL_MAP[r.slot] ?? r.slot,
+    width:  DIMS_MAP[r.slot]?.width  ?? r.width,
+    height: DIMS_MAP[r.slot]?.height ?? r.height,
+  }));
 }
 
 export async function getAd(slot: string): Promise<AdSlotConfig | null> {
