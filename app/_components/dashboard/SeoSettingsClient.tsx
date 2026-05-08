@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { toast } from "@/lib/util/toast";
 import styles from "./cms.module.css";
@@ -17,6 +17,17 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
   const [s, setS] = useState({ ...initialSettings });
   const [saving, setSaving] = useState(false);
   const [ogUploading, setOgUploading] = useState(false);
+  const [indexNowInfo, setIndexNowInfo] = useState<{
+    configured: boolean; key: string | null; keyFileUrl: string | null;
+  } | null>(null);
+  const [indexNowSubmitting, setIndexNowSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/indexnow")
+      .then((r) => r.json())
+      .then((d) => setIndexNowInfo(d))
+      .catch(() => {});
+  }, []);
 
   function set(key: string, value: string) {
     setS((p) => ({ ...p, [key]: value }));
@@ -34,6 +45,19 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
       if (!res.ok) { toast(data.error ?? "Save failed", "error"); return; }
       toast("SEO settings saved successfully.", "success");
     } finally { setSaving(false); }
+  }
+
+  async function submitIndexNow() {
+    setIndexNowSubmitting(true);
+    try {
+      const res = await fetch("/api/indexnow", { method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast(data.error ?? "Submit failed", "error"); return; }
+      toast(`IndexNow: submitted ${data.submitted} URL(s) to search engines.`, "success");
+    } finally { setIndexNowSubmitting(false); }
   }
 
   async function uploadOgImage(file: File) {
@@ -354,6 +378,131 @@ export default function SeoSettingsClient({ initialSettings }: Props) {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* ── IndexNow ── */}
+        <div className={sStyles.section}>
+          <div className={sStyles.sectionHead}>
+            <h2 className={sStyles.sectionTitle}>IndexNow — Instant Indexing</h2>
+            <p className={sStyles.sectionDesc}>
+              IndexNow lets you ping Bing, Yandex, and other engines the moment an article is published —
+              no waiting for a crawler. Articles are submitted automatically on publish.
+            </p>
+          </div>
+          <div className={sStyles.sectionBody}>
+            {indexNowInfo === null ? (
+              <p style={{ fontSize: "0.82rem", color: "var(--color-ink-muted)" }}>Loading…</p>
+            ) : indexNowInfo.configured ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {/* Status row */}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px",
+                  background: "#f0fdf4", border: "1.5px solid #bbf7d0", borderRadius: 10 }}>
+                  <span style={{ fontSize: "1.1rem" }}>✅</span>
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 700, fontSize: "0.85rem", color: "#166534" }}>
+                      IndexNow is active
+                    </p>
+                    <p style={{ margin: 0, fontSize: "0.78rem", color: "#15803d" }}>
+                      Articles are submitted to search engines automatically when published.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Key info */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div>
+                    <p className={styles.label} style={{ marginBottom: 4 }}>Your IndexNow API Key</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <code style={{ flex: 1, padding: "8px 12px", background: "var(--color-bg)",
+                        border: "1px solid var(--color-border)", borderRadius: 7,
+                        fontFamily: "monospace", fontSize: "0.85rem", color: "var(--color-accent)",
+                        wordBreak: "break-all" }}>
+                        {indexNowInfo.key}
+                      </code>
+                      <button
+                        className={styles.actionBtn}
+                        onClick={() => { navigator.clipboard.writeText(indexNowInfo.key ?? ""); toast("Key copied!", "success"); }}
+                        style={{ whiteSpace: "nowrap", padding: "7px 14px", fontSize: "0.8rem" }}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className={styles.hint} style={{ marginTop: 6 }}>
+                      This key is stored as the <code>INDEXNOW_KEY</code> environment variable.
+                      Never share it publicly.
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className={styles.label} style={{ marginBottom: 4 }}>Verification File URL</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <code style={{ flex: 1, padding: "8px 12px", background: "var(--color-bg)",
+                        border: "1px solid var(--color-border)", borderRadius: 7,
+                        fontFamily: "monospace", fontSize: "0.82rem", color: "var(--color-ink-muted)",
+                        wordBreak: "break-all" }}>
+                        {indexNowInfo.keyFileUrl}
+                      </code>
+                      <a
+                        href={indexNowInfo.keyFileUrl ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ whiteSpace: "nowrap", fontSize: "0.8rem", padding: "7px 14px",
+                          border: "1px solid var(--color-border)", borderRadius: 6,
+                          background: "#fff", color: "var(--color-ink)", textDecoration: "none" }}
+                      >
+                        Open ↗
+                      </a>
+                    </div>
+                    <p className={styles.hint} style={{ marginTop: 6 }}>
+                      This file is hosted automatically. When you open it, it should display just the key. Search engines fetch it to verify site ownership.
+                    </p>
+                  </div>
+                </div>
+
+                {/* How it works */}
+                <div style={{ background: "var(--color-bg)", border: "1px solid var(--color-border)",
+                  borderRadius: 10, padding: "14px 16px" }}>
+                  <p style={{ margin: "0 0 10px", fontWeight: 700, fontSize: "0.82rem", color: "var(--color-ink)" }}>
+                    How it works
+                  </p>
+                  <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 5,
+                    fontSize: "0.81rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+                    <li><strong>Automatic</strong> — every time you publish or update an article, both the English and Nepali URLs are pinged instantly.</li>
+                    <li><strong>Engines</strong> — Bing, Yandex, Seznam, and any other IndexNow-compatible engine receive the ping.</li>
+                    <li><strong>Bing Webmaster</strong> — for the best Bing results, also add your key in <a href="https://www.bing.com/webmasters/indexnow" target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-accent)" }}>Bing Webmaster Tools → IndexNow</a>.</li>
+                    <li><strong>Manual push</strong> — use the button below to submit the homepage and sitemaps right now.</li>
+                  </ol>
+                </div>
+
+                {/* Manual submit */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <button
+                    className={styles.submitBtn}
+                    onClick={submitIndexNow}
+                    disabled={indexNowSubmitting}
+                  >
+                    {indexNowSubmitting ? "Submitting…" : "🚀 Submit Homepage to IndexNow Now"}
+                  </button>
+                  <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>
+                    Submits the homepage + sitemaps to Bing, Yandex, and others.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 16px",
+                background: "#fef9ec", border: "1.5px solid #fde68a", borderRadius: 10 }}>
+                <span style={{ fontSize: "1.1rem" }}>⚠️</span>
+                <div>
+                  <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: "0.85rem", color: "#92400e" }}>
+                    INDEXNOW_KEY is not set
+                  </p>
+                  <p style={{ margin: 0, fontSize: "0.8rem", color: "#b45309" }}>
+                    Add <code>INDEXNOW_KEY</code> to your environment variables to activate IndexNow.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { listArticles, createArticle, countByStatus } from "@/lib/content/articles";
 import { revalidateArticleSurfaces } from "@/lib/content/revalidation";
+import { submitToIndexNow, articleUrls } from "@/lib/seo/indexnow";
+import { resolveBaseUrl } from "@/lib/seo/site-url";
 
 export async function GET(req: NextRequest) {
   try {
@@ -66,6 +68,12 @@ export async function POST(req: NextRequest) {
       categories: [article.category],
       tags: Array.isArray(article.tags) ? article.tags : [],
     });
+
+    if (article.status === "published") {
+      resolveBaseUrl().then((base) =>
+        submitToIndexNow(articleUrls(base, article.slug))
+      ).catch(() => {});
+    }
 
     return NextResponse.json({ article }, { status: 201 });
   } catch (err: unknown) {

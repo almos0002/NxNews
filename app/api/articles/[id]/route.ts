@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { getArticleById, updateArticle, deleteArticle } from "@/lib/content/articles";
 import { revalidateArticleSurfaces } from "@/lib/content/revalidation";
+import { submitToIndexNow, articleUrls } from "@/lib/seo/indexnow";
+import { resolveBaseUrl } from "@/lib/seo/site-url";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -65,6 +67,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
           ...(Array.isArray(updated.tags) ? updated.tags : []),
         ])),
       });
+
+      if (updated.status === "published") {
+        resolveBaseUrl().then((base) =>
+          submitToIndexNow(articleUrls(base, updated.slug))
+        ).catch(() => {});
+      }
     }
 
     return NextResponse.json({ article: updated });
