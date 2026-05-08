@@ -99,10 +99,14 @@ export default function AdsClient({ initialAds }: Props) {
                   {ad.code ? "Ad code configured" : "No ad code yet"}
                 </span>
                 <button
-                  className={styles.editBtn}
+                  className={`${styles.codeBtn} ${editSlot === ad.slot ? styles.codeBtnActive : ""}`}
                   onClick={() => editSlot === ad.slot ? setEditSlot(null) : openEdit(ad)}
                 >
-                  {editSlot === ad.slot ? "Cancel" : "Edit Code"}
+                  {editSlot === ad.slot ? (
+                    <>✕ Cancel</>
+                  ) : (
+                    <>✎ Edit Code</>
+                  )}
                 </button>
               </div>
             </div>

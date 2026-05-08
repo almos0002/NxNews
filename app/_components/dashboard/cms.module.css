@@ -144,6 +144,39 @@
 .editBtn:hover  { color: #059669; border-color: #6ee7b7; background: #ecfdf5; }
 .deleteBtn:hover { color: #b91c1c; border-color: #fecaca; background: #fef2f2; }
 
+/* Text-style code edit button (for ads page) */
+.codeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-serif, serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1.5px solid var(--color-border);
+  background: #fff;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.codeBtn:hover {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+  color: #059669;
+}
+.codeBtnActive {
+  border-color: #fca5a5;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+.codeBtnActive:hover {
+  border-color: #f87171;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 /* Shared date / views cell styles */
 .dateCell {
   white-space: nowrap;
