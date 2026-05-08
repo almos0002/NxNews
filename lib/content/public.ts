@@ -1,5 +1,6 @@
 import { pool } from "../db/db";
 import { listTags } from "./taxonomy";
+import { cached } from "../cache/memory";
 
 const FALLBACK_IMAGE = "/og-default.png";
 
@@ -100,44 +101,47 @@ function mapVideo(row: Record<string, unknown>, locale: string): PublicVideo {
 }
 
 export async function getFeaturedArticles(locale: string): Promise<PublicArticle[]> {
-  const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name
-     FROM article a
-     LEFT JOIN "user" u ON u.id = a.author_id
-     WHERE a.status = 'published' AND a.is_featured = true
-     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
-     LIMIT 10`
-  );
-  return rows.map((r) => mapArticle(r, locale));
+  return cached(`featured:${locale}`, 60_000, async () => {
+    const { rows } = await pool.query(
+      `SELECT a.*, u.name AS author_name
+       FROM article a
+       LEFT JOIN "user" u ON u.id = a.author_id
+       WHERE a.status = 'published' AND a.is_featured = true
+       ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
+       LIMIT 10`
+    );
+    return rows.map((r) => mapArticle(r, locale));
+  });
 }
 
 export async function getPublicArticles(
   locale: string,
   opts?: { limit?: number; offset?: number; category?: string }
 ): Promise<PublicArticle[]> {
-  const conditions = ["a.status = 'published'"];
-  const values: unknown[] = [];
-  let idx = 1;
-
-  if (opts?.category) {
-    conditions.push(`LOWER(a.category) = $${idx++}`);
-    values.push(opts.category.toLowerCase());
-  }
-
-  const where = `WHERE ${conditions.join(" AND ")}`;
   const limit = opts?.limit ?? 30;
   const offset = opts?.offset ?? 0;
-
-  const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name
-     FROM article a
-     LEFT JOIN "user" u ON u.id = a.author_id
-     ${where}
-     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
-     LIMIT $${idx++} OFFSET $${idx++}`,
-    [...values, limit, offset]
-  );
-  return rows.map((r) => mapArticle(r, locale));
+  const category = opts?.category ?? "";
+  const key = `articles:${locale}:${category}:${limit}:${offset}`;
+  return cached(key, 60_000, async () => {
+    const conditions = ["a.status = 'published'"];
+    const values: unknown[] = [];
+    let idx = 1;
+    if (category) {
+      conditions.push(`LOWER(a.category) = $${idx++}`);
+      values.push(category.toLowerCase());
+    }
+    const where = `WHERE ${conditions.join(" AND ")}`;
+    const { rows } = await pool.query(
+      `SELECT a.*, u.name AS author_name
+       FROM article a
+       LEFT JOIN "user" u ON u.id = a.author_id
+       ${where}
+       ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
+       LIMIT $${idx++} OFFSET $${idx++}`,
+      [...values, limit, offset]
+    );
+    return rows.map((r) => mapArticle(r, locale));
+  });
 }
 
 export async function getPublicArticleBySlug(
@@ -266,67 +270,73 @@ export async function getTrendingArticles(
   locale: string,
   limit = 8
 ): Promise<PublicArticle[]> {
-  const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name
-     FROM article a
-     LEFT JOIN "user" u ON u.id = a.author_id
-     WHERE a.status = 'published'
-     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
-     LIMIT $1`,
-    [limit]
-  );
-  return rows.map((r) => mapArticle(r, locale));
+  return cached(`trending:${locale}:${limit}`, 120_000, async () => {
+    const { rows } = await pool.query(
+      `SELECT a.*, u.name AS author_name
+       FROM article a
+       LEFT JOIN "user" u ON u.id = a.author_id
+       WHERE a.status = 'published'
+       ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
+       LIMIT $1`,
+      [limit]
+    );
+    return rows.map((r) => mapArticle(r, locale));
+  });
 }
 
 export async function getBreakingHeadline(locale: string): Promise<string> {
-  try {
-    const key = locale === "ne" ? "breaking_news_text_ne" : "breaking_news_text_en";
-    const { rows } = await pool.query(
-      `SELECT value FROM settings WHERE key = $1 LIMIT 1`,
-      [key]
-    );
-    if (rows[0]?.value) return String(rows[0].value);
-  } catch {}
+  return cached(`breaking:${locale}`, 30_000, async () => {
+    try {
+      const key = locale === "ne" ? "breaking_news_text_ne" : "breaking_news_text_en";
+      const { rows } = await pool.query(
+        `SELECT value FROM settings WHERE key = $1 LIMIT 1`,
+        [key]
+      );
+      if (rows[0]?.value) return String(rows[0].value);
+    } catch {}
 
-  try {
-    const { rows } = await pool.query(
-      `SELECT title_en, title_ne FROM article
-       WHERE status = 'published'
-       ORDER BY published_at DESC NULLS LAST, created_at DESC LIMIT 1`
-    );
-    if (rows[0]) {
-      return locale === "ne" && rows[0].title_ne
-        ? String(rows[0].title_ne)
-        : String(rows[0].title_en);
-    }
-  } catch {}
+    try {
+      const { rows } = await pool.query(
+        `SELECT title_en, title_ne FROM article
+         WHERE status = 'published'
+         ORDER BY published_at DESC NULLS LAST, created_at DESC LIMIT 1`
+      );
+      if (rows[0]) {
+        return locale === "ne" && rows[0].title_ne
+          ? String(rows[0].title_ne)
+          : String(rows[0].title_en);
+      }
+    } catch {}
 
-  return locale === "ne"
-    ? "वैश्विक जलवायु शिखर सम्मेलनले कार्बन उत्सर्जनमा ऐतिहासिक सम्झौतामा पुग्यो"
-    : "Global Climate Summit Reaches Historic Agreement on Carbon Emissions";
+    return locale === "ne"
+      ? "वैश्विक जलवायु शिखर सम्मेलनले कार्बन उत्सर्जनमा ऐतिहासिक सम्झौतामा पुग्यो"
+      : "Global Climate Summit Reaches Historic Agreement on Carbon Emissions";
+  });
 }
 
 export async function getBreakingHeadlines(
   locale: string,
   limit = 10
 ): Promise<{ title: string; slug: string }[]> {
-  try {
-    const { rows } = await pool.query(
-      `SELECT title_en, title_ne, slug FROM article
-       WHERE status = 'published'
-       ORDER BY published_at DESC NULLS LAST, created_at DESC LIMIT $1`,
-      [limit]
-    );
-    return rows.map((r) => ({
-      title:
-        locale === "ne" && r.title_ne
-          ? String(r.title_ne)
-          : String(r.title_en),
-      slug: String(r.slug),
-    }));
-  } catch {
-    return [];
-  }
+  return cached(`headlines:${locale}:${limit}`, 30_000, async () => {
+    try {
+      const { rows } = await pool.query(
+        `SELECT title_en, title_ne, slug FROM article
+         WHERE status = 'published'
+         ORDER BY published_at DESC NULLS LAST, created_at DESC LIMIT $1`,
+        [limit]
+      );
+      return rows.map((r) => ({
+        title:
+          locale === "ne" && r.title_ne
+            ? String(r.title_ne)
+            : String(r.title_en),
+        slug: String(r.slug),
+      }));
+    } catch {
+      return [];
+    }
+  });
 }
 
 export async function getPublicTags(
@@ -344,14 +354,16 @@ export async function getPublicTags(
 }
 
 export async function getPublicVideos(locale: string): Promise<PublicVideo[]> {
-  const { rows } = await pool.query(
-    `SELECT v.*, u.name AS author_name
-     FROM videos v
-     LEFT JOIN "user" u ON u.id = v.author_id
-     WHERE v.status = 'published'
-     ORDER BY v.created_at DESC`
-  );
-  return rows.map((r) => mapVideo(r, locale));
+  return cached(`videos:${locale}`, 120_000, async () => {
+    const { rows } = await pool.query(
+      `SELECT v.*, u.name AS author_name
+       FROM videos v
+       LEFT JOIN "user" u ON u.id = v.author_id
+       WHERE v.status = 'published'
+       ORDER BY v.created_at DESC`
+    );
+    return rows.map((r) => mapVideo(r, locale));
+  });
 }
 
 export async function getPublicVideoById(
@@ -386,14 +398,16 @@ export async function getAuthorInfo(
 }
 
 export async function getActiveLiveCount(): Promise<number> {
-  try {
-    const { rows } = await pool.query(
-      `SELECT COUNT(*)::int AS cnt FROM live_streams WHERE is_active = true`
-    );
-    return rows[0]?.cnt ?? 0;
-  } catch {
-    return 0;
-  }
+  return cached("live:count", 30_000, async () => {
+    try {
+      const { rows } = await pool.query(
+        `SELECT COUNT(*)::int AS cnt FROM live_streams WHERE is_active = true`
+      );
+      return rows[0]?.cnt ?? 0;
+    } catch {
+      return 0;
+    }
+  });
 }
 
 export const PUBLIC_PAGE_SIZE = 20;

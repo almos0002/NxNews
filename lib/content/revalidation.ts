@@ -1,5 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { listCategories, listTags } from "./taxonomy";
+import { invalidateAll } from "../cache/memory";
 
 const LOCALES = ["en", "ne"] as const;
 
@@ -22,6 +23,7 @@ function resolveSlug(value: string, entries: { slug: string; name_en: string; na
 }
 
 export async function revalidateArticleSurfaces({ slugs, categories, tags }: ArticleRevalidateInput) {
+  invalidateAll();
   revalidateTag("categories", { expire: 0 });
   revalidateTag("tags", { expire: 0 });
 
