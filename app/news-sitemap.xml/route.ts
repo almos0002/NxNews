@@ -2,7 +2,6 @@ import { pool } from "@/lib/db/db";
 import { getAllSettings } from "@/lib/cms/settings";
 import { resolveBaseUrlSync } from "@/lib/seo/site-url";
 
-export const dynamic = "force-dynamic";
 export const revalidate = 900;
 
 interface ArticleRow {
@@ -12,6 +11,9 @@ interface ArticleRow {
   published_at: string;
   category: string;
 }
+
+const escape = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 export async function GET() {
   let canonical: string | undefined;
@@ -38,14 +40,11 @@ export async function GET() {
     rows = result.rows;
   } catch { /* empty on error */ }
 
-  const escape = (s: string) =>
-    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-
   const blocks: string[] = [];
+
   for (const r of rows) {
     const pubDate = r.published_at ? new Date(r.published_at).toISOString() : new Date().toISOString();
 
-    // English entry
     blocks.push(`  <url>
     <loc>${baseUrl}/en/article/${r.slug}</loc>
     <news:news>
@@ -58,9 +57,9 @@ export async function GET() {
     </news:news>
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en/article/${r.slug}"/>
     <xhtml:link rel="alternate" hreflang="ne" href="${baseUrl}/ne/article/${r.slug}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/article/${r.slug}"/>
   </url>`);
 
-    // Nepali entry — only if the article actually has a Nepali title
     if (r.title_ne) {
       blocks.push(`  <url>
     <loc>${baseUrl}/ne/article/${r.slug}</loc>
@@ -74,6 +73,7 @@ export async function GET() {
     </news:news>
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en/article/${r.slug}"/>
     <xhtml:link rel="alternate" hreflang="ne" href="${baseUrl}/ne/article/${r.slug}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/article/${r.slug}"/>
   </url>`);
     }
   }
