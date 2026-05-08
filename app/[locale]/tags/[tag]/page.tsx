@@ -15,6 +15,8 @@ import {
 } from "@/lib/content/public";
 import { getDefaultOgImage } from "@/lib/seo/site-url";
 
+export const revalidate = 120;
+
 type Props = {
   params: Promise<{ locale: string; tag: string }>;
   searchParams: Promise<Record<string, string>>;

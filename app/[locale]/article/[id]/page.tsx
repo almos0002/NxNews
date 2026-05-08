@@ -25,6 +25,8 @@ import { listCategories, listTags } from "@/lib/content/taxonomy";
 import { Link } from "@/i18n/navigation";
 import styles from "./page.module.css";
 
+export const revalidate = 300;
+
 type Props = { params: Promise<{ locale: string; id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

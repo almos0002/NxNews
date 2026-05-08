@@ -15,6 +15,8 @@ import {
 } from "@/lib/content/public";
 import { getAllSettings } from "@/lib/cms/settings";
 
+export const revalidate = 60;
+
 type Props = {
   params: Promise<{ locale: string }>;
   searchParams: Promise<Record<string, string>>;

@@ -200,7 +200,7 @@ export async function getPublicArticlesByTag(
   locale: string,
   opts?: { limit?: number; offset?: number }
 ): Promise<PublicArticle[]> {
-  const limit = opts?.limit ?? 1000;
+  const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
   const aliases = await tagAliases(tag);
   const { rows } = await pool.query(
@@ -224,7 +224,7 @@ export async function getPublicArticlesByAuthorName(
   locale: string,
   opts?: { limit?: number; offset?: number }
 ): Promise<PublicArticle[]> {
-  const limit = opts?.limit ?? 1000;
+  const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
     `SELECT a.*, u.name AS author_name

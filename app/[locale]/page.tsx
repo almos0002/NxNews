@@ -22,6 +22,8 @@ import { getPublicArticles, getFeaturedArticles, getBreakingHeadlines, getActive
 import { Link } from "@/i18n/navigation";
 import styles from "@/app/page.module.css";
 
+export const revalidate = 60;
+
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

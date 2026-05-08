@@ -17,6 +17,8 @@ import {
 import { listCategories } from "@/lib/content/taxonomy";
 import { getAllSettings } from "@/lib/cms/settings";
 
+export const revalidate = 120;
+
 const RESERVED = new Set(["login", "signup", "article", "tags", "search", "author", "videos", "dashboard"]);
 
 const categoryDescriptionsEn: Record<string, string> = {
