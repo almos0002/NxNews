@@ -6,7 +6,7 @@ import Footer from "@/app/_components/layout/Footer";
 import ArchiveLayout from "@/app/_components/article/ArchiveLayout";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 import JsonLd from "@/app/_components/seo/JsonLd";
-import { getDefaultOgImage } from "@/lib/seo/site-url";
+import { getDefaultOgImage, resolveBaseUrlSync } from "@/lib/seo/site-url";
 import {
   getPublicArticles,
   countPublicArticles,
@@ -25,14 +25,20 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const isNe = locale === "ne";
-  const { getSiteName } = await import("@/lib/cms/site-name");
-  const siteName = await getSiteName(locale);
+  const [s, og] = await Promise.all([
+    getAllSettings().catch(() => ({} as Record<string, string>)),
+    getDefaultOgImage(),
+  ]);
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const siteName = isNe
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
   const title = isNe ? "ताजा समाचार" : "Latest News";
   const description = isNe
     ? `${siteName} का सबैभन्दा ताजा र नयाँ समाचारहरू।`
     : `The most recent stories from ${siteName} — updated continuously.`;
-  const og = await getDefaultOgImage();
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     robots: { index: true, follow: true },
@@ -48,8 +54,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: "website",
-      url: `/${locale}/latest`,
+      url: `${baseUrl}/${locale}/latest`,
+      siteName,
       locale: isNe ? "ne_NP" : "en_US",
+      alternateLocale: isNe ? ["en_US"] : ["ne_NP"],
       images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {

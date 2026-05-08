@@ -13,7 +13,8 @@ import {
   getBreakingHeadline,
   PUBLIC_PAGE_SIZE,
 } from "@/lib/content/public";
-import { getDefaultOgImage } from "@/lib/seo/site-url";
+import { getDefaultOgImage, resolveBaseUrlSync } from "@/lib/seo/site-url";
+import { getAllSettings } from "@/lib/cms/settings";
 import styles from "./page.module.css";
 
 export const revalidate = 120;
@@ -34,26 +35,41 @@ function slugToName(slug: string): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, locale } = await params;
+  const isNe = locale === "ne";
   const name = slugToName(slug);
-  const { getSiteName } = await import("@/lib/cms/site-name");
-  const siteName = await getSiteName(locale);
+  const [s, og] = await Promise.all([
+    getAllSettings().catch(() => ({} as Record<string, string>)),
+    getDefaultOgImage(),
+  ]);
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const siteName = isNe
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
   const title = name;
-  const description = `Read articles by ${name} on ${siteName} — Nepal's multilingual news portal.`;
-  const og = await getDefaultOgImage();
+  const description = isNe
+    ? `${siteName} मा ${name} का लेखहरू पढ्नुहोस् — नेपालको बहुभाषी समाचार पोर्टल।`
+    : `Read articles by ${name} on ${siteName} — Nepal's multilingual news portal.`;
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}/author/${slug}`,
-      languages: { en: `/en/author/${slug}`, ne: `/ne/author/${slug}` },
+      languages: {
+        en: `/en/author/${slug}`,
+        ne: `/ne/author/${slug}`,
+        "x-default": `/en/author/${slug}`,
+      },
     },
     openGraph: {
       title,
       description,
       type: "profile",
-      url: `/${locale}/author/${slug}`,
-      locale: locale === "ne" ? "ne_NP" : "en_US",
+      url: `${baseUrl}/${locale}/author/${slug}`,
+      siteName,
+      locale: isNe ? "ne_NP" : "en_US",
+      alternateLocale: isNe ? ["en_US"] : ["ne_NP"],
       images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {

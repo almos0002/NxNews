@@ -14,7 +14,7 @@ import JsonLd from "@/app/_components/seo/JsonLd";
 import { auth } from "@/lib/auth/auth";
 import { isBookmarked } from "@/lib/auth/account";
 import { getAllSettings } from "@/lib/cms/settings";
-import { resolveBaseUrl, resolveBaseUrlSync, OG_DEFAULT_IMAGE } from "@/lib/seo/site-url";
+import { resolveBaseUrlSync, OG_DEFAULT_IMAGE } from "@/lib/seo/site-url";
 
 import {
   getPublicArticleBySlug,
@@ -31,17 +31,26 @@ type Props = { params: Promise<{ locale: string; id: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id, locale } = await params;
-  const article = await getPublicArticleBySlug(id, locale);
+  const [article, s] = await Promise.all([
+    getPublicArticleBySlug(id, locale),
+    getAllSettings().catch(() => ({} as Record<string, string>)),
+  ]);
   if (!article) return { title: "Article", robots: { index: false, follow: false } };
 
-  const baseUrl = await resolveBaseUrl();
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const siteName = locale === "ne"
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
   const title = article.title;
   const description = article.excerpt || article.title;
-  // Always provide an og:image — fall back to the site default if the article
-  // has no cover image. Without og:image, WhatsApp / iMessage / Slack show no
-  // link preview at all.
-  const ogImageUrl = article.imageUrl || `${baseUrl}${OG_DEFAULT_IMAGE.path}`;
   const canonicalPath = `/${locale}/article/${id}`;
+
+  // Only stamp default dimensions when using the shipped default OG image.
+  // For custom article images we don't know the real dimensions — reporting
+  // wrong values degrades share cards on Facebook / WhatsApp / Slack.
+  const ogImage = article.imageUrl
+    ? { url: article.imageUrl, alt: article.title }
+    : { url: `${baseUrl}${OG_DEFAULT_IMAGE.path}`, width: OG_DEFAULT_IMAGE.width, height: OG_DEFAULT_IMAGE.height, alt: article.title };
 
   return {
     metadataBase: new URL(baseUrl),
@@ -61,14 +70,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: "article",
       url: `${baseUrl}${canonicalPath}`,
-      images: [
-        {
-          url: ogImageUrl,
-          width: OG_DEFAULT_IMAGE.width,
-          height: OG_DEFAULT_IMAGE.height,
-          alt: article.title,
-        },
-      ],
+      siteName,
+      images: [ogImage],
       publishedTime: article.publishedAt || undefined,
       modifiedTime:  article.updatedAt   || undefined,
       section: article.category || undefined,
@@ -80,7 +83,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
-      images: [ogImageUrl],
+      images: [ogImage.url],
     },
   };
 }

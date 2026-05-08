@@ -7,7 +7,8 @@ import AdUnit from "@/app/_components/ads/AdUnit";
 import { getBreakingHeadline } from "@/lib/content/public";
 import { pool } from "@/lib/db/db";
 import { getLivePageViewCount } from "@/lib/cms/live-views";
-import { getDefaultOgImage } from "@/lib/seo/site-url";
+import { getDefaultOgImage, resolveBaseUrlSync } from "@/lib/seo/site-url";
+import { getAllSettings } from "@/lib/cms/settings";
 import ViewTracker from "@/app/_components/article/ViewTracker";
 import styles from "./live.module.css";
 
@@ -50,14 +51,20 @@ function isYoutubeUrl(url: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const isNe = locale === "ne";
-  const { getSiteName } = await import("@/lib/cms/site-name");
-  const siteName = await getSiteName(locale);
+  const [s, og] = await Promise.all([
+    getAllSettings().catch(() => ({} as Record<string, string>)),
+    getDefaultOgImage(),
+  ]);
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const siteName = isNe
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
   const title = isNe ? "सिधा प्रसारण" : "Live";
   const description = isNe
     ? `${siteName} को सिधा प्रसारण हेर्नुहोस् — नेपाल र विश्वका ताजा घटनाहरू।`
     : `Watch ${siteName} live streams and broadcasts — breaking news and events from Nepal and beyond.`;
-  const og = await getDefaultOgImage();
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     robots: { index: true, follow: true },
@@ -73,8 +80,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: "website",
-      url: `/${locale}/live`,
+      url: `${baseUrl}/${locale}/live`,
+      siteName,
       locale: isNe ? "ne_NP" : "en_US",
+      alternateLocale: isNe ? ["en_US"] : ["ne_NP"],
       images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {

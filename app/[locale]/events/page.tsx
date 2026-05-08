@@ -5,7 +5,7 @@ import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 import JsonLd from "@/app/_components/seo/JsonLd";
-import { getDefaultOgImage } from "@/lib/seo/site-url";
+import { getDefaultOgImage, resolveBaseUrlSync } from "@/lib/seo/site-url";
 import { Link } from "@/i18n/navigation";
 import { listEventPhotos, countEventPhotos } from "@/lib/cms/events";
 import { getBreakingHeadline } from "@/lib/content/public";
@@ -20,14 +20,20 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const isNe = locale === "ne";
-  const { getSiteName } = await import("@/lib/cms/site-name");
-  const siteName = await getSiteName(locale);
+  const [s, og] = await Promise.all([
+    getAllSettings().catch(() => ({} as Record<string, string>)),
+    getDefaultOgImage(),
+  ]);
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const siteName = isNe
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
   const title = isNe ? "कार्यक्रम फोटोहरू" : "Event Photos";
   const description = isNe
     ? `${siteName} द्वारा कभर गरिएका कार्यक्रम र समारोहका फोटो ग्यालेरीहरू।`
     : `Photo galleries from events and occasions covered by ${siteName}.`;
-  const og = await getDefaultOgImage();
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     robots: { index: true, follow: true },
@@ -43,8 +49,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: "website",
-      url: `/${locale}/events`,
+      url: `${baseUrl}/${locale}/events`,
+      siteName,
       locale: isNe ? "ne_NP" : "en_US",
+      alternateLocale: isNe ? ["en_US"] : ["ne_NP"],
       images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {

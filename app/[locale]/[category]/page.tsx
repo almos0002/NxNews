@@ -7,7 +7,7 @@ import Footer from "@/app/_components/layout/Footer";
 import ArchiveLayout from "@/app/_components/article/ArchiveLayout";
 import PaginationBar from "@/app/_components/article/PaginationBar";
 import JsonLd from "@/app/_components/seo/JsonLd";
-import { getDefaultOgImage } from "@/lib/seo/site-url";
+import { getDefaultOgImage, resolveBaseUrlSync } from "@/lib/seo/site-url";
 import {
   getPublicArticles,
   countPublicArticles,
@@ -52,17 +52,26 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, category } = await params;
-  const categories = await listCategories().catch(() => []);
+  const isNe = locale === "ne";
+  const [categories, s, og] = await Promise.all([
+    listCategories().catch(() => []),
+    getAllSettings().catch(() => ({} as Record<string, string>)),
+    getDefaultOgImage(),
+  ]);
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const siteName = isNe
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
   const cat = categories.find((c) => c.slug === category);
   const label = cat
-    ? (locale === "ne" ? cat.name_ne || cat.name_en : cat.name_en)
+    ? (isNe ? cat.name_ne || cat.name_en : cat.name_en)
     : category.charAt(0).toUpperCase() + category.slice(1);
-  const descriptions = locale === "ne" ? categoryDescriptionsNe : categoryDescriptionsEn;
+  const descriptions = isNe ? categoryDescriptionsNe : categoryDescriptionsEn;
   const description = descriptions[category as keyof typeof descriptions]
-    || (locale === "ne" ? `${label} समाचारहरू।` : `Latest ${label} news.`);
+    || (isNe ? `${label} समाचारहरू।` : `Latest ${label} news.`);
   const title = label;
-  const og = await getDefaultOgImage();
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     robots: { index: true, follow: true },
@@ -78,8 +87,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: "website",
-      url: `/${locale}/${category}`,
-      locale: locale === "ne" ? "ne_NP" : "en_US",
+      url: `${baseUrl}/${locale}/${category}`,
+      siteName,
+      locale: isNe ? "ne_NP" : "en_US",
+      alternateLocale: isNe ? ["en_US"] : ["ne_NP"],
       images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {

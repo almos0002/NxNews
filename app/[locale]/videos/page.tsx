@@ -6,25 +6,32 @@ import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
 import AdUnit from "@/app/_components/ads/AdUnit";
 import JsonLd from "@/app/_components/seo/JsonLd";
-import { getDefaultOgImage } from "@/lib/seo/site-url";
+import { getDefaultOgImage, resolveBaseUrlSync } from "@/lib/seo/site-url";
+import { getAllSettings } from "@/lib/cms/settings";
 import { Link } from "@/i18n/navigation";
 import { getPublicVideos, getBreakingHeadline } from "@/lib/content/public";
-import { getAllSettings } from "@/lib/cms/settings";
 import styles from "./videos.module.css";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "nav" });
-  const { getSiteName } = await import("@/lib/cms/site-name");
-  const siteName = await getSiteName(locale);
+  const isNe = locale === "ne";
+  const [t, s, og] = await Promise.all([
+    getTranslations({ locale, namespace: "nav" }),
+    getAllSettings().catch(() => ({} as Record<string, string>)),
+    getDefaultOgImage(),
+  ]);
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const siteName = isNe
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
   const title = t("videos");
-  const description = locale === "ne"
+  const description = isNe
     ? `${siteName} मा नेपाल र विश्वका समाचार भिडियोहरू हेर्नुहोस्।`
     : `Watch the latest news videos from Nepal and around the world on ${siteName}.`;
-  const og = await getDefaultOgImage();
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     robots: { index: true, follow: true },
@@ -40,8 +47,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: "website",
-      url: `/${locale}/videos`,
-      locale: locale === "ne" ? "ne_NP" : "en_US",
+      url: `${baseUrl}/${locale}/videos`,
+      siteName,
+      locale: isNe ? "ne_NP" : "en_US",
+      alternateLocale: isNe ? ["en_US"] : ["ne_NP"],
       images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {

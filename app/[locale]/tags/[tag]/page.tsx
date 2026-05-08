@@ -13,7 +13,8 @@ import {
   getBreakingHeadline,
   PUBLIC_PAGE_SIZE,
 } from "@/lib/content/public";
-import { getDefaultOgImage } from "@/lib/seo/site-url";
+import { getDefaultOgImage, resolveBaseUrlSync } from "@/lib/seo/site-url";
+import { getAllSettings } from "@/lib/cms/settings";
 
 export const revalidate = 120;
 
@@ -24,28 +25,43 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { tag, locale } = await params;
-  const tags = await getPublicTags(locale);
+  const isNe = locale === "ne";
+  const [tags, s, og] = await Promise.all([
+    getPublicTags(locale),
+    getAllSettings().catch(() => ({} as Record<string, string>)),
+    getDefaultOgImage(),
+  ]);
+  const baseUrl = resolveBaseUrlSync(s.seo_canonical_base_url);
+  const siteName = isNe
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
   const tagData = tags.find((t) => t.slug === tag);
   const label = tagData?.label ?? tag.replace(/-/g, " ");
-  const { getSiteName } = await import("@/lib/cms/site-name");
-  const siteName = await getSiteName(locale);
   const title = label;
-  const description = tagData?.description || `Articles tagged with "${label}" on ${siteName}.`;
-  const og = await getDefaultOgImage();
+  const description = isNe
+    ? (tagData?.description || `"${label}" ट्यागका लेखहरू ${siteName} मा पढ्नुहोस्।`)
+    : (tagData?.description || `Articles tagged with "${label}" on ${siteName}.`);
   return {
+    metadataBase: new URL(baseUrl),
     title,
     description,
     robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}/tags/${tag}`,
-      languages: { en: `/en/tags/${tag}`, ne: `/ne/tags/${tag}` },
+      languages: {
+        en: `/en/tags/${tag}`,
+        ne: `/ne/tags/${tag}`,
+        "x-default": `/en/tags/${tag}`,
+      },
     },
     openGraph: {
       title,
       description,
       type: "website",
-      url: `/${locale}/tags/${tag}`,
-      locale: locale === "ne" ? "ne_NP" : "en_US",
+      url: `${baseUrl}/${locale}/tags/${tag}`,
+      siteName,
+      locale: isNe ? "ne_NP" : "en_US",
+      alternateLocale: isNe ? ["en_US"] : ["ne_NP"],
       images: [{ url: og.url, width: og.width, height: og.height, alt: title }],
     },
     twitter: {

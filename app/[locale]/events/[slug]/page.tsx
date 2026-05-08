@@ -31,6 +31,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // platforms (WhatsApp / Slack / Twitter) can still render a link preview.
   const ogImageUrl = event.cover_image || `${baseUrl}${OG_DEFAULT_IMAGE.path}`;
 
+  const s = await getAllSettings().catch(() => ({} as Record<string, string>));
+  const siteName = isNe
+    ? (s.site_title_ne || s.site_title_en || "KumariHub")
+    : (s.site_title_en || "KumariHub");
+
+  // Only stamp known dimensions for the shipped default OG image.
+  // Custom event cover images may be any size — lying about dimensions
+  // degrades preview cards on Facebook / WhatsApp.
+  const ogImage = event.cover_image
+    ? { url: ogImageUrl, alt: title }
+    : { url: ogImageUrl, width: OG_DEFAULT_IMAGE.width, height: OG_DEFAULT_IMAGE.height, alt: title };
+
   return {
     metadataBase: new URL(baseUrl),
     title,
@@ -49,8 +61,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: "website",
       url: `${baseUrl}/${locale}/events/${slug}`,
+      siteName,
       locale: isNe ? "ne_NP" : "en_US",
-      images: [{ url: ogImageUrl, width: OG_DEFAULT_IMAGE.width, height: OG_DEFAULT_IMAGE.height, alt: title }],
+      alternateLocale: isNe ? ["en_US"] : ["ne_NP"],
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
