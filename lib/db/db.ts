@@ -68,7 +68,7 @@ export const pool = new Pool({
   connectionTimeoutMillis: 15_000,
   allowExitOnIdle: true,
   keepAlive: !useNeon,
-  ...(useNeon
+  ...(!usePooler && useNeon
     ? {
         options: `-c statement_timeout=10000`,
       }

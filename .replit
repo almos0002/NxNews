@@ -35,6 +35,7 @@ outputType = "webview"
 
 [userenv.shared]
 BETTER_AUTH_SECRET = "PmD-nYWVE9diveyMBGQdwKEz30Dfn_60d0kNPABHKnbyzQreXKbFoAZfEJi5Dv-3"
+NEON_DATABASE_URL = "postgresql://neondb_owner:npg_x1hca9ZWyFQw@ep-tiny-salad-ap6nadv2-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 [[ports]]
 localPort = 5000
