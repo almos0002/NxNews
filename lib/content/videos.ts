@@ -34,13 +34,14 @@ export function youtubeThumbnail(url: string): string {
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
 }
 
+const VIDEO_COLS = `id, title_en, title_ne, youtube_url, description_en, description_ne,
+  thumbnail, category, duration, status, author_id, created_at, updated_at, view_count`;
+
 export async function listVideos(opts?: { limit?: number; offset?: number }): Promise<Video[]> {
-  // Default lowered from 1000→50. Full content fields are present here since
-  // videos don't have separate large content blobs (description is short).
   const limit = opts?.limit ?? 50;
   const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
-    "SELECT * FROM videos ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+    `SELECT ${VIDEO_COLS} FROM videos ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
     [limit, offset]
   );
   return rows;
@@ -52,7 +53,7 @@ export async function countVideos(): Promise<number> {
 }
 
 export async function getVideoById(id: string): Promise<Video | null> {
-  const { rows } = await pool.query("SELECT * FROM videos WHERE id=$1", [id]);
+  const { rows } = await pool.query(`SELECT ${VIDEO_COLS} FROM videos WHERE id=$1`, [id]);
   return rows[0] ?? null;
 }
 

@@ -32,8 +32,11 @@ export async function countPages(): Promise<number> {
   return rows[0]?.cnt ?? 0;
 }
 
+const PAGE_FULL_COLS = `id, title_en, title_ne, slug, content_en, content_ne,
+  status, author_id, created_at, updated_at, view_count`;
+
 export async function getPageById(id: string): Promise<Page | null> {
-  const { rows } = await pool.query("SELECT * FROM pages WHERE id=$1", [id]);
+  const { rows } = await pool.query(`SELECT ${PAGE_FULL_COLS} FROM pages WHERE id=$1`, [id]);
   return rows[0] ?? null;
 }
 

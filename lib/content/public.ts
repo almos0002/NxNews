@@ -162,13 +162,23 @@ export async function getPublicArticles(
   });
 }
 
+// Full article columns — includes content blobs, only used on the single-article page.
+const ARTICLE_FULL_COLS = `
+  a.id, a.title_en, a.title_ne, a.slug,
+  a.excerpt_en, a.excerpt_ne,
+  a.content_en, a.content_ne,
+  a.category, a.tags, a.status,
+  a.featured_image, a.author_id,
+  a.published_at, a.created_at, a.updated_at,
+  a.view_count, a.is_featured
+`.trim();
+
 export async function getPublicArticleBySlug(
   slug: string,
   locale: string
 ): Promise<(PublicArticle & { content: string; tags: string[]; publishedAt: string | null; updatedAt: string | null }) | null> {
-  // Full content is needed here — intentionally select a.* for the article page.
   const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name
+    `SELECT ${ARTICLE_FULL_COLS}, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.slug = $1 AND a.status = 'published'`,
@@ -194,17 +204,20 @@ export async function getRelatedPublicArticles(
   locale: string,
   limit = 4
 ): Promise<PublicArticle[]> {
-  const { rows } = await pool.query(
-    `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
-     FROM article a
-     LEFT JOIN "user" u ON u.id = a.author_id
-     WHERE a.status = 'published' AND a.slug != $1
-       AND LOWER(a.category) = LOWER($2)
-     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
-     LIMIT $3`,
-    [slug, category, limit]
-  );
-  return rows.map((r) => mapArticle(r, locale));
+  const key = `related:${locale}:${category}:${limit}`;
+  return cached(key, 120_000, async () => {
+    const { rows } = await pool.query(
+      `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
+       FROM article a
+       LEFT JOIN "user" u ON u.id = a.author_id
+       WHERE a.status = 'published' AND a.slug != $1
+         AND LOWER(a.category) = LOWER($2)
+       ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
+       LIMIT $3`,
+      [slug, category, limit]
+    );
+    return rows.map((r) => mapArticle(r, locale));
+  });
 }
 
 async function tagAliases(tagSlug: string): Promise<string[]> {
@@ -474,17 +487,19 @@ export async function getPublicVideoById(
 export async function getAuthorInfo(
   authorName: string
 ): Promise<{ id: string; name: string; role: string; bio: string; twitter?: string; linkedin?: string } | null> {
-  const { rows } = await pool.query(
-    `SELECT id, name, bio FROM "user" WHERE LOWER(name) = LOWER($1) LIMIT 1`,
-    [authorName]
-  );
-  if (!rows[0]) return null;
-  return {
-    id: rows[0].id,
-    name: rows[0].name,
-    role: "Contributor",
-    bio: rows[0].bio || `${rows[0].name} is a contributor to KumariHub.`,
-  };
+  return cached(`author:${authorName.toLowerCase()}`, 300_000, async () => {
+    const { rows } = await pool.query(
+      `SELECT id, name, bio FROM "user" WHERE LOWER(name) = LOWER($1) LIMIT 1`,
+      [authorName]
+    );
+    if (!rows[0]) return null;
+    return {
+      id: rows[0].id,
+      name: rows[0].name,
+      role: "Contributor",
+      bio: rows[0].bio || `${rows[0].name} is a contributor to KumariHub.`,
+    };
+  });
 }
 
 export async function getActiveLiveCount(): Promise<number> {
