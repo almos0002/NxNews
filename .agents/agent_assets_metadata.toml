@@ -6,3 +6,9 @@ id = "txj8QBljuJnoT-WhDlioS"
 uri = "file://SEO_AUDIT.md"
 type = "text"
 title = "KumariHub — Full SEO Audit"
+
+[[outputs]]
+id = "VjZ7TYvsE4vVNeBsX5e-_"
+uri = "file://backups/neon_backup_20260520_090549.dump.gz"
+type = "unspecified"
+title = "Neon Database Backup — neon_backup_20260520_090549.dump.gz (3.2 MB)"
