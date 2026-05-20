@@ -94,13 +94,19 @@ export default async function LocaleHomePage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
-  const [allArticles, featuredArticles, headlines, liveCount, topStories, culturalArticles] = await Promise.all([
-    getPublicArticles(locale, { limit: 50 }),
+  const [
+    allArticles, featuredArticles, headlines, liveCount, topStories,
+    culturalArticles, businessArticles, techArticles, entertainmentArticles,
+  ] = await Promise.all([
+    getPublicArticles(locale, { limit: 20 }),
     getFeaturedArticles(locale),
     getBreakingHeadlines(locale, 10),
     getActiveLiveCount(),
     getTopStoriesArticles(locale, 12),
     getPublicArticles(locale, { limit: 15, category: "cultural" }),
+    getPublicArticles(locale, { limit: 5, category: "business" }),
+    getPublicArticles(locale, { limit: 5, category: "technology" }),
+    getPublicArticles(locale, { limit: 5, category: "entertainment" }),
   ]);
 
   const featuredPool = featuredArticles.length >= 1 ? featuredArticles : allArticles;
@@ -109,20 +115,9 @@ export default async function LocaleHomePage({ params }: Props) {
   const latest = allArticles.slice(0, 8);
   const picks = allArticles.slice(2, 6);
 
-  const business = allArticles.filter(
-    (a) => a.category.toLowerCase() === "business"
-  );
-  const tech = allArticles.filter(
-    (a) => a.category.toLowerCase() === "technology"
-  );
-
-  const entertainment = allArticles.filter(
-    (a) => a.category.toLowerCase() === "entertainment"
-  );
-
   const categoryColumns = [
-    { label: tNav("business"), articles: business.slice(0, 5), href: "/business" },
-    { label: tNav("technology"), articles: tech.slice(0, 5), href: "/technology" },
+    { label: tNav("business"), articles: businessArticles, href: "/business" },
+    { label: tNav("technology"), articles: techArticles, href: "/technology" },
     { label: t("aroundTheWorld"), articles: allArticles.slice(0, 5), href: "/world" },
   ];
 
@@ -223,7 +218,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </section>
 
         <section className={styles.section}>
-          <EntertainmentSection articles={entertainment} />
+          <EntertainmentSection articles={entertainmentArticles} />
         </section>
 
         <section className={styles.section}>

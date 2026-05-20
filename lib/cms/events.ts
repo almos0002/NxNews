@@ -38,25 +38,32 @@ export async function listEventPhotos(opts?: {
   limit?: number;
   offset?: number;
   status?: "published" | "draft" | "all";
+  excludeSlug?: string;
 }): Promise<EventPhoto[]> {
   await ensureTable();
-  const limit = opts?.limit ?? 100;
+  const limit = opts?.limit ?? 30;
   const offset = opts?.offset ?? 0;
   const st = opts?.status ?? "all";
+  const excludeSlug = opts?.excludeSlug;
 
   const COLS = `id, title_en, title_ne, description_en, description_ne,
     location_en, location_ne, event_date, cover_image, images, slug,
     status, view_count, created_at, updated_at`;
+
   if (st === "all") {
+    const params: unknown[] = [limit, offset];
+    const excl = excludeSlug ? `WHERE slug != $${params.push(excludeSlug)}` : "";
     const { rows } = await pool.query(
-      `SELECT ${COLS} FROM event_photos ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
-      [limit, offset]
+      `SELECT ${COLS} FROM event_photos ${excl} ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
+      params
     );
     return rows.map(row);
   }
+  const params: unknown[] = [st, limit, offset];
+  const excl = excludeSlug ? `AND slug != $${params.push(excludeSlug)}` : "";
   const { rows } = await pool.query(
-    `SELECT ${COLS} FROM event_photos WHERE status=$1 ORDER BY event_date DESC NULLS LAST, created_at DESC LIMIT $2 OFFSET $3`,
-    [st, limit, offset]
+    `SELECT ${COLS} FROM event_photos WHERE status=$1 ${excl} ORDER BY event_date DESC NULLS LAST, created_at DESC LIMIT $2 OFFSET $3`,
+    params
   );
   return rows.map(row);
 }

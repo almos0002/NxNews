@@ -7,7 +7,7 @@ import Header from "@/app/_components/layout/Header";
 import Footer from "@/app/_components/layout/Footer";
 import AdUnit from "@/app/_components/ads/AdUnit";
 import { Link } from "@/i18n/navigation";
-import { getPublicVideos, getPublicVideoById, getBreakingHeadline } from "@/lib/content/public";
+import { getRelatedVideos, getPublicVideoById, getBreakingHeadline } from "@/lib/content/public";
 import { resolveBaseUrl, getDefaultOgImage } from "@/lib/seo/site-url";
 import { extractYoutubeId } from "@/lib/content/videos";
 import ViewTracker from "@/app/_components/article/ViewTracker";
@@ -76,15 +76,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function VideoDetailPage({ params }: Props) {
   const { locale, id } = await params;
 
-  const [video, allVideos, headline] = await Promise.all([
+  const [video, headline] = await Promise.all([
     getPublicVideoById(id, locale),
-    getPublicVideos(locale),
     getBreakingHeadline(locale),
   ]);
 
   if (!video) notFound();
 
-  const related = allVideos.filter((v) => v.id !== id).slice(0, 4);
+  const related = await getRelatedVideos(id, locale, 4);
   const t = await getTranslations({ locale, namespace: "home" });
 
   return (

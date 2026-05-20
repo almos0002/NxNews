@@ -1,4 +1,5 @@
 import { pool } from "../db/db";
+import { cached, invalidate } from "../cache/memory";
 
 export interface AdSlotConfig {
   slot: string;
@@ -25,6 +26,8 @@ const DIMS_MAP: Record<string, { width: number; height: number }> = Object.fromE
   DEFAULT_SLOTS.map((s) => [s.slot, { width: s.width, height: s.height }])
 );
 
+const ADS_TTL = 5 * 60_000;
+
 async function seedDefaultSlots(): Promise<void> {
   for (const s of DEFAULT_SLOTS) {
     await pool.query(
@@ -40,32 +43,39 @@ export async function initAdsTable(): Promise<void> {
 }
 
 export async function getAllAds(): Promise<AdSlotConfig[]> {
-  let { rows } = await pool.query(
-    "SELECT slot, enabled, code, width, height, updated_at FROM ads ORDER BY slot"
-  );
-
-  if (rows.length === 0) {
-    await seedDefaultSlots();
-    ({ rows } = await pool.query(
+  return cached("ads:all", ADS_TTL, async () => {
+    let { rows } = await pool.query(
       "SELECT slot, enabled, code, width, height, updated_at FROM ads ORDER BY slot"
-    ));
-  }
+    );
 
-  return rows.map((r) => ({
-    ...r,
-    label: LABEL_MAP[r.slot] ?? r.slot,
-    width:  DIMS_MAP[r.slot]?.width  ?? r.width,
-    height: DIMS_MAP[r.slot]?.height ?? r.height,
-  }));
+    if (rows.length === 0) {
+      await seedDefaultSlots();
+      ({ rows } = await pool.query(
+        "SELECT slot, enabled, code, width, height, updated_at FROM ads ORDER BY slot"
+      ));
+    }
+
+    return rows.map((r) => ({
+      ...r,
+      label: LABEL_MAP[r.slot] ?? r.slot,
+      width:  DIMS_MAP[r.slot]?.width  ?? r.width,
+      height: DIMS_MAP[r.slot]?.height ?? r.height,
+    }));
+  });
 }
 
 export async function getAd(slot: string): Promise<AdSlotConfig | null> {
-  try {
-    const { rows } = await pool.query("SELECT slot, enabled, code, width, height, updated_at FROM ads WHERE slot=$1", [slot]);
-    return rows[0] ?? null;
-  } catch {
-    return null;
-  }
+  return cached(`ads:slot:${slot}`, ADS_TTL, async () => {
+    try {
+      const { rows } = await pool.query(
+        "SELECT slot, enabled, code, width, height, updated_at FROM ads WHERE slot=$1",
+        [slot]
+      );
+      return rows[0] ?? null;
+    } catch {
+      return null;
+    }
+  });
 }
 
 export async function updateAd(
@@ -82,8 +92,12 @@ export async function updateAd(
   fields.push("updated_at=NOW()");
 
   const { rows } = await pool.query(
-    `UPDATE ads SET ${fields.join(", ")} WHERE slot=$1 RETURNING *`,
+    `UPDATE ads SET ${fields.join(", ")} WHERE slot=$1
+     RETURNING slot, enabled, code, width, height, updated_at`,
     params
   );
+
+  invalidate("ads:");
+
   return rows[0] ?? null;
 }

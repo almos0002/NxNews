@@ -79,9 +79,9 @@ export default async function EventGalleryPage({ params }: Props) {
   const { locale, slug } = await params;
   const isNe = locale === "ne";
 
-  const [event, related, headline, settings] = await Promise.all([
+  const [event, relatedEvents, headline, settings] = await Promise.all([
     getEventPhotoBySlug(slug),
-    listEventPhotos({ limit: 4, status: "published" }),
+    listEventPhotos({ limit: 3, status: "published", excludeSlug: slug }),
     getBreakingHeadline(locale),
     getAllSettings().catch(() => ({} as Record<string, string>)),
   ]);
@@ -91,8 +91,6 @@ export default async function EventGalleryPage({ params }: Props) {
   const title = isNe && event.title_ne ? event.title_ne : event.title_en;
   const description = isNe ? event.description_ne : event.description_en;
   const location = isNe && event.location_ne ? event.location_ne : event.location_en;
-
-  const relatedEvents = related.filter((r) => r.id !== event.id).slice(0, 3);
 
   // Absolute URLs in JSON-LD play best with Schema.org validators / Google
   // Rich Results — relative URLs require the parser to know the page origin.

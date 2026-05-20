@@ -78,9 +78,19 @@ export async function listArticles(opts?: {
   return rows;
 }
 
+const ARTICLE_FULL_COLS = `
+  a.id, a.title_en, a.title_ne, a.slug,
+  a.excerpt_en, a.excerpt_ne,
+  a.content_en, a.content_ne,
+  a.category, a.tags, a.status,
+  a.featured_image, a.author_id,
+  a.published_at, a.created_at, a.updated_at,
+  a.view_count, a.is_featured
+`.trim();
+
 export async function getArticleById(id: string): Promise<ArticleWithAuthor | null> {
   const { rows } = await pool.query<ArticleWithAuthor>(
-    `SELECT a.*, u.name AS author_name
+    `SELECT ${ARTICLE_FULL_COLS}, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.id = $1`,
@@ -91,7 +101,7 @@ export async function getArticleById(id: string): Promise<ArticleWithAuthor | nu
 
 export async function getArticleBySlug(slug: string): Promise<ArticleWithAuthor | null> {
   const { rows } = await pool.query<ArticleWithAuthor>(
-    `SELECT a.*, u.name AS author_name
+    `SELECT ${ARTICLE_FULL_COLS}, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.slug = $1`,
@@ -123,7 +133,10 @@ export async function createArticle(input: ArticleInput): Promise<Article> {
         content_en, content_ne, category, tags, status,
         featured_image, author_id, published_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
-     RETURNING *`,
+     RETURNING id, title_en, title_ne, slug, excerpt_en, excerpt_ne,
+               content_en, content_ne, category, tags, status,
+               featured_image, author_id, published_at,
+               created_at, updated_at, view_count, is_featured`,
     [
       input.title_en, input.title_ne, input.slug,
       input.excerpt_en, input.excerpt_ne,
@@ -161,7 +174,11 @@ export async function updateArticle(
   values.push(id);
 
   const { rows } = await pool.query<Article>(
-    `UPDATE article SET ${sets.join(", ")} WHERE id = $${idx} RETURNING *`,
+    `UPDATE article SET ${sets.join(", ")} WHERE id = $${idx}
+     RETURNING id, title_en, title_ne, slug, excerpt_en, excerpt_ne,
+               content_en, content_ne, category, tags, status,
+               featured_image, author_id, published_at,
+               created_at, updated_at, view_count, is_featured`,
     values
   );
   return rows[0] ?? null;

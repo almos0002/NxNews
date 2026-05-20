@@ -221,11 +221,13 @@ export async function getRelatedPublicArticles(
 }
 
 async function tagAliases(tagSlug: string): Promise<string[]> {
-  const tags = await listTags();
-  const match = tags.find((t) => t.slug.toLowerCase() === tagSlug.toLowerCase());
-  if (!match) return [tagSlug];
+  const { rows } = await pool.query(
+    `SELECT slug, name_en, name_ne FROM tags WHERE LOWER(slug) = LOWER($1) LIMIT 1`,
+    [tagSlug]
+  );
+  if (!rows[0]) return [tagSlug];
   return Array.from(new Set(
-    [match.slug, match.name_en, match.name_ne].filter(Boolean) as string[],
+    [rows[0].slug, rows[0].name_en, rows[0].name_ne].filter(Boolean) as string[],
   ));
 }
 
@@ -464,6 +466,26 @@ export async function getPublicVideos(locale: string, limit = 20): Promise<Publi
     );
     return rows.map((r) => mapVideo(r, locale));
   });
+}
+
+export async function getRelatedVideos(
+  excludeId: string,
+  locale: string,
+  limit = 4
+): Promise<PublicVideo[]> {
+  const { rows } = await pool.query(
+    `SELECT v.id, v.title_en, v.title_ne, v.description_en, v.description_ne,
+            v.youtube_url, v.thumbnail, v.category, v.duration,
+            v.status, v.created_at, v.view_count,
+            u.name AS author_name
+     FROM videos v
+     LEFT JOIN "user" u ON u.id = v.author_id
+     WHERE v.status = 'published' AND v.id != $1
+     ORDER BY v.created_at DESC
+     LIMIT $2`,
+    [excludeId, limit]
+  );
+  return rows.map((r) => mapVideo(r, locale));
 }
 
 export async function getPublicVideoById(

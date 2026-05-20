@@ -10,10 +10,20 @@ export async function GET(req: NextRequest) {
     const role = (session.user as { role?: string }).role ?? "user";
     if (role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const { rows } = await pool.query(
-      `SELECT id, name, email, role, "createdAt", "banned", "banReason" FROM "user" ORDER BY "createdAt" DESC`
-    );
-    return NextResponse.json({ users: rows });
+    const url = new URL(req.url);
+    const limit = Math.min(parseInt(url.searchParams.get("limit") ?? "100", 10), 500);
+    const page  = Math.max(parseInt(url.searchParams.get("page")  ?? "1",   10), 1);
+    const offset = (page - 1) * limit;
+
+    const [{ rows }, { rows: countRows }] = await Promise.all([
+      pool.query(
+        `SELECT id, name, email, role, "createdAt", "banned", "banReason"
+         FROM "user" ORDER BY "createdAt" DESC LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      pool.query(`SELECT COUNT(*)::int AS total FROM "user"`),
+    ]);
+    return NextResponse.json({ users: rows, total: countRows[0].total, page, limit });
   } catch (err) {
     console.error("[GET /api/users]", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
