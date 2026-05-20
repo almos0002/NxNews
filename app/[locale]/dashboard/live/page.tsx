@@ -11,7 +11,9 @@ export const metadata: Metadata = { title: "Live Streams" };
 async function getStreams() {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM live_streams ORDER BY display_order ASC, created_at DESC"
+      `SELECT id, title_en, title_ne, description_en, description_ne,
+              stream_url, platform, is_active, display_order, created_at, updated_at
+       FROM live_streams ORDER BY display_order ASC, created_at DESC`
     );
     return rows;
   } catch {

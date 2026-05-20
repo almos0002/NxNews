@@ -47,7 +47,10 @@ export async function listMenuItems(menu_type?: string): Promise<MenuItem[]> {
       const where = menu_type ? "WHERE m.menu_type=$1" : "";
       const params = menu_type ? [menu_type] : [];
       const { rows } = await pool.query(
-        `SELECT m.*, p.slug AS page_slug, p.title_en AS page_title_en
+        `SELECT m.id, m.menu_type, m.label_en, m.label_ne, m.link_type,
+                m.page_id, m.url, m.sort_order, m.open_new_tab,
+                m.section_label_en, m.section_label_ne, m.created_at,
+                p.slug AS page_slug, p.title_en AS page_title_en
          FROM menu_items m
          LEFT JOIN pages p ON m.page_id = p.id
          ${where}

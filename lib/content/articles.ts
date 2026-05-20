@@ -58,8 +58,16 @@ export async function listArticles(opts?: {
   const limit = opts?.limit ?? 50;
   const offset = opts?.offset ?? 0;
 
+  // Exclude content_en / content_ne from list queries — large HTML blobs not
+  // needed in admin article list views. Full content is fetched by getArticleById/Slug.
   const { rows } = await pool.query<ArticleWithAuthor>(
-    `SELECT a.*, u.name AS author_name
+    `SELECT a.id, a.title_en, a.title_ne, a.slug,
+            a.excerpt_en, a.excerpt_ne,
+            a.category, a.tags, a.status,
+            a.featured_image, a.author_id,
+            a.published_at, a.created_at, a.updated_at,
+            a.view_count, a.is_featured,
+            u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      ${where}

@@ -4,6 +4,18 @@ import { cached } from "../cache/memory";
 
 const FALLBACK_IMAGE = "/og-default.png";
 
+// Columns needed for list views — deliberately excludes content_en / content_ne
+// (large HTML blobs) to reduce egress. Full content is only fetched by
+// getPublicArticleBySlug for the single-article page.
+const ARTICLE_LIST_COLS = `
+  a.id, a.title_en, a.title_ne, a.slug,
+  a.excerpt_en, a.excerpt_ne,
+  a.category, a.tags, a.status,
+  a.featured_image, a.author_id,
+  a.published_at, a.created_at, a.updated_at,
+  a.view_count, a.is_featured
+`.trim();
+
 function sanitizeImageUrl(raw: string): string {
   if (!raw || !raw.trim()) return FALLBACK_IMAGE;
   try {
@@ -44,9 +56,9 @@ export interface PublicVideo {
   viewCount?: number;
 }
 
-function estimateReadTime(html: string): string {
-  const text = html.replace(/<[^>]+>/g, " ");
-  const words = text.split(/\s+/).filter(Boolean).length;
+function estimateReadTime(text: string): string {
+  const plain = text.replace(/<[^>]+>/g, " ");
+  const words = plain.split(/\s+/).filter(Boolean).length;
   return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }
 
@@ -70,7 +82,11 @@ function mapArticle(row: Record<string, unknown>, locale: string): PublicArticle
   const isNe = locale === "ne";
   const title = (isNe && row.title_ne) ? String(row.title_ne) : String(row.title_en ?? "");
   const excerpt = (isNe && row.excerpt_ne) ? String(row.excerpt_ne) : String(row.excerpt_en ?? "");
-  const content = (isNe && row.content_ne) ? String(row.content_ne) : String(row.content_en ?? "");
+  // For list queries content_en/content_ne are not fetched — estimate from excerpt.
+  const contentForReadTime =
+    (row.content_en != null || row.content_ne != null)
+      ? String((isNe && row.content_ne) ? row.content_ne : (row.content_en ?? ""))
+      : excerpt;
   return {
     id: String(row.slug ?? row.id),
     rawId: String(row.id),
@@ -80,7 +96,7 @@ function mapArticle(row: Record<string, unknown>, locale: string): PublicArticle
     author: String(row.author_name ?? "KumariHub"),
     date: formatDate(row.created_at as string),
     time: formatTime(row.created_at as string),
-    readTime: estimateReadTime(content),
+    readTime: estimateReadTime(contentForReadTime),
     imageUrl: sanitizeImageUrl(String(row.featured_image ?? "")),
     viewCount: typeof row.view_count === "number" ? row.view_count : parseInt(String(row.view_count ?? "0"), 10),
   };
@@ -105,7 +121,7 @@ function mapVideo(row: Record<string, unknown>, locale: string): PublicVideo {
 export async function getFeaturedArticles(locale: string): Promise<PublicArticle[]> {
   return cached(`featured:${locale}`, 60_000, async () => {
     const { rows } = await pool.query(
-      `SELECT a.*, u.name AS author_name
+      `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
        FROM article a
        LEFT JOIN "user" u ON u.id = a.author_id
        WHERE a.status = 'published' AND a.is_featured = true
@@ -134,7 +150,7 @@ export async function getPublicArticles(
     }
     const where = `WHERE ${conditions.join(" AND ")}`;
     const { rows } = await pool.query(
-      `SELECT a.*, u.name AS author_name
+      `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
        FROM article a
        LEFT JOIN "user" u ON u.id = a.author_id
        ${where}
@@ -150,6 +166,7 @@ export async function getPublicArticleBySlug(
   slug: string,
   locale: string
 ): Promise<(PublicArticle & { content: string; tags: string[]; publishedAt: string | null; updatedAt: string | null }) | null> {
+  // Full content is needed here — intentionally select a.* for the article page.
   const { rows } = await pool.query(
     `SELECT a.*, u.name AS author_name
      FROM article a
@@ -178,7 +195,7 @@ export async function getRelatedPublicArticles(
   limit = 4
 ): Promise<PublicArticle[]> {
   const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name
+    `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.status = 'published' AND a.slug != $1
@@ -191,8 +208,6 @@ export async function getRelatedPublicArticles(
 }
 
 async function tagAliases(tagSlug: string): Promise<string[]> {
-  // article.tags is a free-form text[] of slugs/names, so look up every
-  // historical form (slug + localized names) for the given tag slug.
   const tags = await listTags();
   const match = tags.find((t) => t.slug.toLowerCase() === tagSlug.toLowerCase());
   if (!match) return [tagSlug];
@@ -210,7 +225,7 @@ export async function getPublicArticlesByTag(
   const offset = opts?.offset ?? 0;
   const aliases = await tagAliases(tag);
   const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name
+    `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.status = 'published'
@@ -233,7 +248,7 @@ export async function getPublicArticlesByAuthorName(
   const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name
+    `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.status = 'published' AND LOWER(u.name) = LOWER($1)
@@ -253,7 +268,7 @@ export async function searchPublicArticles(
   const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name,
+    `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name,
             ts_rank(
               to_tsvector('simple',
                 coalesce(a.title_en,'')   || ' ' ||
@@ -289,10 +304,8 @@ export async function getTrendingArticles(
   limit = 8
 ): Promise<PublicArticle[]> {
   return cached(`trending:${locale}:${limit}`, 120_000, async () => {
-    // Hot-score: view_count / (hours_since_published + 2)^1.5
-    // Window: last 7 days so only recent articles can trend
     const { rows } = await pool.query(
-      `SELECT a.*, u.name AS author_name
+      `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
        FROM article a
        LEFT JOIN "user" u ON u.id = a.author_id
        WHERE a.status = 'published'
@@ -308,12 +321,11 @@ export async function getTrendingArticles(
        LIMIT $1`,
       [limit]
     );
-    // Fall back to recency if not enough results in the 7-day window
     if (rows.length >= Math.min(limit, 3)) {
       return rows.map((r) => mapArticle(r, locale));
     }
     const { rows: fallback } = await pool.query(
-      `SELECT a.*, u.name AS author_name
+      `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
        FROM article a
        LEFT JOIN "user" u ON u.id = a.author_id
        WHERE a.status = 'published'
@@ -330,9 +342,8 @@ export async function getTopStoriesArticles(
   limit = 12
 ): Promise<PublicArticle[]> {
   return cached(`top_stories:${locale}:${limit}`, 300_000, async () => {
-    // Most-viewed articles published in the last 30 days
     const { rows } = await pool.query(
-      `SELECT a.*, u.name AS author_name
+      `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
        FROM article a
        LEFT JOIN "user" u ON u.id = a.author_id
        WHERE a.status = 'published'
@@ -341,12 +352,11 @@ export async function getTopStoriesArticles(
        LIMIT $1`,
       [limit]
     );
-    // Fall back to recency if not enough articles in last 30 days
     if (rows.length >= Math.min(limit, 3)) {
       return rows.map((r) => mapArticle(r, locale));
     }
     const { rows: fallback } = await pool.query(
-      `SELECT a.*, u.name AS author_name
+      `SELECT ${ARTICLE_LIST_COLS}, u.name AS author_name
        FROM article a
        LEFT JOIN "user" u ON u.id = a.author_id
        WHERE a.status = 'published'
@@ -416,8 +426,6 @@ export async function getBreakingHeadlines(
 export async function getPublicTags(
   locale: string = "en",
 ): Promise<{ slug: string; label: string; description: string }[]> {
-  // Read through the same cached helper the admin uses so both surfaces
-  // see the same data and revalidate together.
   const tags = await listTags();
   const isNe = locale === "ne";
   return tags.map((t) => ({
@@ -427,14 +435,19 @@ export async function getPublicTags(
   }));
 }
 
-export async function getPublicVideos(locale: string): Promise<PublicVideo[]> {
-  return cached(`videos:${locale}`, 120_000, async () => {
+export async function getPublicVideos(locale: string, limit = 20): Promise<PublicVideo[]> {
+  return cached(`videos:${locale}:${limit}`, 120_000, async () => {
     const { rows } = await pool.query(
-      `SELECT v.*, u.name AS author_name
+      `SELECT v.id, v.title_en, v.title_ne, v.description_en, v.description_ne,
+              v.youtube_url, v.thumbnail, v.category, v.duration,
+              v.status, v.created_at, v.view_count,
+              u.name AS author_name
        FROM videos v
        LEFT JOIN "user" u ON u.id = v.author_id
        WHERE v.status = 'published'
-       ORDER BY v.created_at DESC`
+       ORDER BY v.created_at DESC
+       LIMIT $1`,
+      [limit]
     );
     return rows.map((r) => mapVideo(r, locale));
   });
@@ -445,7 +458,10 @@ export async function getPublicVideoById(
   locale: string
 ): Promise<PublicVideo | null> {
   const { rows } = await pool.query(
-    `SELECT v.*, u.name AS author_name
+    `SELECT v.id, v.title_en, v.title_ne, v.description_en, v.description_ne,
+            v.youtube_url, v.thumbnail, v.category, v.duration,
+            v.status, v.created_at, v.view_count,
+            u.name AS author_name
      FROM videos v
      LEFT JOIN "user" u ON u.id = v.author_id
      WHERE v.id = $1`,

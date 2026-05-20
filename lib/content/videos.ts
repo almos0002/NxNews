@@ -35,7 +35,9 @@ export function youtubeThumbnail(url: string): string {
 }
 
 export async function listVideos(opts?: { limit?: number; offset?: number }): Promise<Video[]> {
-  const limit = opts?.limit ?? 1000;
+  // Default lowered from 1000→50. Full content fields are present here since
+  // videos don't have separate large content blobs (description is short).
+  const limit = opts?.limit ?? 50;
   const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
     "SELECT * FROM videos ORDER BY created_at DESC LIMIT $1 OFFSET $2",

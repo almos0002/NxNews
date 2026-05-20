@@ -15,10 +15,13 @@ export interface Page {
 }
 
 export async function listPages(opts?: { limit?: number; offset?: number }): Promise<Page[]> {
-  const limit = opts?.limit ?? 1000;
+  // Default lowered from 1000→50 to avoid bulk-fetching large content_en/content_ne blobs.
+  // Full content is only needed for a single page (getPageById).
+  const limit = opts?.limit ?? 50;
   const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
-    "SELECT * FROM pages ORDER BY updated_at DESC LIMIT $1 OFFSET $2",
+    `SELECT id, title_en, title_ne, slug, status, author_id, created_at, updated_at, view_count
+     FROM pages ORDER BY updated_at DESC LIMIT $1 OFFSET $2`,
     [limit, offset]
   );
   return rows;

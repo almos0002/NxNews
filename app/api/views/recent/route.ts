@@ -40,8 +40,14 @@ export async function GET(req: NextRequest) {
       [limit]
     );
 
-    const totalRow = await pool.query("SELECT COUNT(*) AS cnt FROM page_views");
-    const uniqueIpRow = await pool.query("SELECT COUNT(DISTINCT ip) AS cnt FROM page_views");
+    // Use estimated counts for large tables — exact COUNT(*) full-table scans
+    // grow increasingly expensive as page_views accumulates rows.
+    const totalRow = await pool.query(
+      `SELECT reltuples::bigint AS cnt FROM pg_class WHERE relname = 'page_views'`
+    );
+    const uniqueIpRow = await pool.query(
+      `SELECT COUNT(DISTINCT ip)::int AS cnt FROM page_views WHERE created_at >= NOW() - INTERVAL '30 days'`
+    );
     const countryRow = await pool.query(
       "SELECT country, COUNT(*) AS cnt FROM page_views WHERE country IS NOT NULL GROUP BY country ORDER BY cnt DESC LIMIT 5"
     );

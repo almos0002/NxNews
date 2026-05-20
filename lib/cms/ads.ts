@@ -61,7 +61,7 @@ export async function getAllAds(): Promise<AdSlotConfig[]> {
 
 export async function getAd(slot: string): Promise<AdSlotConfig | null> {
   try {
-    const { rows } = await pool.query("SELECT * FROM ads WHERE slot=$1", [slot]);
+    const { rows } = await pool.query("SELECT slot, enabled, code, width, height, updated_at FROM ads WHERE slot=$1", [slot]);
     return rows[0] ?? null;
   } catch {
     return null;

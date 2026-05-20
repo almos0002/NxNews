@@ -30,7 +30,9 @@ interface LiveStream {
 async function getActiveStreams(): Promise<LiveStream[]> {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM live_streams WHERE is_active=true ORDER BY display_order ASC, created_at DESC"
+      `SELECT id, title_en, title_ne, description_en, description_ne,
+              stream_url, platform, is_active, display_order, created_at, updated_at
+       FROM live_streams WHERE is_active=true ORDER BY display_order ASC, created_at DESC`
     );
     return rows;
   } catch {

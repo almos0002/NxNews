@@ -44,15 +44,18 @@ export async function listEventPhotos(opts?: {
   const offset = opts?.offset ?? 0;
   const st = opts?.status ?? "all";
 
+  const COLS = `id, title_en, title_ne, description_en, description_ne,
+    location_en, location_ne, event_date, cover_image, images, slug,
+    status, view_count, created_at, updated_at`;
   if (st === "all") {
     const { rows } = await pool.query(
-      "SELECT * FROM event_photos ORDER BY created_at DESC LIMIT $1 OFFSET $2",
+      `SELECT ${COLS} FROM event_photos ORDER BY created_at DESC LIMIT $1 OFFSET $2`,
       [limit, offset]
     );
     return rows.map(row);
   }
   const { rows } = await pool.query(
-    "SELECT * FROM event_photos WHERE status=$1 ORDER BY event_date DESC NULLS LAST, created_at DESC LIMIT $2 OFFSET $3",
+    `SELECT ${COLS} FROM event_photos WHERE status=$1 ORDER BY event_date DESC NULLS LAST, created_at DESC LIMIT $2 OFFSET $3`,
     [st, limit, offset]
   );
   return rows.map(row);
@@ -73,14 +76,24 @@ export async function countEventPhotos(opts?: { status?: "published" | "draft" |
 
 export async function getEventPhotoById(id: string): Promise<EventPhoto | null> {
   await ensureTable();
-  const { rows } = await pool.query("SELECT * FROM event_photos WHERE id=$1", [id]);
+  const { rows } = await pool.query(
+    `SELECT id, title_en, title_ne, description_en, description_ne,
+            location_en, location_ne, event_date, cover_image, images, slug,
+            status, view_count, created_at, updated_at
+     FROM event_photos WHERE id=$1`,
+    [id]
+  );
   return rows[0] ? row(rows[0]) : null;
 }
 
 export async function getEventPhotoBySlug(slug: string): Promise<EventPhoto | null> {
   await ensureTable();
   const { rows } = await pool.query(
-    "SELECT * FROM event_photos WHERE slug=$1 AND status='published'", [slug]
+    `SELECT id, title_en, title_ne, description_en, description_ne,
+            location_en, location_ne, event_date, cover_image, images, slug,
+            status, view_count, created_at, updated_at
+     FROM event_photos WHERE slug=$1 AND status='published'`,
+    [slug]
   );
   return rows[0] ? row(rows[0]) : null;
 }
