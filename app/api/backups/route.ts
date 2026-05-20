@@ -50,7 +50,7 @@ export async function POST() {
   }
   try {
     const { stdout, stderr } = await execFileAsync("bash", [SCRIPT], {
-      env: process.env as Record<string, string>,
+      env: { ...process.env } as NodeJS.ProcessEnv,
       timeout: 120_000,
     });
     const output = (stdout + stderr).trim();
