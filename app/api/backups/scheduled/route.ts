@@ -20,7 +20,8 @@ export async function GET(req: Request) {
   try {
     const { sql, filename } = await generateSqlDump();
     const { url, sha } = await commitBackupToGitHub(filename, sql);
-    const deleted = await deleteOldBackups(7);
+    const keepDays = parseInt(process.env.BACKUP_KEEP_DAYS ?? "14", 10);
+    const deleted = await deleteOldBackups(keepDays);
 
     console.log(`[backup] Committed ${filename} to GitHub (sha: ${sha}). Deleted ${deleted} old backup(s).`);
 
