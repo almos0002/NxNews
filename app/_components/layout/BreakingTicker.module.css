@@ -33,6 +33,7 @@
   border-radius: 2px;
   flex-shrink: 0;
   position: relative;
+  animation: flash 1s step-start infinite;
 }
 
 .label::before {
@@ -45,12 +46,6 @@
   height: 6px;
   background: #1a0000;
   border-radius: 50%;
-}
-
-/* Only the text flashes — badge background stays solid */
-.labelText {
-  animation: flash 1s step-start infinite;
-  display: inline;
 }
 
 /* ── Scrolling track ── */
@@ -118,7 +113,7 @@
   .scrollContent {
     animation: none;
   }
-  .labelText {
+  .label {
     animation: none;
   }
 }
