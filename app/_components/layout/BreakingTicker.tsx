@@ -55,6 +55,7 @@ export default function BreakingTicker({ headlines, headline, locale = "en" }: P
         </div>
       </div>
       <div className={styles.goldStrip} aria-hidden="true" />
+      <div className={styles.blackStrip} aria-hidden="true" />
     </div>
   );
 }

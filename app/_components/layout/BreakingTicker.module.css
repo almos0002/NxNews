@@ -99,6 +99,12 @@
   background-color: #d4af37;
 }
 
+/* ── Straight black strip below gold ── */
+.blackStrip {
+  height: 5px;
+  background-color: #111111;
+}
+
 @keyframes marquee {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }

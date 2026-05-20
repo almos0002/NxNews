@@ -59,6 +59,9 @@ export default function middleware(request: NextRequest) {
     const reqHeaders = new Headers(request.headers);
     reqHeaders.set("x-pathname", pathname);
     reqHeaders.set("x-locale", locale);
+    // Required so next-intl's getRequestLocale() / getLocale() resolves
+    // correctly in server components (Link, getTranslations, etc.)
+    reqHeaders.set("X-NEXT-INTL-LOCALE", locale);
 
     const response = NextResponse.next({
       request: { headers: reqHeaders },
