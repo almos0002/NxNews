@@ -176,6 +176,218 @@
   justify-content: flex-end;
 }
 
+.restoreBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.restoreBtn:hover {
+  color: #b45309;
+  border-color: #fcd34d;
+  background: #fffbeb;
+}
+
+/* ── Modal ─────────────────────────────────────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px 36px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.modalIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fffbeb;
+  border: 1.5px solid #fcd34d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b45309;
+  margin-bottom: 4px;
+}
+
+.resultIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  border: 1.5px solid #a7f3d0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #059669;
+  margin-bottom: 4px;
+}
+
+.modalTitle {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.modalBody {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  color: var(--color-ink-muted);
+  margin: 0;
+}
+
+.modalFilename {
+  font-family: monospace;
+  font-size: 0.8rem;
+  background: #f1f5f9;
+  color: var(--color-ink);
+  padding: 6px 12px;
+  border-radius: 6px;
+  word-break: break-all;
+}
+
+.modalNote {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  color: var(--color-ink-muted);
+  margin: 0;
+  line-height: 1.6;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.modalCancel {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-border);
+  background: #fff;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.modalCancel:hover { background: #f8fafc; }
+.modalCancel:disabled { opacity: 0.5; cursor: default; }
+
+.modalConfirm {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 0;
+  border-radius: 8px;
+  border: none;
+  background: #b45309;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: background 0.15s ease;
+}
+.modalConfirm:hover { background: #92400e; }
+.modalConfirm:disabled { opacity: 0.6; cursor: default; }
+
+/* Result grid */
+.resultGrid {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  margin: 4px 0;
+}
+
+.resultStat {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.resultNum {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.resultLabel {
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-muted);
+}
+
+.resultErrors {
+  width: 100%;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: left;
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  color: #b91c1c;
+}
+
+.resultErrors ul {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .modal { padding: 24px 20px; }
+  .resultGrid { gap: 8px; }
+}
+
 .footerNote {
   font-family: var(--font-serif);
   font-size: 0.78rem;

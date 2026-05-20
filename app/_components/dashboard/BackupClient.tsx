@@ -18,7 +18,7 @@ function IconDatabase() {
 
 function IconDownload() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
       <polyline points="7 10 12 15 17 10"/>
       <line x1="12" y1="15" x2="12" y2="3"/>
@@ -32,6 +32,25 @@ function IconUpload() {
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
       <polyline points="17 8 12 3 7 8"/>
       <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+  );
+}
+
+function IconRestore() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+      <path d="M3 3v5h5"/>
+    </svg>
+  );
+}
+
+function IconWarning() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
     </svg>
   );
 }
@@ -65,6 +84,13 @@ interface GitHubBackupFile {
   date: string | null;
 }
 
+interface RestoreResult {
+  total: number;
+  inserted: number;
+  skipped: number;
+  errors: string[];
+}
+
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -90,12 +116,107 @@ function timeAgo(iso: string | null): string {
   return `${days}d ago`;
 }
 
+// ── Confirmation modal ────────────────────────────────────────────────────────
+function RestoreModal({
+  filename,
+  onConfirm,
+  onCancel,
+  restoring,
+  result,
+}: {
+  filename: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  restoring: boolean;
+  result: RestoreResult | null;
+}) {
+  return (
+    <div className={bStyles.modalOverlay} onClick={!restoring && !result ? onCancel : undefined}>
+      <div className={bStyles.modal} onClick={(e) => e.stopPropagation()}>
+        {!result ? (
+          <>
+            <div className={bStyles.modalIcon}>
+              <IconWarning />
+            </div>
+            <h2 className={bStyles.modalTitle}>Restore from backup?</h2>
+            <p className={bStyles.modalBody}>
+              This will replay all <code>INSERT</code> statements from:
+            </p>
+            <code className={bStyles.modalFilename}>{filename}</code>
+            <p className={bStyles.modalNote}>
+              Rows that already exist will be skipped (no duplicates). Rows that don&apos;t exist will be re-inserted. This is safe to run on a live database.
+            </p>
+            <div className={bStyles.modalActions}>
+              <button
+                className={bStyles.modalCancel}
+                onClick={onCancel}
+                disabled={restoring}
+              >
+                Cancel
+              </button>
+              <button
+                className={bStyles.modalConfirm}
+                onClick={onConfirm}
+                disabled={restoring}
+              >
+                {restoring ? (
+                  <><IconRefresh spinning /> Restoring…</>
+                ) : (
+                  <><IconRestore /> Restore</>
+                )}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={bStyles.resultIcon}>
+              <IconDatabase />
+            </div>
+            <h2 className={bStyles.modalTitle}>Restore complete</h2>
+            <div className={bStyles.resultGrid}>
+              <div className={bStyles.resultStat}>
+                <span className={bStyles.resultNum}>{result.total}</span>
+                <span className={bStyles.resultLabel}>Total rows</span>
+              </div>
+              <div className={bStyles.resultStat}>
+                <span className={bStyles.resultNum} style={{ color: "#059669" }}>{result.inserted}</span>
+                <span className={bStyles.resultLabel}>Inserted</span>
+              </div>
+              <div className={bStyles.resultStat}>
+                <span className={bStyles.resultNum} style={{ color: "#92400e" }}>{result.skipped}</span>
+                <span className={bStyles.resultLabel}>Skipped</span>
+              </div>
+            </div>
+            {result.errors.length > 0 && (
+              <div className={bStyles.resultErrors}>
+                <strong>Errors ({result.errors.length}):</strong>
+                <ul>
+                  {result.errors.map((e, i) => <li key={i}>{e}</li>)}
+                </ul>
+              </div>
+            )}
+            <div className={bStyles.modalActions}>
+              <button className={bStyles.modalConfirm} onClick={onCancel}>
+                Done
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
 export default function BackupClient() {
   const [pushing, setPushing] = useState(false);
   const [backups, setBackups] = useState<GitHubBackupFile[] | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [restoreTarget, setRestoreTarget] = useState<GitHubBackupFile | null>(null);
+  const [restoring, setRestoring] = useState(false);
+  const [restoreResult, setRestoreResult] = useState<RestoreResult | null>(null);
 
   const loadHistory = useCallback(async () => {
     setLoadingHistory(true);
@@ -163,6 +284,34 @@ export default function BackupClient() {
     }
   }
 
+  async function confirmRestore() {
+    if (!restoreTarget) return;
+    setRestoring(true);
+    try {
+      const res = await fetch(
+        `/api/backups/github/${encodeURIComponent(restoreTarget.name)}/restore`,
+        { method: "POST" }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        toast(data.error ?? "Restore failed.", "error");
+        setRestoreTarget(null);
+        return;
+      }
+      setRestoreResult(data as RestoreResult);
+    } catch {
+      toast("Restore failed. Please try again.", "error");
+      setRestoreTarget(null);
+    } finally {
+      setRestoring(false);
+    }
+  }
+
+  function closeModal() {
+    setRestoreTarget(null);
+    setRestoreResult(null);
+  }
+
   const totalSize = backups?.reduce((sum, b) => sum + b.size, 0) ?? 0;
   const latestDate = backups?.[0]?.date ?? null;
 
@@ -170,13 +319,23 @@ export default function BackupClient() {
     <>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
+      {restoreTarget && (
+        <RestoreModal
+          filename={restoreTarget.name}
+          onConfirm={confirmRestore}
+          onCancel={closeModal}
+          restoring={restoring}
+          result={restoreResult}
+        />
+      )}
+
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <div className={styles.pageHeaderLeft}>
             <Link href="/en/dashboard" className={styles.breadcrumb}>← Dashboard</Link>
             <h1 className={styles.pageTitle}>Database Backups</h1>
             <p className={styles.pageSubtitle}>
-              Generate and download SQL dumps, or restore from a past GitHub backup.
+              Push SQL dumps to GitHub, or restore data from any past backup.
             </p>
           </div>
           <div className={bStyles.headerActions}>
@@ -245,7 +404,7 @@ export default function BackupClient() {
 
           {!loadingHistory && !historyError && backups && backups.length === 0 && (
             <div className={bStyles.historyEmpty}>
-              No backups found in the GitHub repository yet. Backups are pushed automatically every day, or you can set one up manually.
+              No backups found in the GitHub repository yet. Click &ldquo;Push to GitHub&rdquo; to create the first one.
             </div>
           )}
 
@@ -289,6 +448,13 @@ export default function BackupClient() {
                             ? <IconRefresh spinning />
                             : <IconDownload />}
                         </button>
+                        <button
+                          className={bStyles.restoreBtn}
+                          title="Restore from this backup"
+                          onClick={() => { setRestoreResult(null); setRestoreTarget(backup); }}
+                        >
+                          <IconRestore />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -296,16 +462,14 @@ export default function BackupClient() {
               </tbody>
             </table>
           )}
-
         </div>
 
         <div className={bStyles.tipsCard}>
           <h3 className={bStyles.tipsTitle}>Restore instructions</h3>
           <ol className={bStyles.tipsList}>
-            <li>Download any backup using the button above.</li>
-            <li>Connect to your Neon database using <code>psql</code> or a GUI tool.</li>
-            <li>Run: <code>psql &quot;your_database_url&quot; -f neon_backup_*.sql</code></li>
-            <li>All rows will be re-inserted. Run on a fresh database to avoid duplicates.</li>
+            <li>Click the <strong>restore</strong> icon on any backup row above.</li>
+            <li>Confirm in the dialog — existing rows are skipped, missing rows are re-inserted.</li>
+            <li>Or download the <code>.sql</code> file and run it manually via <code>psql</code>.</li>
           </ol>
         </div>
       </div>
