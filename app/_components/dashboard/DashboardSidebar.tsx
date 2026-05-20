@@ -173,6 +173,14 @@ function IconBackup() {
   );
 }
 
+function IconHeartbeat() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+  );
+}
+
 
 function IconLive() {
   return (
@@ -331,6 +339,7 @@ export default function DashboardSidebar({ name, email, role, siteName }: Props)
               {link(`${base}/settings`, <IconSettings />, "Settings")}
               {link(`${base}/seo`, <IconSeo />, "SEO Settings")}
               {link(`${base}/backup`, <IconBackup />, "Backups")}
+              {link(`${base}/db-health`, <IconHeartbeat />, "DB Health")}
             </>
           )}
         </nav>
