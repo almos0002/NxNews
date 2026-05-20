@@ -21,12 +21,12 @@ export default async function ThreeColSection({
   const col1Lead  = articles[0];
   // col1Texts: articles[1..2] → numbered 02, 03
   const col1Texts = articles.slice(1, 3);
-  // col2: articles[4..7] → numbered 04..07  (offset = 1 lead + 2 text = 3)
-  const col2Items  = articles.slice(4, 8);
+  // col2: articles[3..6] → numbered 04..07
+  const col2Items  = articles.slice(3, 7);
   const col2Offset = 3; // 1 (lead) + 2 (col1Texts)
-  // col3: articles[9..12] → numbered 08..11  (offset = 3 + 4 = 7)
-  const col3Items  = articles.slice(9, 13);
-  const col3Offset = col2Offset + col2Items.length; // 7
+  // col3: articles[7..10] → numbered 08..11
+  const col3Items  = articles.slice(7, 11);
+  const col3Offset = col2Offset + col2Items.length;
 
   const COL2_AD_AT = 2;
   const COL3_AD_AT = 3;

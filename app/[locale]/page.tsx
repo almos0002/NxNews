@@ -94,12 +94,13 @@ export default async function LocaleHomePage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
-  const [allArticles, featuredArticles, headlines, liveCount, topStories] = await Promise.all([
+  const [allArticles, featuredArticles, headlines, liveCount, topStories, culturalArticles] = await Promise.all([
     getPublicArticles(locale, { limit: 50 }),
     getFeaturedArticles(locale),
     getBreakingHeadlines(locale, 10),
     getActiveLiveCount(),
     getTopStoriesArticles(locale, 12),
+    getPublicArticles(locale, { limit: 15, category: "cultural" }),
   ]);
 
   const featuredPool = featuredArticles.length >= 1 ? featuredArticles : allArticles;
@@ -114,9 +115,7 @@ export default async function LocaleHomePage({ params }: Props) {
   const tech = allArticles.filter(
     (a) => a.category.toLowerCase() === "technology"
   );
-  const cultural = allArticles.filter(
-    (a) => a.category.toLowerCase() === "cultural"
-  );
+
   const entertainment = allArticles.filter(
     (a) => a.category.toLowerCase() === "entertainment"
   );
@@ -204,7 +203,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </div>
 
         <div className={styles.topicDivider}>
-          <ThreeColSection title={tNav("culture")} articles={cultural} href="/cultural" />
+          <ThreeColSection title={tNav("culture")} articles={culturalArticles} href="/cultural" />
         </div>
 
         <div className={styles.adSection}>
