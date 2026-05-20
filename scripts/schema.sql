@@ -326,6 +326,15 @@ CREATE INDEX IF NOT EXISTS idx_article_category_status
 CREATE INDEX IF NOT EXISTS idx_article_tags_gin
   ON article USING GIN (tags);
 
+-- Covers: WHERE status='published' ORDER BY view_count DESC, published_at DESC
+-- Used by getTrendingArticles (hotness fallback) and getTopStoriesArticles.
+-- Replaces the single-column idx_article_view_count — the planner prefers
+-- this composite index whenever both status filter and view-count sort appear.
+CREATE INDEX IF NOT EXISTS idx_article_status_views_published
+  ON article (status, view_count DESC, published_at DESC NULLS LAST);
+
+-- Keep the single-column index for bare ORDER BY view_count DESC queries
+-- (e.g. dashboard SUM, views API sort without status filter).
 CREATE INDEX IF NOT EXISTS idx_article_view_count
   ON article (view_count DESC);
 
