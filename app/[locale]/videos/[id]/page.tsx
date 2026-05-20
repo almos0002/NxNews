@@ -9,6 +9,7 @@ import AdUnit from "@/app/_components/ads/AdUnit";
 import { Link } from "@/i18n/navigation";
 import { getPublicVideos, getPublicVideoById, getBreakingHeadline } from "@/lib/content/public";
 import { resolveBaseUrl, getDefaultOgImage } from "@/lib/seo/site-url";
+import { extractYoutubeId } from "@/lib/content/videos";
 import ViewTracker from "@/app/_components/article/ViewTracker";
 import styles from "./video.module.css";
 
@@ -96,27 +97,45 @@ export default async function VideoDetailPage({ params }: Props) {
         <div className={styles.inner}>
           <main className={styles.main}>
             <div className={styles.player}>
-              {video.thumbnailUrl && (
-                <Image
-                  src={video.thumbnailUrl}
-                  alt={video.title}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 70vw"
-                  style={{ objectFit: "cover" }}
-                />
-              )}
-              <div className={styles.playerOverlay} />
-              <div className={styles.playBtn}>
-                <div className={styles.playBtnCircle}>
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </div>
-              {video.duration && (
-                <span className={styles.playerDuration}>{video.duration}</span>
-              )}
+              {(() => {
+                const ytId = extractYoutubeId(video.youtubeUrl);
+                if (ytId) {
+                  return (
+                    <iframe
+                      className={styles.playerIframe}
+                      src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`}
+                      title={video.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  );
+                }
+                return (
+                  <div className={styles.playerFallback}>
+                    {video.thumbnailUrl && (
+                      <Image
+                        src={video.thumbnailUrl}
+                        alt={video.title}
+                        fill
+                        priority
+                        sizes="(max-width: 768px) 100vw, 70vw"
+                        style={{ objectFit: "cover" }}
+                      />
+                    )}
+                    <div className={styles.playerOverlay} />
+                    <div className={styles.playBtn}>
+                      <div className={styles.playBtnCircle}>
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                    {video.duration && (
+                      <span className={styles.playerDuration}>{video.duration}</span>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             <div className={styles.meta}>

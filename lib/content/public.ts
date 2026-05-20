@@ -40,6 +40,7 @@ export interface PublicVideo {
   date: string;
   duration: string;
   thumbnailUrl: string;
+  youtubeUrl: string;
   viewCount?: number;
 }
 
@@ -96,6 +97,7 @@ function mapVideo(row: Record<string, unknown>, locale: string): PublicVideo {
     date: formatDate(row.created_at as string),
     duration: String(row.duration ?? ""),
     thumbnailUrl: String(row.thumbnail ?? ""),
+    youtubeUrl: String(row.youtube_url ?? ""),
     viewCount: typeof row.view_count === "number" ? row.view_count : parseInt(String(row.view_count ?? "0"), 10),
   };
 }

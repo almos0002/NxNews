@@ -125,9 +125,11 @@ CREATE TABLE IF NOT EXISTS pages (
   content_ne TEXT        NOT NULL DEFAULT '',
   status     TEXT        NOT NULL DEFAULT 'draft',
   author_id  TEXT        NOT NULL,
+  view_count INTEGER     NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+ALTER TABLE pages ADD COLUMN IF NOT EXISTS view_count INTEGER NOT NULL DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS categories (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -156,13 +158,15 @@ CREATE TABLE IF NOT EXISTS videos (
   thumbnail      TEXT        NOT NULL DEFAULT '',
   status         TEXT        NOT NULL DEFAULT 'published',
   author_id      TEXT        NOT NULL,
+  view_count     INTEGER     NOT NULL DEFAULT 0,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Optional video columns added by scripts/seed.ts
-ALTER TABLE videos ADD COLUMN IF NOT EXISTS category VARCHAR(100) DEFAULT 'Video';
-ALTER TABLE videos ADD COLUMN IF NOT EXISTS duration VARCHAR(20)  DEFAULT '';
+ALTER TABLE videos ADD COLUMN IF NOT EXISTS category    VARCHAR(100) DEFAULT 'Video';
+ALTER TABLE videos ADD COLUMN IF NOT EXISTS duration    VARCHAR(20)  DEFAULT '';
+ALTER TABLE videos ADD COLUMN IF NOT EXISTS view_count  INTEGER      NOT NULL DEFAULT 0;
 
 
 -- ============================================================================
