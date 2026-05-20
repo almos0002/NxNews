@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateSqlDump } from "@/lib/db/backup";
-import { uploadToDrive, deleteOldBackups } from "@/lib/gdrive/upload";
+import { commitBackupToGitHub, deleteOldBackups } from "@/lib/github/backup";
 
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
@@ -10,27 +10,25 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const folderId = process.env.GDRIVE_FOLDER_ID;
-  if (!folderId) {
-    return NextResponse.json({ error: "GDRIVE_FOLDER_ID is not set." }, { status: 500 });
+  if (!process.env.GITHUB_BACKUP_TOKEN) {
+    return NextResponse.json({ error: "GITHUB_BACKUP_TOKEN is not set." }, { status: 500 });
   }
-
-  if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-    return NextResponse.json({ error: "GOOGLE_SERVICE_ACCOUNT_JSON is not set." }, { status: 500 });
+  if (!process.env.GITHUB_BACKUP_REPO) {
+    return NextResponse.json({ error: "GITHUB_BACKUP_REPO is not set." }, { status: 500 });
   }
 
   try {
     const { sql, filename } = await generateSqlDump();
-    const { id, webViewLink } = await uploadToDrive(filename, sql, folderId);
-    const deleted = await deleteOldBackups(folderId, 7);
+    const { url, sha } = await commitBackupToGitHub(filename, sql);
+    const deleted = await deleteOldBackups(7);
 
-    console.log(`[backup] Uploaded ${filename} to Google Drive (id: ${id}). Deleted ${deleted} old backup(s).`);
+    console.log(`[backup] Committed ${filename} to GitHub (sha: ${sha}). Deleted ${deleted} old backup(s).`);
 
     return NextResponse.json({
       ok: true,
       filename,
-      driveFileId: id,
-      webViewLink,
+      githubUrl: url,
+      sha,
       deletedOldBackups: deleted,
     });
   } catch (err) {
