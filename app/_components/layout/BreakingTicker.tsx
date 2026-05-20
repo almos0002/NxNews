@@ -31,7 +31,9 @@ export default function BreakingTicker({ headlines, headline, locale = "en" }: P
     <div className={styles.wrapper}>
       <div className={styles.ticker} role="marquee" aria-label="Breaking news">
         <div className={styles.inner}>
-          <span className={styles.label}>Live</span>
+          <span className={styles.label}>
+            <span className={styles.labelText}>Live</span>
+          </span>
           <div className={styles.scrollTrack}>
             <div className={styles.scrollContent}>
               {repeated.map((h, i) => (
@@ -54,7 +56,6 @@ export default function BreakingTicker({ headlines, headline, locale = "en" }: P
           </div>
         </div>
       </div>
-      <div className={styles.goldStrip} aria-hidden="true" />
       <div className={styles.blackStrip} aria-hidden="true" />
     </div>
   );

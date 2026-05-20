@@ -33,7 +33,6 @@
   border-radius: 2px;
   flex-shrink: 0;
   position: relative;
-  animation: flash 1s step-start infinite;
 }
 
 .label::before {
@@ -46,6 +45,12 @@
   height: 6px;
   background: #1a0000;
   border-radius: 50%;
+}
+
+/* Only the text flashes — badge background stays solid */
+.labelText {
+  animation: flash 1s step-start infinite;
+  display: inline;
 }
 
 /* ── Scrolling track ── */
@@ -93,13 +98,7 @@
   vertical-align: middle;
 }
 
-/* ── Thin golden strip below ticker ── */
-.goldStrip {
-  height: 5px;
-  background-color: #d4af37;
-}
-
-/* ── Straight black strip below gold ── */
+/* ── Straight black strip below ticker ── */
 .blackStrip {
   height: 5px;
   background-color: #111111;
@@ -119,7 +118,7 @@
   .scrollContent {
     animation: none;
   }
-  .label {
+  .labelText {
     animation: none;
   }
 }
