@@ -1,0 +1,129 @@
+.headerActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.resetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #fca5a5;
+  background: #fff1f2;
+  color: #b91c1c;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.resetBtn:hover  { background: #fee2e2; border-color: #f87171; }
+.resetBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.summaryRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 640px) {
+  .summaryRow { grid-template-columns: 1fr 1fr; }
+}
+
+.statCard {
+  background: #fff;
+  border: 1px solid #e8e4dc;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.statLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.statValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Latency colour tokens */
+.good { color: #059669; }
+.warn { color: #d97706; }
+.bad  { color: #dc2626; }
+
+.queryTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.queryRow {
+  cursor: pointer;
+}
+.queryRow:hover { background: #fafaf9 !important; }
+
+.queryCell {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.latencyPip {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.latencyPip.good { background: #10b981; }
+.latencyPip.warn { background: #f59e0b; }
+.latencyPip.bad  { background: #ef4444; }
+
+.queryText {
+  font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  font-size: 11.5px;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
+  line-height: 1.5;
+}
+.queryExpanded {
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow: visible;
+}
+
+.numCell {
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.errorBox {
+  background: #fff1f2;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 16px 20px;
+  color: #b91c1c;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.footerNote {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #9ca3af;
+}
