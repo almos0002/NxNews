@@ -94,7 +94,7 @@ export default function BackupClient() {
           <p>
             Clicking &ldquo;Download Backup&rdquo; generates a complete SQL dump of all your
             database tables and downloads it directly to your computer as a <code>.sql</code> file.
-            Store these files somewhere safe — Google Drive, Dropbox, or a local drive.
+            Store these files somewhere safe — Dropbox, a USB drive, or a local folder.
           </p>
           {lastDownloaded && (
             <p className={bStyles.lastDownloaded}>
