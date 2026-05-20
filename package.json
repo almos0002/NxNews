@@ -16,23 +16,23 @@
     "@uppy/core": "^5.2.0",
     "@uppy/dashboard": "^5.1.1",
     "@uppy/react": "^5.2.0",
-    "better-auth": "^1.6.2",
+    "better-auth": "^1.6.11",
     "google-auth-library": "^10.6.2",
     "nepali-date-converter": "^3.4.0",
-    "next": "^16.2.3",
-    "next-intl": "^4.9.0",
-    "pg": "^8.20.0",
+    "next": "^16.2.6",
+    "next-intl": "^4.12.0",
+    "pg": "^8.21.0",
     "quill": "^2.0.3",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "zod": "^4.3.6"
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "^22.19.17",
-    "@types/react": "^19.2.14",
+    "@types/node": "^22.19.19",
+    "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^16.2.3",
+    "eslint-config-next": "^16.2.6",
     "typescript": "^5.9.3"
   }
 }
