@@ -55,12 +55,6 @@ export default function ArticleCard({
             <time className={styles.date}>{article.date}</time>
             <span className={styles.separator}>·</span>
             <span className={styles.readTime}>{article.readTime}</span>
-            {article.viewCount != null && article.viewCount > 0 && (
-              <>
-                <span className={styles.separator}>·</span>
-                <ViewCount count={article.viewCount} />
-              </>
-            )}
           </div>
         </div>
       </article>
@@ -88,12 +82,6 @@ export default function ArticleCard({
             <span className={styles.author}>{article.author}</span>
             <span className={styles.separator}>·</span>
             <span className={styles.readTime}>{article.readTime}</span>
-            {article.viewCount != null && article.viewCount > 0 && (
-              <>
-                <span className={styles.separator}>·</span>
-                <ViewCount count={article.viewCount} />
-              </>
-            )}
           </div>
         </div>
       </Link>
@@ -112,12 +100,6 @@ export default function ArticleCard({
             <span className={styles.author}>{article.author}</span>
             <span className={styles.separator}>·</span>
             <span className={styles.readTime}>{article.readTime}</span>
-            {article.viewCount != null && article.viewCount > 0 && (
-              <>
-                <span className={styles.separator}>·</span>
-                <ViewCount count={article.viewCount} />
-              </>
-            )}
           </div>
         </div>
       </Link>
@@ -147,12 +129,6 @@ export default function ArticleCard({
           <span className={styles.author}>{article.author}</span>
           <span className={styles.separator}>·</span>
           <span className={styles.readTime}>{article.readTime}</span>
-          {article.viewCount != null && article.viewCount > 0 && (
-            <>
-              <span className={styles.separator}>·</span>
-              <ViewCount count={article.viewCount} />
-            </>
-          )}
         </div>
       </div>
     </Link>

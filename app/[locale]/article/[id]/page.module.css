@@ -131,7 +131,7 @@
 
 .richContent {
   font-family: var(--font-serif);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   line-height: 1.78;
   color: var(--color-ink-secondary);
 }
@@ -141,7 +141,7 @@
 }
 
 .richContent p:first-child {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--color-ink);
 }
 
@@ -190,14 +190,14 @@
 
 .para {
   font-family: var(--font-serif);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   line-height: 1.78;
   color: var(--color-ink-secondary);
   margin-bottom: 24px;
 }
 
 .para:first-child {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--color-ink);
 }
 
