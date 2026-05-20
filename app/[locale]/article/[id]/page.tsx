@@ -198,7 +198,7 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <>
       <JsonLd data={[newsArticleLd, breadcrumbLd]} />
-      <BreakingTicker headline={headline} />
+      <BreakingTicker headline={headline} locale={locale} />
       <Header />
       {article.rawId && (
         <ViewTracker type="article" id={article.rawId} />

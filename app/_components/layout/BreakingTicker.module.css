@@ -33,6 +33,7 @@
   border-radius: 2px;
   flex-shrink: 0;
   position: relative;
+  animation: flash 1s step-start infinite;
 }
 
 .label::before {
@@ -45,7 +46,6 @@
   height: 6px;
   background: #1a0000;
   border-radius: 50%;
-  animation: pulse 1.5s ease-in-out infinite;
 }
 
 /* ── Scrolling track ── */
@@ -93,29 +93,10 @@
   vertical-align: middle;
 }
 
-/* ── Thin golden strip between ticker and wavy border ── */
+/* ── Thin golden strip below ticker ── */
 .goldStrip {
   height: 5px;
   background-color: #d4af37;
-}
-
-/* ── White backing so masked wave blends with white navbar ── */
-.stripWrap {
-  background-color: #ffffff;
-  line-height: 0;
-}
-
-/* ── Wavy black bottom strip (flipped, irregular wave pointing downward) ── */
-.strip {
-  height: 28px;
-  background-color: #111111;
-  /* 5 waves per 300px tile, moderate height */
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 28' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L300%2C0 L300%2C13 C288%2C28 268%2C28 255%2C13 C242%2C0 232%2C0 220%2C13 C207%2C28 183%2C28 170%2C13 C157%2C0 147%2C0 135%2C13 C121%2C28 99%2C28 85%2C13 C71%2C0 61%2C0 50%2C13 C37%2C28 15%2C28 0%2C13 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 28' preserveAspectRatio='none'%3E%3Cpath d='M0%2C0 L300%2C0 L300%2C13 C288%2C28 268%2C28 255%2C13 C242%2C0 232%2C0 220%2C13 C207%2C28 183%2C28 170%2C13 C157%2C0 147%2C0 135%2C13 C121%2C28 99%2C28 85%2C13 C71%2C0 61%2C0 50%2C13 C37%2C28 15%2C28 0%2C13 Z' fill='black'%2F%3E%3C%2Fsvg%3E");
-  -webkit-mask-repeat: repeat-x;
-  mask-repeat: repeat-x;
-  -webkit-mask-size: 300px 28px;
-  mask-size: 300px 28px;
 }
 
 @keyframes marquee {
@@ -123,16 +104,16 @@
   100% { transform: translateX(-50%); }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
+@keyframes flash {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .scrollContent {
     animation: none;
   }
-  .label::before {
+  .label {
     animation: none;
   }
 }
