@@ -248,13 +248,15 @@ export default function DashboardSidebar({ name, email, role, siteName }: Props)
   return (
     <>
       {/* Mobile hamburger button — only visible on mobile when sidebar is closed */}
-      <button
-        className={styles.mobileToggle}
-        onClick={() => setMobileOpen(true)}
-        aria-label="Open navigation"
-      >
-        <IconHamburger />
-      </button>
+      {!mobileOpen && (
+        <button
+          className={styles.mobileToggle}
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open navigation"
+        >
+          <IconHamburger />
+        </button>
+      )}
 
       {/* Backdrop overlay */}
       {mobileOpen && (
