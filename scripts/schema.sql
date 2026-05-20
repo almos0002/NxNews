@@ -314,6 +314,14 @@ ALTER TABLE reading_history ADD COLUMN IF NOT EXISTS read_at TIMESTAMPTZ NOT NUL
 CREATE INDEX IF NOT EXISTS idx_article_status_published
   ON article (status, published_at DESC NULLS LAST);
 
+-- Partial index: only published rows, exact recency sort order.
+-- Covers every query shaped: WHERE status='published' ORDER BY published_at DESC NULLS LAST, created_at DESC
+-- (breaking headlines, latest feed, archive pages, related articles, tag pages, author pages).
+-- Smaller than a full-table index (excludes draft/pending) → faster scans and less I/O.
+CREATE INDEX IF NOT EXISTS idx_article_published_recency
+  ON article (published_at DESC NULLS LAST, created_at DESC)
+  WHERE status = 'published';
+
 CREATE INDEX IF NOT EXISTS idx_article_slug
   ON article (slug);
 
