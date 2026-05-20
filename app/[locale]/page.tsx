@@ -114,6 +114,9 @@ export default async function LocaleHomePage({ params }: Props) {
   const tech = allArticles.filter(
     (a) => a.category.toLowerCase() === "technology"
   );
+  const cultural = allArticles.filter(
+    (a) => a.category.toLowerCase() === "cultural"
+  );
   const entertainment = allArticles.filter(
     (a) => a.category.toLowerCase() === "entertainment"
   );
@@ -201,7 +204,7 @@ export default async function LocaleHomePage({ params }: Props) {
         </div>
 
         <div className={styles.topicDivider}>
-          <ThreeColSection title={t("scienceTech")} articles={tech} href="/technology" />
+          <ThreeColSection title={tNav("culture")} articles={cultural} href="/cultural" />
         </div>
 
         <div className={styles.adSection}>
