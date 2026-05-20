@@ -212,14 +212,17 @@ CREATE TABLE IF NOT EXISTS ads (
 );
 
 CREATE TABLE IF NOT EXISTS live_streams (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  title_en    TEXT        NOT NULL,
-  title_ne    TEXT        NOT NULL DEFAULT '',
-  youtube_url TEXT        NOT NULL,
-  is_active   BOOLEAN     NOT NULL DEFAULT true,
-  sort_order  INTEGER     NOT NULL DEFAULT 0,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  title_en       TEXT        NOT NULL,
+  title_ne       TEXT,
+  description_en TEXT,
+  description_ne TEXT,
+  stream_url     TEXT        NOT NULL,
+  platform       TEXT        NOT NULL DEFAULT 'youtube',
+  is_active      BOOLEAN     NOT NULL DEFAULT true,
+  display_order  INTEGER     NOT NULL DEFAULT 0,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 

@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import SignOutButton from "../auth/SignOutButton";
@@ -161,6 +162,7 @@ function IconSeo() {
     </svg>
   );
 }
+
 function IconLive() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -182,15 +184,48 @@ function IconCamera() {
   );
 }
 
+function IconHamburger() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="21" y2="12"/>
+      <line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  );
+}
+
+function IconClose() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  );
+}
+
 export default function DashboardSidebar({ name, email, role, siteName }: Props) {
   const pathname = usePathname();
   const params = useParams();
   const locale = (params.locale as string) ?? "en";
   const base = `/${locale}/dashboard`;
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isAdmin = role === "admin";
   const isModerator = role === "admin" || role === "moderator";
   const isAuthor = role === "admin" || role === "moderator" || role === "author";
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   function isActive(href: string, exact = false) {
     if (exact) return pathname === href;
@@ -202,6 +237,7 @@ export default function DashboardSidebar({ name, email, role, siteName }: Props)
       <Link
         href={href}
         className={`${styles.link} ${isActive(href, exact) ? styles.active : ""}`}
+        onClick={() => setMobileOpen(false)}
       >
         <span className={styles.linkIcon}>{icon}</span>
         {label}
@@ -210,75 +246,103 @@ export default function DashboardSidebar({ name, email, role, siteName }: Props)
   }
 
   return (
-    <aside className={styles.sidebar}>
-      {/* Brand */}
-      <div className={styles.brand}>
-        <div className={styles.brandMark}>{(siteName || "KumariHub").trim().charAt(0).toUpperCase()}</div>
-        <div className={styles.brandText}>
-          <span className={styles.brandName}>{siteName || "KumariHub"}</span>
-          <span className={styles.brandSub}>CMS</span>
-        </div>
-      </div>
+    <>
+      {/* Mobile hamburger button — only visible on mobile when sidebar is closed */}
+      <button
+        className={styles.mobileToggle}
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open navigation"
+      >
+        <IconHamburger />
+      </button>
 
-      {/* Navigation */}
-      <nav className={styles.nav}>
-        <span className={styles.navLabel}>General</span>
-        {link(base, <IconGrid />, "Overview", true)}
-        {link(`${base}/profile`, <IconUser />, "My Profile")}
+      {/* Backdrop overlay */}
+      {mobileOpen && (
+        <div
+          className={styles.overlay}
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
-        {isAuthor && (
-          <>
-            <span className={styles.navLabel}>Content</span>
-            {link(`${base}/articles`, <IconFile />, "Articles")}
-            {link(`${base}/pages`, <IconPages />, "Pages")}
-            {link(`${base}/videos`, <IconVideo />, "Videos")}
-          </>
-        )}
-
-        {isModerator && (
-          <>
-            <span className={styles.navLabel}>Moderation</span>
-            {link(`${base}/moderation`, <IconShield />, "Review Queue")}
-            {link(`${base}/featured`, <IconStar />, "Featured Posts")}
-            {link(`${base}/live`, <IconLive />, "Live Streams")}
-            {link(`${base}/events`, <IconCamera />, "Event Photos")}
-            {link(`${base}/taxonomy`, <IconTag />, "Categories & Tags")}
-            {link(`${base}/menu`, <IconMenu />, "Menu Manager")}
-          </>
-        )}
-
-        {isAdmin && (
-          <>
-            <span className={styles.navLabel}>Admin</span>
-            {link(`${base}/users`, <IconUsers />, "User Management")}
-            {link(`${base}/ads`, <IconAd />, "Ad Management")}
-            {link(`${base}/settings`, <IconSettings />, "Settings")}
-            {link(`${base}/seo`, <IconSeo />, "SEO Settings")}
-          </>
-        )}
-      </nav>
-
-      {/* User info + sign out */}
-      <div className={styles.userArea}>
-        <div className={styles.userRow}>
-          <div className={styles.userAvatar}>
-            {name?.charAt(0).toUpperCase() ?? "U"}
+      <aside className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ""}`}>
+        {/* Brand */}
+        <div className={styles.brand}>
+          <div className={styles.brandMark}>{(siteName || "KumariHub").trim().charAt(0).toUpperCase()}</div>
+          <div className={styles.brandText}>
+            <span className={styles.brandName}>{siteName || "KumariHub"}</span>
+            <span className={styles.brandSub}>CMS</span>
           </div>
-          <div className={styles.userMeta}>
-            <p className={styles.userName}>{name}</p>
-            <p className={styles.userEmail}>{email}</p>
+          {/* Close button — only visible on mobile */}
+          <button
+            className={styles.mobileClose}
+            onClick={() => setMobileOpen(false)}
+            aria-label="Close navigation"
+          >
+            <IconClose />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className={styles.nav}>
+          <span className={styles.navLabel}>General</span>
+          {link(base, <IconGrid />, "Overview", true)}
+          {link(`${base}/profile`, <IconUser />, "My Profile")}
+
+          {isAuthor && (
+            <>
+              <span className={styles.navLabel}>Content</span>
+              {link(`${base}/articles`, <IconFile />, "Articles")}
+              {link(`${base}/pages`, <IconPages />, "Pages")}
+              {link(`${base}/videos`, <IconVideo />, "Videos")}
+            </>
+          )}
+
+          {isModerator && (
+            <>
+              <span className={styles.navLabel}>Moderation</span>
+              {link(`${base}/moderation`, <IconShield />, "Review Queue")}
+              {link(`${base}/featured`, <IconStar />, "Featured Posts")}
+              {link(`${base}/live`, <IconLive />, "Live Streams")}
+              {link(`${base}/events`, <IconCamera />, "Event Photos")}
+              {link(`${base}/taxonomy`, <IconTag />, "Categories & Tags")}
+              {link(`${base}/menu`, <IconMenu />, "Menu Manager")}
+            </>
+          )}
+
+          {isAdmin && (
+            <>
+              <span className={styles.navLabel}>Admin</span>
+              {link(`${base}/users`, <IconUsers />, "User Management")}
+              {link(`${base}/ads`, <IconAd />, "Ad Management")}
+              {link(`${base}/settings`, <IconSettings />, "Settings")}
+              {link(`${base}/seo`, <IconSeo />, "SEO Settings")}
+            </>
+          )}
+        </nav>
+
+        {/* User info + sign out */}
+        <div className={styles.userArea}>
+          <div className={styles.userRow}>
+            <div className={styles.userAvatar}>
+              {name?.charAt(0).toUpperCase() ?? "U"}
+            </div>
+            <div className={styles.userMeta}>
+              <p className={styles.userName}>{name}</p>
+              <p className={styles.userEmail}>{email}</p>
+            </div>
+            <span
+              className={styles.rolePip}
+              style={{ background: ROLE_COLORS[role] ?? "#64748b" }}
+              title={ROLE_LABELS[role] ?? role}
+            />
           </div>
-          <span
-            className={styles.rolePip}
-            style={{ background: ROLE_COLORS[role] ?? "#64748b" }}
-            title={ROLE_LABELS[role] ?? role}
-          />
+          <div className={styles.signOutRow}>
+            <span className={styles.signOutIcon}><IconLogOut /></span>
+            <SignOutButton variant="dark" />
+          </div>
         </div>
-        <div className={styles.signOutRow}>
-          <span className={styles.signOutIcon}><IconLogOut /></span>
-          <SignOutButton variant="dark" />
-        </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

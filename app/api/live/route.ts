@@ -3,26 +3,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 import { pool } from "@/lib/db/db";
 
-async function ensureTable() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS live_streams (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      title_en TEXT NOT NULL,
-      title_ne TEXT,
-      description_en TEXT,
-      description_ne TEXT,
-      stream_url TEXT NOT NULL,
-      platform TEXT NOT NULL DEFAULT 'youtube',
-      is_active BOOLEAN NOT NULL DEFAULT true,
-      display_order INTEGER NOT NULL DEFAULT 0,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-}
-
 export async function GET() {
-  await ensureTable();
   const { rows } = await pool.query(
     "SELECT * FROM live_streams ORDER BY display_order ASC, created_at DESC"
   );
@@ -37,7 +18,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  await ensureTable();
   const body = await req.json();
   const { title_en, title_ne, description_en, description_ne, stream_url, platform, is_active, display_order } = body;
 
