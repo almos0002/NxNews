@@ -10,6 +10,7 @@ import { getLivePageViewCount } from "@/lib/cms/live-views";
 import { getDefaultOgImage, resolveBaseUrlSync } from "@/lib/seo/site-url";
 import { getAllSettings } from "@/lib/cms/settings";
 import ViewTracker from "@/app/_components/article/ViewTracker";
+import LiveStreamCard from "@/app/_components/live/LiveStreamCard";
 import styles from "./live.module.css";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -159,53 +160,15 @@ export default async function LivePage({ params }: Props) {
             </div>
           ) : (
             <div className={styles.streams}>
-              {streams.map((s, idx) => {
-                const title = isNe && s.title_ne ? s.title_ne : s.title_en;
-                const desc = isNe && s.description_ne ? s.description_ne : s.description_en;
-                const ytId = isYoutubeUrl(s.stream_url) ? extractYoutubeId(s.stream_url) : null;
-                const isYTChannel = s.stream_url.includes("/channel/") || s.stream_url.includes("/@");
-
-                return (
-                  <div key={s.id} className={`${styles.stream} ${idx === 0 ? styles.streamFeatured : ""}`}>
-                    <div className={styles.embedWrap}>
-                      {ytId && !isYTChannel ? (
-                        <iframe
-                          src={`https://www.youtube.com/embed/${ytId}?autoplay=${idx === 0 ? 1 : 0}&mute=${idx === 0 ? 1 : 0}`}
-                          title={title}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className={styles.embed}
-                        />
-                      ) : (
-                        <div className={styles.linkCard}>
-                          <div className={styles.linkIcon}>
-                            <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M21.593 7.203a2.506 2.506 0 00-1.762-1.766C18.265 5.007 12 5 12 5s-6.264-.007-7.831.404a2.56 2.56 0 00-1.766 1.778C2 8.774 2 12.004 2 12.004s0 3.23.403 4.816a2.51 2.51 0 001.766 1.778c1.567.409 7.83.402 7.83.402s6.265.007 7.831-.403a2.51 2.51 0 001.762-1.778C22 15.23 22 12 22 12s0-3.23-.407-4.797zM9.996 15.005l.005-6 5.207 3.005-5.212 2.995z"/>
-                            </svg>
-                          </div>
-                          <p className={styles.linkDesc}>
-                            {isNe ? "सिधा प्रसारण हेर्न यहाँ थिच्नुहोस्" : "Click to watch the live stream"}
-                          </p>
-                          <a href={s.stream_url} target="_blank" rel="noopener noreferrer" className={styles.watchBtn}>
-                            {isNe ? "अहिले हेर्नुहोस्" : "Watch Now"}
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                    <div className={styles.streamInfo}>
-                      <div className={styles.liveBadge}>
-                        <span className={styles.liveDotSm} />
-                        {isNe ? "सिधा" : "LIVE"}
-                      </div>
-                      <h2 className={styles.streamTitle}>{title}</h2>
-                      {desc && <p className={styles.streamDesc}>{desc}</p>}
-                      <a href={s.stream_url} target="_blank" rel="noopener noreferrer" className={styles.openLink}>
-                        {isNe ? "नयाँ ट्याबमा खोल्नुहोस् →" : "Open in new tab →"}
-                      </a>
-                    </div>
-                  </div>
-                );
-              })}
+              {streams.map((s, idx) => (
+                <LiveStreamCard
+                  key={s.id}
+                  stream={s}
+                  featured={idx === 0}
+                  autoplay={idx === 0}
+                  initialLocale={locale}
+                />
+              ))}
             </div>
           )}
 
