@@ -350,6 +350,22 @@ CREATE INDEX IF NOT EXISTS idx_article_status_views_published
 CREATE INDEX IF NOT EXISTS idx_article_view_count
   ON article (view_count DESC);
 
+-- Full-text search index over title (EN+NE), excerpt (EN+NE), and category.
+-- Uses 'simple' dictionary so it works language-agnostically for both
+-- English and Nepali text without needing a language-specific stemmer.
+-- Queries use plainto_tsquery('simple', ?) which is injection-safe and
+-- handles multi-word input gracefully (no syntax errors from user input).
+CREATE INDEX IF NOT EXISTS idx_article_fts
+  ON article USING GIN (
+    to_tsvector('simple',
+      coalesce(title_en,   '') || ' ' ||
+      coalesce(title_ne,   '') || ' ' ||
+      coalesce(excerpt_en, '') || ' ' ||
+      coalesce(excerpt_ne, '') || ' ' ||
+      coalesce(category,   '')
+    )
+  );
+
 -- user — author lookup (case-insensitive)
 CREATE INDEX IF NOT EXISTS idx_user_lower_name
   ON "user" (LOWER(name));

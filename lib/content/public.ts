@@ -253,17 +253,33 @@ export async function searchPublicArticles(
   const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
   const { rows } = await pool.query(
-    `SELECT a.*, u.name AS author_name
+    `SELECT a.*, u.name AS author_name,
+            ts_rank(
+              to_tsvector('simple',
+                coalesce(a.title_en,'')   || ' ' ||
+                coalesce(a.title_ne,'')   || ' ' ||
+                coalesce(a.excerpt_en,'') || ' ' ||
+                coalesce(a.excerpt_ne,'') || ' ' ||
+                coalesce(a.category,'')
+              ),
+              plainto_tsquery('simple', $1)
+            ) AS rank
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.status = 'published'
-       AND (a.title_en ILIKE $1 OR a.title_ne ILIKE $1
-            OR a.excerpt_en ILIKE $1 OR a.excerpt_ne ILIKE $1
-            OR LOWER(a.category) ILIKE $1
-            OR u.name ILIKE $1)
-     ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
-     LIMIT $2 OFFSET $3`,
-    [`%${query}%`, limit, offset]
+       AND (
+         to_tsvector('simple',
+           coalesce(a.title_en,'')   || ' ' ||
+           coalesce(a.title_ne,'')   || ' ' ||
+           coalesce(a.excerpt_en,'') || ' ' ||
+           coalesce(a.excerpt_ne,'') || ' ' ||
+           coalesce(a.category,'')
+         ) @@ plainto_tsquery('simple', $1)
+         OR u.name ILIKE $2
+       )
+     ORDER BY rank DESC, a.published_at DESC NULLS LAST, a.created_at DESC
+     LIMIT $3 OFFSET $4`,
+    [query.trim(), `%${query.trim()}%`, limit, offset]
   );
   return rows.map((r) => mapArticle(r, locale));
 }
@@ -515,10 +531,17 @@ export async function countSearchArticles(query: string): Promise<number> {
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
      WHERE a.status = 'published'
-       AND (a.title_en ILIKE $1 OR a.title_ne ILIKE $1
-            OR a.excerpt_en ILIKE $1 OR a.excerpt_ne ILIKE $1
-            OR LOWER(a.category) ILIKE $1 OR u.name ILIKE $1)`,
-    [`%${query}%`]
+       AND (
+         to_tsvector('simple',
+           coalesce(a.title_en,'')   || ' ' ||
+           coalesce(a.title_ne,'')   || ' ' ||
+           coalesce(a.excerpt_en,'') || ' ' ||
+           coalesce(a.excerpt_ne,'') || ' ' ||
+           coalesce(a.category,'')
+         ) @@ plainto_tsquery('simple', $1)
+         OR u.name ILIKE $2
+       )`,
+    [query.trim(), `%${query.trim()}%`]
   );
   return rows[0]?.cnt ?? 0;
 }
