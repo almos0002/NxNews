@@ -26,6 +26,16 @@ function IconDownload() {
   );
 }
 
+function IconUpload() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+  );
+}
+
 function IconGitHub() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -81,8 +91,7 @@ function timeAgo(iso: string | null): string {
 }
 
 export default function BackupClient() {
-  const [creating, setCreating] = useState(false);
-  const [lastDownloaded, setLastDownloaded] = useState<string | null>(null);
+  const [pushing, setPushing] = useState(false);
   const [backups, setBackups] = useState<GitHubBackupFile[] | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
@@ -110,33 +119,21 @@ export default function BackupClient() {
     loadHistory();
   }, [loadHistory]);
 
-  async function createBackup() {
-    setCreating(true);
+  async function pushToGitHub() {
+    setPushing(true);
     try {
-      const res = await fetch("/api/backups", { method: "POST" });
+      const res = await fetch("/api/backups/github", { method: "POST" });
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
-        toast(data.error ?? "Backup failed", "error");
+        toast(data.error ?? "Push failed.", "error");
         return;
       }
-      const disposition = res.headers.get("Content-Disposition") ?? "";
-      const match = disposition.match(/filename="([^"]+)"/);
-      const filename = match ? match[1] : `neon_backup_${Date.now()}.sql`;
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      setLastDownloaded(filename);
-      toast("Backup downloaded successfully.", "success");
+      toast(`Pushed ${data.filename} to GitHub.`, "success");
+      await loadHistory();
     } catch {
-      toast("Backup failed. Please try again.", "error");
+      toast("Push failed. Please try again.", "error");
     } finally {
-      setCreating(false);
+      setPushing(false);
     }
   }
 
@@ -193,11 +190,11 @@ export default function BackupClient() {
             </button>
             <button
               className={styles.submitBtn}
-              onClick={createBackup}
-              disabled={creating}
+              onClick={pushToGitHub}
+              disabled={pushing}
             >
-              <IconDownload />
-              {creating ? "Generating…" : "Download Backup"}
+              {pushing ? <IconRefresh spinning /> : <IconUpload />}
+              {pushing ? "Pushing…" : "Push to GitHub"}
             </button>
           </div>
         </div>
@@ -300,11 +297,6 @@ export default function BackupClient() {
             </table>
           )}
 
-          {lastDownloaded && (
-            <p className={bStyles.footerNote}>
-              Last downloaded: <code>{lastDownloaded}</code>
-            </p>
-          )}
         </div>
 
         <div className={bStyles.tipsCard}>

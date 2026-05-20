@@ -18,6 +18,36 @@ export interface GitHubBackupFile {
   date: string | null;
 }
 
+export async function POST() {
+  if (!(await requireAdmin())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const token = process.env.GITHUB_BACKUP_TOKEN;
+  const repo = process.env.GITHUB_BACKUP_REPO;
+
+  if (!token || !repo) {
+    return NextResponse.json(
+      { error: "GitHub backup is not configured. Add GITHUB_BACKUP_TOKEN and GITHUB_BACKUP_REPO secrets." },
+      { status: 503 }
+    );
+  }
+
+  try {
+    const { generateSqlDump } = await import("@/lib/db/backup");
+    const { commitBackupToGitHub, deleteOldBackups } = await import("@/lib/github/backup");
+
+    const { sql, filename } = await generateSqlDump();
+    const { url, sha } = await commitBackupToGitHub(filename, sql);
+    const deleted = await deleteOldBackups(7);
+
+    return NextResponse.json({ ok: true, filename, githubUrl: url, sha, deletedOldBackups: deleted });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Push failed";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
+
 export async function GET() {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
