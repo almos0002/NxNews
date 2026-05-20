@@ -271,16 +271,72 @@ export async function getTrendingArticles(
   limit = 8
 ): Promise<PublicArticle[]> {
   return cached(`trending:${locale}:${limit}`, 120_000, async () => {
+    // Hot-score: view_count / (hours_since_published + 2)^1.5
+    // Window: last 7 days so only recent articles can trend
     const { rows } = await pool.query(
       `SELECT a.*, u.name AS author_name
        FROM article a
        LEFT JOIN "user" u ON u.id = a.author_id
        WHERE a.status = 'published'
-       ORDER BY a.published_at DESC NULLS LAST, a.created_at DESC
+         AND COALESCE(a.published_at, a.created_at) >= NOW() - INTERVAL '7 days'
+       ORDER BY
+         (a.view_count::float /
+           POWER(
+             EXTRACT(EPOCH FROM (NOW() - COALESCE(a.published_at, a.created_at))) / 3600.0 + 2,
+             1.5
+           )
+         ) DESC,
+         COALESCE(a.published_at, a.created_at) DESC
        LIMIT $1`,
       [limit]
     );
-    return rows.map((r) => mapArticle(r, locale));
+    // Fall back to recency if not enough results in the 7-day window
+    if (rows.length >= Math.min(limit, 3)) {
+      return rows.map((r) => mapArticle(r, locale));
+    }
+    const { rows: fallback } = await pool.query(
+      `SELECT a.*, u.name AS author_name
+       FROM article a
+       LEFT JOIN "user" u ON u.id = a.author_id
+       WHERE a.status = 'published'
+       ORDER BY a.view_count DESC, COALESCE(a.published_at, a.created_at) DESC
+       LIMIT $1`,
+      [limit]
+    );
+    return fallback.map((r) => mapArticle(r, locale));
+  });
+}
+
+export async function getTopStoriesArticles(
+  locale: string,
+  limit = 12
+): Promise<PublicArticle[]> {
+  return cached(`top_stories:${locale}:${limit}`, 300_000, async () => {
+    // Most-viewed articles published in the last 30 days
+    const { rows } = await pool.query(
+      `SELECT a.*, u.name AS author_name
+       FROM article a
+       LEFT JOIN "user" u ON u.id = a.author_id
+       WHERE a.status = 'published'
+         AND COALESCE(a.published_at, a.created_at) >= NOW() - INTERVAL '30 days'
+       ORDER BY a.view_count DESC, COALESCE(a.published_at, a.created_at) DESC
+       LIMIT $1`,
+      [limit]
+    );
+    // Fall back to recency if not enough articles in last 30 days
+    if (rows.length >= Math.min(limit, 3)) {
+      return rows.map((r) => mapArticle(r, locale));
+    }
+    const { rows: fallback } = await pool.query(
+      `SELECT a.*, u.name AS author_name
+       FROM article a
+       LEFT JOIN "user" u ON u.id = a.author_id
+       WHERE a.status = 'published'
+       ORDER BY a.view_count DESC, COALESCE(a.published_at, a.created_at) DESC
+       LIMIT $1`,
+      [limit]
+    );
+    return fallback.map((r) => mapArticle(r, locale));
   });
 }
 
