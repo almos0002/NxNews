@@ -103,7 +103,7 @@ export default async function LocaleHomePage({ params }: Props) {
 
   const featuredPool = featuredArticles.length >= 1 ? featuredArticles : allArticles;
   const featured = featuredPool[0];
-  const secondary = featuredPool.slice(1, 4);
+  const secondary = featuredPool.slice(1, 3);
   const latest = allArticles.slice(0, 8);
   const picks = allArticles.slice(2, 6);
   const grid = allArticles.slice(0, 12);
