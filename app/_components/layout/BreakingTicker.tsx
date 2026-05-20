@@ -31,7 +31,7 @@ export default function BreakingTicker({ headlines, headline, locale = "en" }: P
     <div className={styles.wrapper}>
       <div className={styles.ticker} role="marquee" aria-label="Breaking news">
         <div className={styles.inner}>
-          <span className={styles.label}>Live</span>
+          <span className={styles.label}>Flash</span>
           <div className={styles.scrollTrack}>
             <div className={styles.scrollContent}>
               {repeated.map((h, i) => (
