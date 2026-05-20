@@ -1,4 +1,4 @@
-import { pool } from "../db/db";
+import { readPool as pool } from "../db/db";
 import { listTags } from "./taxonomy";
 import { cached } from "../cache/memory";
 

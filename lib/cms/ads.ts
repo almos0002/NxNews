@@ -1,4 +1,4 @@
-import { pool } from "../db/db";
+import { pool, readPool } from "../db/db";
 import { cached, invalidate } from "../cache/memory";
 
 export interface AdSlotConfig {
@@ -44,13 +44,13 @@ export async function initAdsTable(): Promise<void> {
 
 export async function getAllAds(): Promise<AdSlotConfig[]> {
   return cached("ads:all", ADS_TTL, async () => {
-    let { rows } = await pool.query(
+    let { rows } = await readPool.query(
       "SELECT slot, enabled, code, width, height, updated_at FROM ads ORDER BY slot"
     );
 
     if (rows.length === 0) {
       await seedDefaultSlots();
-      ({ rows } = await pool.query(
+      ({ rows } = await readPool.query(
         "SELECT slot, enabled, code, width, height, updated_at FROM ads ORDER BY slot"
       ));
     }
@@ -67,7 +67,7 @@ export async function getAllAds(): Promise<AdSlotConfig[]> {
 export async function getAd(slot: string): Promise<AdSlotConfig | null> {
   return cached(`ads:slot:${slot}`, ADS_TTL, async () => {
     try {
-      const { rows } = await pool.query(
+      const { rows } = await readPool.query(
         "SELECT slot, enabled, code, width, height, updated_at FROM ads WHERE slot=$1",
         [slot]
       );

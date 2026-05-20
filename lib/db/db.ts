@@ -24,13 +24,21 @@ const useSSL = isNeonDatabase(rawUrl);
 const useNeon = useSSL;
 const usePooler = isNeonPooler(rawUrl);
 
-function buildConnectionUrl(url: string): string {
+// Read replica URL — set NEON_READ_REPLICA_URL to your Neon read-replica
+// connection string. Falls back to the primary pool when not configured so
+// the app works identically without a replica.
+const rawReplicaUrl = process.env.NEON_READ_REPLICA_URL || rawUrl;
+const replicaSSL = isNeonDatabase(rawReplicaUrl);
+const replicaPooler = isNeonPooler(rawReplicaUrl);
+const hasReplica = !!process.env.NEON_READ_REPLICA_URL;
+
+function buildConnectionUrl(url: string, ssl: boolean): string {
   if (!url) return url;
   try {
     const parsed = new URL(url);
     parsed.searchParams.delete("ssl");
     parsed.searchParams.delete("sslmode");
-    if (useSSL) {
+    if (ssl) {
       parsed.searchParams.set("sslmode", "verify-full");
     }
     return parsed.toString();
@@ -39,7 +47,8 @@ function buildConnectionUrl(url: string): string {
   }
 }
 
-const cleanUrl = buildConnectionUrl(rawUrl);
+const cleanUrl = buildConnectionUrl(rawUrl, useSSL);
+const cleanReplicaUrl = buildConnectionUrl(rawReplicaUrl, replicaSSL);
 
 // Pool tuning
 // -----------
@@ -68,13 +77,31 @@ export const pool = new Pool({
   connectionTimeoutMillis: 15_000,
   allowExitOnIdle: true,
   keepAlive: !useNeon,
-  ...(!usePooler && useNeon
-    ? {
-        options: `-c statement_timeout=10000`,
-      }
-    : {}),
+  ...(!usePooler && useNeon ? { options: `-c statement_timeout=10000` } : {}),
 });
+
+// Read replica pool — routes SELECT queries to a dedicated read replica,
+// offloading the primary and reducing compute costs on write-heavy workloads.
+// When NEON_READ_REPLICA_URL is not set this is the same pool as above (no-op).
+export const readPool = hasReplica
+  ? new Pool({
+      connectionString: cleanReplicaUrl,
+      ...(replicaSSL ? { ssl: { rejectUnauthorized: true } } : { ssl: false }),
+      max: replicaPooler ? 3 : replicaSSL ? 5 : 10,
+      idleTimeoutMillis: replicaPooler ? 10_000 : 30_000,
+      connectionTimeoutMillis: 15_000,
+      allowExitOnIdle: true,
+      keepAlive: !replicaSSL,
+      ...(!replicaPooler && replicaSSL ? { options: `-c statement_timeout=10000` } : {}),
+    })
+  : pool;
 
 pool.on("error", (err) => {
   console.error("[DB Pool Error]", err.message);
 });
+
+if (hasReplica) {
+  readPool.on("error", (err) => {
+    console.error("[DB Read Replica Pool Error]", err.message);
+  });
+}

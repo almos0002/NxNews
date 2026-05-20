@@ -1,4 +1,4 @@
-import { pool } from "../db/db";
+import { pool, readPool } from "../db/db";
 
 export interface Article {
   id: string;
@@ -60,7 +60,7 @@ export async function listArticles(opts?: {
 
   // Exclude content_en / content_ne from list queries — large HTML blobs not
   // needed in admin article list views. Full content is fetched by getArticleById/Slug.
-  const { rows } = await pool.query<ArticleWithAuthor>(
+  const { rows } = await readPool.query<ArticleWithAuthor>(
     `SELECT a.id, a.title_en, a.title_ne, a.slug,
             a.excerpt_en, a.excerpt_ne,
             a.category, a.tags, a.status,
@@ -89,7 +89,7 @@ const ARTICLE_FULL_COLS = `
 `.trim();
 
 export async function getArticleById(id: string): Promise<ArticleWithAuthor | null> {
-  const { rows } = await pool.query<ArticleWithAuthor>(
+  const { rows } = await readPool.query<ArticleWithAuthor>(
     `SELECT ${ARTICLE_FULL_COLS}, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
@@ -100,7 +100,7 @@ export async function getArticleById(id: string): Promise<ArticleWithAuthor | nu
 }
 
 export async function getArticleBySlug(slug: string): Promise<ArticleWithAuthor | null> {
-  const { rows } = await pool.query<ArticleWithAuthor>(
+  const { rows } = await readPool.query<ArticleWithAuthor>(
     `SELECT ${ARTICLE_FULL_COLS}, u.name AS author_name
      FROM article a
      LEFT JOIN "user" u ON u.id = a.author_id
@@ -190,7 +190,7 @@ export async function deleteArticle(id: string): Promise<boolean> {
 }
 
 export async function countByStatus(authorId?: string): Promise<Record<string, number>> {
-  const { rows } = await pool.query<{ status: string; cnt: string }>(
+  const { rows } = await readPool.query<{ status: string; cnt: string }>(
     `SELECT status, COUNT(*) AS cnt FROM article
      ${authorId ? 'WHERE author_id = $1' : ''}
      GROUP BY status`,
