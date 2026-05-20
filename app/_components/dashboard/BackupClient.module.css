@@ -4,6 +4,88 @@
   gap: 10px;
 }
 
+.infoCard {
+  display: flex;
+  gap: 16px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.infoIcon {
+  flex-shrink: 0;
+  color: #0284c7;
+  margin-top: 2px;
+}
+
+.infoText {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  color: var(--color-ink);
+  line-height: 1.6;
+}
+
+.infoText strong {
+  display: block;
+  font-size: 0.92rem;
+  margin-bottom: 6px;
+  color: var(--color-ink);
+}
+
+.infoText p {
+  margin: 0 0 6px;
+  color: var(--color-ink-muted);
+}
+
+.infoText code {
+  font-family: monospace;
+  font-size: 0.82rem;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.lastDownloaded {
+  margin-top: 8px !important;
+  color: #065f46 !important;
+}
+
+.tipsCard {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 20px 24px;
+}
+
+.tipsTitle {
+  font-family: var(--font-serif);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 12px;
+}
+
+.tipsList {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: var(--color-ink-muted);
+  line-height: 1.7;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.tipsList code {
+  font-family: monospace;
+  font-size: 0.8rem;
+  background: var(--color-surface, #f5f5f5);
+  color: var(--color-ink);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
 .statsRow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

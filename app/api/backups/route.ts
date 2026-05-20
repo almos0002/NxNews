@@ -1,14 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
-import { execFile } from "child_process";
-import { promisify } from "util";
-import path from "path";
-import fs from "fs/promises";
-
-const execFileAsync = promisify(execFile);
-const BACKUP_DIR = path.join(process.cwd(), "backups");
-const SCRIPT = path.join(process.cwd(), "scripts", "backup.sh");
+import { pool } from "@/lib/db/db";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -18,63 +11,102 @@ async function requireAdmin() {
   return session;
 }
 
+function escapeValue(val: unknown): string {
+  if (val === null || val === undefined) return "NULL";
+  if (typeof val === "boolean") return val ? "TRUE" : "FALSE";
+  if (typeof val === "number") return String(val);
+  if (val instanceof Date) return `'${val.toISOString()}'`;
+  const str = String(val);
+  return `'${str.replace(/'/g, "''")}'`;
+}
+
 export async function GET() {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  try {
-    await fs.mkdir(BACKUP_DIR, { recursive: true });
-    const files = await fs.readdir(BACKUP_DIR);
-    const backups = await Promise.all(
-      files
-        .filter((f) => f.startsWith("neon_backup_") && f.endsWith(".dump"))
-        .map(async (filename) => {
-          const stat = await fs.stat(path.join(BACKUP_DIR, filename));
-          return {
-            filename,
-            size: stat.size,
-            createdAt: stat.mtime.toISOString(),
-          };
-        })
-    );
-    backups.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    return NextResponse.json({ backups });
-  } catch {
-    return NextResponse.json({ error: "Failed to list backups" }, { status: 500 });
-  }
+  return NextResponse.json({
+    backups: [],
+    message: "Backups are generated on demand and downloaded directly. Click 'Create Backup' to download a SQL dump.",
+  });
 }
 
 export async function POST() {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const client = await pool.connect();
   try {
-    const { stdout, stderr } = await execFileAsync("bash", [SCRIPT], {
-      env: { ...process.env } as NodeJS.ProcessEnv,
-      timeout: 120_000,
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const filename = `neon_backup_${timestamp}.sql`;
+
+    const { rows: tables } = await client.query<{ tablename: string }>(`
+      SELECT tablename
+      FROM pg_tables
+      WHERE schemaname = 'public'
+      ORDER BY tablename
+    `);
+
+    const chunks: string[] = [];
+
+    chunks.push(`-- KumariHub database backup\n`);
+    chunks.push(`-- Generated: ${new Date().toISOString()}\n`);
+    chunks.push(`-- Tables: ${tables.map((t) => t.tablename).join(", ")}\n\n`);
+    chunks.push(`SET client_encoding = 'UTF8';\n`);
+    chunks.push(`SET standard_conforming_strings = on;\n\n`);
+
+    for (const { tablename } of tables) {
+      const { rows: colRows } = await client.query<{ column_name: string }>(
+        `SELECT column_name
+         FROM information_schema.columns
+         WHERE table_schema = 'public' AND table_name = $1
+         ORDER BY ordinal_position`,
+        [tablename]
+      );
+      const columns = colRows.map((c) => c.column_name);
+
+      const { rows: dataRows } = await client.query(
+        `SELECT * FROM "${tablename}"`
+      );
+
+      chunks.push(`-- Table: ${tablename} (${dataRows.length} rows)\n`);
+
+      if (dataRows.length === 0) {
+        chunks.push(`-- (empty)\n\n`);
+        continue;
+      }
+
+      const colList = columns.map((c) => `"${c}"`).join(", ");
+      for (const row of dataRows) {
+        const values = columns.map((c) => escapeValue(row[c])).join(", ");
+        chunks.push(`INSERT INTO "${tablename}" (${colList}) VALUES (${values});\n`);
+      }
+      chunks.push(`\n`);
+    }
+
+    const body = chunks.join("");
+
+    return new NextResponse(body, {
+      headers: {
+        "Content-Type": "application/sql; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Length": String(Buffer.byteLength(body, "utf8")),
+      },
     });
-    const output = (stdout + stderr).trim();
-    const match = output.match(/Saved (neon_backup_\S+\.dump)/);
-    const filename = match ? path.basename(match[1]) : null;
-    return NextResponse.json({ ok: true, filename, output });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Backup failed";
     return NextResponse.json({ error: msg }, { status: 500 });
+  } finally {
+    client.release();
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE() {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const { filename } = await req.json();
-  if (!filename || typeof filename !== "string" || !filename.match(/^neon_backup_[\w]+\.dump$/)) {
-    return NextResponse.json({ error: "Invalid filename" }, { status: 400 });
-  }
-  try {
-    await fs.unlink(path.join(BACKUP_DIR, filename));
-    return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to delete backup" }, { status: 500 });
-  }
+  return NextResponse.json({
+    ok: true,
+    message: "Backups are downloaded directly and not stored on the server.",
+  });
 }
