@@ -33,8 +33,104 @@ export function tableRestorePriority(table: string): number {
 }
 
 export function extractInsertTable(stmt: string): string | null {
-  const m = stmt.match(/^INSERT\s+INTO\s+"?([^"(\s]+)"?/i);
+  const m = stmt.trim().match(/^INSERT\s+INTO\s+"?([^"(\s]+)"?/i);
   return m?.[1] ?? null;
+}
+
+/**
+ * Split a SQL dump into statements without cutting inside quoted strings.
+ * Existing backups embed real newlines inside article/settings text, so a
+ * naive split-by-line breaks those INSERTs mid-string.
+ */
+export function splitSqlStatements(sql: string): string[] {
+  const results: string[] = [];
+  const n = sql.length;
+  let i = 0;
+
+  while (i < n) {
+    while (i < n && /\s/.test(sql[i]!)) i++;
+    if (i >= n) break;
+
+    // Line comments
+    if (sql[i] === "-" && sql[i + 1] === "-") {
+      while (i < n && sql[i] !== "\n") i++;
+      continue;
+    }
+
+    const slice = sql.slice(i);
+    if (!/^(INSERT\s+INTO|SET\s+)/i.test(slice)) {
+      while (i < n && sql[i] !== "\n") i++;
+      continue;
+    }
+
+    const start = i;
+    let inSingle = false;
+    let inEscapeString = false; // E'...' / e'...'
+    let closed = false;
+
+    while (i < n) {
+      const c = sql[i]!;
+
+      if (inSingle) {
+        if (inEscapeString && c === "\\") {
+          i += 2; // skip escaped char
+          continue;
+        }
+        if (c === "'") {
+          // doubled quote ''
+          if (sql[i + 1] === "'") {
+            i += 2;
+            continue;
+          }
+          inSingle = false;
+          inEscapeString = false;
+          i++;
+          continue;
+        }
+        i++;
+        continue;
+      }
+
+      if (c === "'") {
+        const before = i > 0 ? sql[i - 1] : "";
+        inEscapeString = before === "E" || before === "e";
+        inSingle = true;
+        i++;
+        continue;
+      }
+
+      if (c === ";") {
+        results.push(sql.slice(start, i + 1).trim());
+        i++;
+        closed = true;
+        break;
+      }
+
+      i++;
+    }
+
+    if (!closed) {
+      const rest = sql.slice(start).trim();
+      if (rest) results.push(rest);
+      break;
+    }
+  }
+
+  return results.filter((s) => /^(INSERT\s+INTO|SET\s+)/i.test(s));
+}
+
+function escapeSqlString(str: string): string {
+  // Keep each INSERT on one physical line: use escape-string syntax for
+  // values that contain newlines / backslashes; otherwise standard quotes.
+  if (!/[\n\r\\]/.test(str)) {
+    return `'${str.replace(/'/g, "''")}'`;
+  }
+  const escaped = str
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r");
+  return `E'${escaped}'`;
 }
 
 function escapeValue(val: unknown): string {
@@ -46,17 +142,14 @@ function escapeValue(val: unknown): string {
   if (Array.isArray(val)) {
     if (val.length === 0) return "ARRAY[]::text[]";
     const inner = val.map((v) =>
-      v === null || v === undefined
-        ? "NULL"
-        : `'${String(v).replace(/'/g, "''")}'`
+      v === null || v === undefined ? "NULL" : escapeSqlString(String(v))
     );
     return `ARRAY[${inner.join(",")}]`;
   }
   if (typeof val === "object") {
-    return `'${JSON.stringify(val).replace(/'/g, "''")}'`;
+    return escapeSqlString(JSON.stringify(val));
   }
-  const str = String(val);
-  return `'${str.replace(/'/g, "''")}'`;
+  return escapeSqlString(String(val));
 }
 
 function sortTables(names: string[]): string[] {

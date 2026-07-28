@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth/auth";
 import { pool } from "@/lib/db/db";
 import {
   extractInsertTable,
+  splitSqlStatements,
   tableRestorePriority,
 } from "@/lib/db/backup";
 
@@ -15,18 +16,11 @@ async function requireAdmin() {
   return session;
 }
 
-function splitStatements(sql: string): string[] {
-  return sql
-    .split("\n")
-    .map((s) => s.trim())
-    .filter((t) => t.startsWith("INSERT INTO") || t.startsWith("SET "));
-}
-
 /** Sort INSERTs by FK-safe table order; keep SET statements first. */
 function orderStatements(statements: string[]): string[] {
-  const sets = statements.filter((s) => s.startsWith("SET "));
+  const sets = statements.filter((s) => /^SET\s+/i.test(s));
   const inserts = statements
-    .filter((s) => s.startsWith("INSERT INTO"))
+    .filter((s) => /^INSERT\s+INTO/i.test(s))
     .sort((a, b) => {
       const ta = extractInsertTable(a) ?? "";
       const tb = extractInsertTable(b) ?? "";
@@ -87,9 +81,10 @@ export async function POST(
   }
 
   const sql = await fileRes.text();
-  const statements = orderStatements(splitStatements(sql));
+  const statements = orderStatements(splitSqlStatements(sql));
+  const insertCount = statements.filter((s) => /^INSERT\s+INTO/i.test(s)).length;
 
-  if (statements.filter((s) => s.startsWith("INSERT")).length === 0) {
+  if (insertCount === 0) {
     return NextResponse.json({ error: "No INSERT statements found in backup file." }, { status: 400 });
   }
 
@@ -105,18 +100,15 @@ export async function POST(
     await client.query("SET LOCAL session_replication_role = replica").catch(() => {});
 
     for (const stmt of statements) {
-      if (stmt.startsWith("SET ")) {
+      if (/^SET\s+/i.test(stmt)) {
         // Ignore dump-level SET session_replication_role — we handle it above.
         if (/session_replication_role/i.test(stmt)) continue;
         await client.query(stmt).catch(() => {});
         continue;
       }
 
-      const safeStmt = fixEmptyArrays(
-        stmt.endsWith(";")
-          ? stmt.slice(0, -1) + " ON CONFLICT DO NOTHING;"
-          : stmt + " ON CONFLICT DO NOTHING;"
-      );
+      const trimmed = stmt.trim().replace(/;$/, "");
+      const safeStmt = fixEmptyArrays(`${trimmed} ON CONFLICT DO NOTHING;`);
 
       // SAVEPOINT so one failed INSERT does not abort the whole transaction
       await client.query("SAVEPOINT restore_row");
@@ -148,7 +140,7 @@ export async function POST(
   return NextResponse.json({
     ok: true,
     filename,
-    total: statements.filter((s) => s.startsWith("INSERT")).length,
+    total: insertCount,
     inserted,
     skipped,
     errors: errorMessages,
