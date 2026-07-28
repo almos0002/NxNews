@@ -41,3 +41,4 @@ next-env.d.ts
 
 # attached pasted snippets (workspace-only)
 /attached_assets/Pasted-*.txt
+.env

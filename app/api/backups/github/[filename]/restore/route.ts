@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 import { pool } from "@/lib/db/db";
+import {
+  extractInsertTable,
+  tableRestorePriority,
+} from "@/lib/db/backup";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -14,12 +18,26 @@ async function requireAdmin() {
 function splitStatements(sql: string): string[] {
   return sql
     .split("\n")
-    .filter((line) => {
-      const t = line.trim();
-      return t.startsWith("INSERT INTO") || t.startsWith("SET ");
-    })
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter((t) => t.startsWith("INSERT INTO") || t.startsWith("SET "));
+}
+
+/** Sort INSERTs by FK-safe table order; keep SET statements first. */
+function orderStatements(statements: string[]): string[] {
+  const sets = statements.filter((s) => s.startsWith("SET "));
+  const inserts = statements
+    .filter((s) => s.startsWith("INSERT INTO"))
+    .sort((a, b) => {
+      const ta = extractInsertTable(a) ?? "";
+      const tb = extractInsertTable(b) ?? "";
+      const diff = tableRestorePriority(ta) - tableRestorePriority(tb);
+      return diff !== 0 ? diff : ta.localeCompare(tb);
+    });
+  return [...sets, ...inserts];
+}
+
+function fixEmptyArrays(stmt: string): string {
+  return stmt.replace(/ARRAY\[\]/g, "ARRAY[]::text[]");
 }
 
 export async function POST(
@@ -43,7 +61,6 @@ export async function POST(
     return NextResponse.json({ error: "Invalid filename." }, { status: 400 });
   }
 
-  // Fetch file metadata from GitHub
   const metaRes = await fetch(
     `https://api.github.com/repos/${repo}/contents/backups/${filename}`,
     {
@@ -70,9 +87,9 @@ export async function POST(
   }
 
   const sql = await fileRes.text();
-  const statements = splitStatements(sql);
+  const statements = orderStatements(splitStatements(sql));
 
-  if (statements.length === 0) {
+  if (statements.filter((s) => s.startsWith("INSERT")).length === 0) {
     return NextResponse.json({ error: "No INSERT statements found in backup file." }, { status: 400 });
   }
 
@@ -84,24 +101,35 @@ export async function POST(
   try {
     await client.query("BEGIN");
 
+    // Best-effort: skip FK/trigger checks if the role allows it (Neon often does not).
+    await client.query("SET LOCAL session_replication_role = replica").catch(() => {});
+
     for (const stmt of statements) {
       if (stmt.startsWith("SET ")) {
+        // Ignore dump-level SET session_replication_role — we handle it above.
+        if (/session_replication_role/i.test(stmt)) continue;
         await client.query(stmt).catch(() => {});
         continue;
       }
 
-      try {
-        // Add ON CONFLICT DO NOTHING so existing rows are skipped cleanly
-        const safeStmt = stmt.endsWith(";")
+      const safeStmt = fixEmptyArrays(
+        stmt.endsWith(";")
           ? stmt.slice(0, -1) + " ON CONFLICT DO NOTHING;"
-          : stmt + " ON CONFLICT DO NOTHING;";
+          : stmt + " ON CONFLICT DO NOTHING;"
+      );
+
+      // SAVEPOINT so one failed INSERT does not abort the whole transaction
+      await client.query("SAVEPOINT restore_row");
+      try {
         const result = await client.query(safeStmt);
+        await client.query("RELEASE SAVEPOINT restore_row");
         if (result.rowCount && result.rowCount > 0) {
           inserted++;
         } else {
           skipped++;
         }
       } catch (err) {
+        await client.query("ROLLBACK TO SAVEPOINT restore_row");
         skipped++;
         const msg = err instanceof Error ? err.message : String(err);
         if (errorMessages.length < 5) errorMessages.push(msg);
@@ -110,7 +138,7 @@ export async function POST(
 
     await client.query("COMMIT");
   } catch (err) {
-    await client.query("ROLLBACK");
+    await client.query("ROLLBACK").catch(() => {});
     const msg = err instanceof Error ? err.message : "Restore failed";
     return NextResponse.json({ error: msg }, { status: 500 });
   } finally {
